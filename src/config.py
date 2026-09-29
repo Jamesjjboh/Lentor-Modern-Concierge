@@ -11,8 +11,9 @@ GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
 GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-3.8-flash")
 
 # Telegram Bot Config
-TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN", "")
-ADMIN_TELEGRAM_ID = int(os.getenv("ADMIN_TELEGRAM_ID", "0")) if os.getenv("ADMIN_TELEGRAM_ID") else None
+raw_admin_id = os.getenv("ADMIN_TELEGRAM_ID", "").strip()
+ADMIN_TELEGRAM_ID = int(raw_admin_id) if raw_admin_id.isdigit() else None
+
 
 # Google Cloud Platform & Firestore
 GCP_PROJECT_ID = os.getenv("GCP_PROJECT_ID", "")

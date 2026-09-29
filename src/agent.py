@@ -205,32 +205,49 @@ class LentorAgent:
             # Fallback simulator for local testing before API key is provided
             return self._simulated_response(user_query, user_id)
 
-        try:
-            # Create a tool-calling session using Gemini 3.8 Flash
-            config = types.GenerateContentConfig(
-                system_instruction=SYSTEM_INSTRUCTION,
-                tools=TOOL_FUNCTIONS,
-                temperature=0.3,
-            )
+        candidate_models = [self.model]
+        for fallback in ["gemini-3.5-flash", "gemini-3.1-flash-lite"]:
+            if fallback not in candidate_models:
+                candidate_models.append(fallback)
 
-            # Generate content with tools enabled
-            response = self.client.models.generate_content(
-                model=self.model,
-                contents=user_query,
-                config=config,
-            )
+        config = types.GenerateContentConfig(
+            system_instruction=SYSTEM_INSTRUCTION,
+            tools=TOOL_FUNCTIONS,
+            temperature=0.3,
+        )
 
-            # Inspect function calls if any were triggered
-            final_text = response.text or ""
-            if response.function_calls:
-                for call in response.function_calls:
-                    tools_called.append(call.name)
+        last_error = None
+        for current_model in candidate_models:
+            try:
+                chat = self.client.chats.create(
+                    model=current_model,
+                    config=config,
+                )
 
-            return final_text, tools_called
+                response = chat.send_message(user_query)
+                final_text = response.text or ""
 
-        except Exception as e:
-            logger.error(f"Error in Gemini agent query execution: {e}")
-            return f"I encountered an unexpected issue processing your query: {e}. Please try again shortly.", tools_called
+                # Check history for tool calls executed by the agent
+                for msg in chat.get_history():
+                    for part in getattr(msg, "parts", []):
+                        fn_call = getattr(part, "function_call", None)
+                        if fn_call and fn_call.name:
+                            tools_called.append(fn_call.name)
+
+                return final_text, tools_called
+
+            except Exception as e:
+                last_error = e
+                # If error is a transient 503 spike, try next candidate model
+                if "503" in str(e) or "UNAVAILABLE" in str(e):
+                    logger.warning(f"Model {current_model} returned 503. Cascading to next fallback model...")
+                    continue
+                else:
+                    logger.error(f"Error in Gemini agent query execution with {current_model}: {e}")
+                    break
+
+        return f"I encountered an unexpected issue processing your query: {last_error}. Please try again shortly.", tools_called
+
 
     def _simulated_response(self, user_query: str, user_id: int) -> Tuple[str, List[str]]:
         """Rule-based simulation mode for testing when Gemini API key is not yet set."""

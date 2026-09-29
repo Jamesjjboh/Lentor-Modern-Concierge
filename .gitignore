@@ -1,0 +1,18 @@
+# Sensitive Raw Community & Estate Data
+data/raw/*
+!data/raw/.gitkeep
+*.session
+*.session-journal
+
+# Environment & Credentials
+.env
+.env.*
+!.env.example
+
+# Python
+__pycache__/
+*.py[cod]
+venv/
+.venv/
+.DS_Store
+

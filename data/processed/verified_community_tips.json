@@ -1,0 +1,27 @@
+[
+  {
+    "tip_id": "tip_seed_1",
+    "topic": "aircon",
+    "content": "For 3-bedroom and 4-bedroom units, the outdoor aircon ledge accommodates up to 2 multi-split condensing units. Make sure your aircon installer uses copper piping grade 22 SWG as mandated by building management, otherwise MA will reject the installation during inspection."
+  },
+  {
+    "tip_id": "tip_seed_2",
+    "topic": "wifi",
+    "content": "When NetLink Trust comes to activate your fiber, remember to tell the security guardhouse at Tower 1 that your installer needs the riser key for your floor. If you don't collect the key before the installer goes up, they often reschedule."
+  },
+  {
+    "tip_id": "tip_seed_3",
+    "topic": "deliveries",
+    "content": "For bulky furniture deliveries (Taobao, IKEA, Courts), remind delivery drivers that the residential loading bay entrance is on Lentor Hills Road (not the mall car park entrance on Lentor Central). Height limit is 3.8m."
+  },
+  {
+    "tip_id": "tip_seed_4",
+    "topic": "mall",
+    "content": "CS Fresh has a daily discount on sushi boxes and pre-packed salads starting around 8:30 PM (20% off) and increasing up to 30%-40% after 9:30 PM."
+  },
+  {
+    "tip_id": "tip_seed_5",
+    "topic": "appliances",
+    "content": "If your kitchen induction hob starts beeping with an 'L' symbol, the child safety lock has been accidentally engaged. Hold down the key/lock icon for 3 full seconds until the beep stops."
+  }
+]

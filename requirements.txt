@@ -1,0 +1,7 @@
+google-genai
+python-telegram-bot
+pydantic
+python-dotenv
+chromadb
+pypdf
+google-cloud-firestore

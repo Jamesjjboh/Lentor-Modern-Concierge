@@ -4,7 +4,7 @@ Supports graceful fallback to an in-memory/mock store when GCP credentials are n
 """
 
 import logging
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from typing import Any, Dict, List, Optional
 
 from google.cloud import firestore
@@ -357,41 +357,43 @@ class DatabaseClient:
             return {"total_feedback": 0, "unresolved_feedback": 0}
 
     # --- Analytics & Content Gaps ---
-    def get_analytics_summary(self) -> Dict[str, Any]:
-        """Summarizes total users, total queries, content gaps, and feedback counts."""
-        fb_stats = self.get_feedback_stats()
+    def _fetch_analytics_inputs(self, days: Optional[int]) -> Dict[str, List[Dict[str, Any]]]:
+        """Fetches raw users, query logs (>= max(window, 7 days)), and feedback for analytics."""
+        since_days = None if not days else max(days, 7)
+        since_iso = (
+            (datetime.now(timezone.utc) - timedelta(days=since_days)).isoformat() if since_days else None
+        )
+
         if self._mock_mode or not self.db:
-            total_users = len(self._mock_users)
-            total_queries = len(self._mock_logs)
-            unanswered = [
-                log["user_query"] for log in self._mock_logs
-                if not log.get("answered_successfully", True)
+            logs = [
+                l for l in self._mock_logs
+                if since_iso is None or l.get("timestamp", "") >= since_iso
             ]
             return {
-                "total_users": total_users,
-                "total_queries": total_queries,
-                "unanswered_count": len(unanswered),
-                "unanswered_examples": unanswered[:5],
-                "total_feedback": fb_stats["total_feedback"],
-                "unresolved_feedback": fb_stats["unresolved_feedback"],
+                "users": list(self._mock_users.values()),
+                "logs": logs,
+                "feedback": list(self._mock_feedback.values()),
             }
 
-        users_count = len(list(self.db.collection("users").limit(1000).stream()))
-        unanswered_docs = (
-            self.db.collection("query_logs")
-            .where("answered_successfully", "==", False)
-            .limit(10)
-            .stream()
-        )
-        unanswered_queries = [d.to_dict().get("user_query", "") for d in unanswered_docs]
+        users = [d.to_dict() or {} for d in self.db.collection("users").limit(2000).stream()]
+        logs_ref = self.db.collection("query_logs")
+        if since_iso:
+            # Single-field range filter: no composite index required (timestamps are ISO-8601 UTC strings).
+            logs_ref = logs_ref.where("timestamp", ">=", since_iso)
+        logs = [d.to_dict() or {} for d in logs_ref.limit(5000).stream()]
+        feedback = [d.to_dict() or {} for d in self.db.collection("resident_feedback").limit(1000).stream()]
+        return {"users": users, "logs": logs, "feedback": feedback}
 
-        return {
-            "total_users": users_count,
-            "unanswered_count": len(unanswered_queries),
-            "unanswered_examples": unanswered_queries[:5],
-            "total_feedback": fb_stats["total_feedback"],
-            "unresolved_feedback": fb_stats["unresolved_feedback"],
-        }
+    def get_analytics_summary(self, days: Optional[int] = 7) -> Dict[str, Any]:
+        """Summarizes users, queries, topics, ranked content gaps, and feedback for the last `days` days (None = all time)."""
+        from src.analytics import compute_analytics
+
+        try:
+            data = self._fetch_analytics_inputs(days)
+            return compute_analytics(data["users"], data["logs"], data["feedback"], days=days)
+        except Exception as e:
+            logger.error(f"Analytics fetch failed: {e}")
+            return compute_analytics([], [], [], days=days)
 
 
 # Global singleton instance

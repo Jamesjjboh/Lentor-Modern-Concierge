@@ -3,6 +3,7 @@ Supports 1-on-1 resident chats, interactive admin moderation, broadcast engine, 
 Runs via long-polling in local development, and supports webhook for Cloud Run deployment.
 """
 
+import asyncio
 import logging
 import os
 from telegram import Chat, InlineKeyboardButton, InlineKeyboardMarkup, Update
@@ -20,12 +21,14 @@ from telegram.request import HTTPXRequest
 
 import re
 
+from src import analytics
 from src.admin import (
     handle_admin_stats_command,
     handle_broadcast_command,
     handle_feedback_callback,
     handle_moderation_callback,
     handle_reply_command,
+    handle_stats_callback,
     is_admin,
     notify_admin_new_feedback,
     notify_admin_new_tip,
@@ -63,6 +66,37 @@ def get_quick_menu_keyboard() -> InlineKeyboardMarkup:
 def get_back_to_menu_keyboard() -> InlineKeyboardMarkup:
     """Returns a Back to Quick Menu button."""
     return InlineKeyboardMarkup([[InlineKeyboardButton("◀️ Back to Quick Menu", callback_data="menu_main")]])
+
+
+def get_unanswered_fallback_keyboard() -> InlineKeyboardMarkup:
+    """Returns interactive 1-tap options when a question cannot be factually answered."""
+    keyboard = [
+        [
+            InlineKeyboardButton("✉️ Draft Email to MA", callback_data="fallback_draft_ma"),
+            InlineKeyboardButton("🏢 On-Site Contacts", callback_data="menu_contacts"),
+        ],
+        [
+            InlineKeyboardButton("◀️ Quick Menu", callback_data="menu_main"),
+        ],
+    ]
+    return InlineKeyboardMarkup(keyboard)
+
+
+async def _keep_typing(bot, chat_id: int, stop_event: asyncio.Event):
+    """Periodically emits ChatAction.TYPING every 3.5 seconds until stop_event is set.
+    Telegram's typing indicator naturally expires after ~4-5s, so this background heartbeat
+    ensures the user clearly sees that the bot is actively thinking/processing.
+    """
+    while not stop_event.is_set():
+        try:
+            await bot.send_chat_action(chat_id=chat_id, action=ChatAction.TYPING)
+        except Exception:
+            pass
+        try:
+            await asyncio.wait_for(stop_event.wait(), timeout=3.5)
+        except asyncio.TimeoutError:
+            pass
+
 
 
 async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -130,6 +164,19 @@ async def handle_quick_menu_callback(update: Update, context: ContextTypes.DEFAU
         )
         return
 
+    # Track quick-menu usage (kept separate from typed questions in analytics)
+    if action in analytics.MENU_LABELS:
+        try:
+            db_client.log_query(
+                user_id=user.id,
+                user_query=f"{analytics.MENU_PREFIX}{action}",
+                tools_called=[action],
+                agent_response="",
+                answered_successfully=True,
+            )
+        except Exception as e:
+            logger.warning(f"Failed to log menu tap: {e}")
+
     back_markup = get_back_to_menu_keyboard()
 
     if action == "menu_contacts":
@@ -178,7 +225,7 @@ async def handle_quick_menu_callback(update: Update, context: ContextTypes.DEFAU
         text = (
             "🏬 *Lentor Modern Mall Highlights:*\n\n"
             "• 🛒 *CS Fresh Supermarket:* Basement 1 (#B1-11 to 16) | 08:00 – 22:00 daily\n"
-            "• 👶 *ChildFirst Childcare:* Level 2 (#02-01)\n"
+            "• 👶 *Mulberry Learning @ Lentor (preschool & childcare):* Level 2 (#02-01)\n"
             "• 🏷️ *Resident Discounts (31 Merchants):* Flash your Resident Access Card for 5%–15% off at Burger King, KFC, Ajumma's, QB Premium, Tim Hortons, etc.\n"
             "• 🎟️ *GuocoLand e-Vouchers:* Accepted at 11 participating outlets\n"
             "• 📲 *ResiQ Digital Portal:* Queue for QB Premium or order food online at [resiq-lm.vercel.app](https://resiq-lm.vercel.app/)\n"
@@ -214,6 +261,43 @@ async def handle_quick_menu_callback(update: Update, context: ContextTypes.DEFAU
     )
 
 
+async def handle_fallback_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Handles 1-tap fallback buttons (e.g. drafting MA email) when a question is unanswered."""
+    query = update.callback_query
+    if not query:
+        return
+    await query.answer()
+
+    action = query.data
+    user = query.from_user
+
+    if action == "fallback_draft_ma":
+        draft = (
+            "✉️ *Ready-to-Send Email Draft to Managing Agent (CBRE):*\n\n"
+            "```\n"
+            "To: managementoffice@LT-MODERN.COM\n"
+            "Cc: concierge@LT-MODERN.COM\n"
+            "Subject: [Lentor Modern] Resident Inquiry / Request\n\n"
+            "Dear Managing Agent (CBRE) / Estate Management Office,\n\n"
+            "I am writing as a resident of Lentor Modern regarding:\n"
+            "[Please describe your request, maintenance item, or question here]\n\n"
+            "In accordance with estate management guidelines, could you kindly advise on the next steps or arrange for follow-up?\n\n"
+            "Thank you for your assistance.\n\n"
+            "Best regards,\n"
+            f"{user.first_name or 'Resident'}\n"
+            "Unit: [Your Unit # / Tower]\n"
+            "Contact: [Your Mobile #]\n"
+            "```\n\n"
+            "💡 *Tips:* You can also call the Estate Office directly at `+65 6054 3370` (Mon–Fri 9am–6pm, Sat 9am–1pm) or visit Level 3 at 9 Lentor Central."
+        )
+        await query.message.reply_text(
+            text=draft,
+            parse_mode="Markdown",
+            reply_markup=get_back_to_menu_keyboard(),
+        )
+
+
+
 async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Handles /help command."""
     if not update.message:
@@ -230,7 +314,7 @@ async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "*Admin Commands:*\n"
         "• `/reply <user_id> <message>` — Send direct message to a resident.\n"
         "• `/broadcast <message>` — Send estate broadcast to registered residents.\n"
-        "• `/admin_stats` — View resident activity, feedback, and content gaps."
+        "• `/admin_stats [7|30|all]` — Analytics dashboard (users, topics, content gaps, feedback). You can also just ask, e.g. _\"what did residents ask most this week?\"_"
     )
     await update.message.reply_text(
         help_text,
@@ -428,19 +512,38 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
 
     user_query = message.text.strip()
-    
+
+    # Admin-only conversational analytics (e.g. "what did residents ask most this week?")
+    if is_admin(user.id) and analytics.is_analytics_question(user_query):
+        await context.bot.send_chat_action(chat_id=message.chat_id, action=ChatAction.TYPING)
+        q_lower = user_query.lower()
+        window = 30 if ("month" in q_lower or "30" in q_lower) else (None if "all time" in q_lower else 7)
+        summary = db_client.get_analytics_summary(days=window)
+        answer = analytics.answer_admin_question(user_query, summary, concierge_agent)
+        try:
+            await message.reply_text(answer, reply_markup=analytics.stats_keyboard(window), parse_mode="Markdown")
+        except Exception:
+            # LLM output may contain Markdown Telegram rejects; resend as plain text.
+            await message.reply_text(answer, reply_markup=analytics.stats_keyboard(window))
+        return
+
     # Register / update user activity
     db_client.get_or_create_user(user_id=user.id, username=user.username, first_name=user.first_name)
     db_client.increment_user_query(user_id=user.id)
 
-    # Show Telegram typing indicator
-    await context.bot.send_chat_action(chat_id=message.chat_id, action=ChatAction.TYPING)
-
-    # Execute autonomous agent query
-    response_text, tools_called = concierge_agent.run_query(user_query=user_query, user_id=user.id)
+    # Execute autonomous agent query non-blockingly with persistent typing heartbeat
+    stop_typing_event = asyncio.Event()
+    typing_task = asyncio.create_task(_keep_typing(context.bot, message.chat_id, stop_typing_event))
+    try:
+        response_text, tools_called = await asyncio.to_thread(
+            concierge_agent.run_query, user_query=user_query, user_id=user.id
+        )
+    finally:
+        stop_typing_event.set()
+        await typing_task
 
     # Log query into Firestore for content gap detection
-    answered_successfully = not ("I don't know" in response_text or "No official by-laws found" in response_text)
+    answered_successfully = analytics.is_answered(response_text, tools_called)
     db_client.log_query(
         user_id=user.id,
         user_query=user_query,
@@ -476,7 +579,21 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
             message=user_query,
         )
 
-    await message.reply_text(response_text)
+    # If the query could not be factually answered, polish reply and provide 1-tap fallback buttons
+    if not answered_successfully:
+        fallback_prompt = (
+            f"{response_text}\n\n"
+            f"━━━━━━━━━━━━━━━━━━━\n"
+            f"💡 *Would you like me to help you take the next step?*\n"
+            f"• Tap *Draft Email to MA* to generate a formatted email draft.\n"
+            f"• Tap *On-Site Contacts* for estate office phone numbers."
+        )
+        await message.reply_text(
+            fallback_prompt,
+            reply_markup=get_unanswered_fallback_keyboard(),
+        )
+    else:
+        await message.reply_text(response_text)
 
 
 async def handle_photo(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -509,12 +626,19 @@ async def handle_photo(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await message.reply_text("Sorry, I had trouble downloading your photo. Please try sending it again.")
         return
 
-    # Multimodal image analysis using Gemini 3.8 Flash Vision
-    result = concierge_agent.analyze_resident_image(
-        image_bytes=bytes(photo_bytes),
-        caption=caption,
-        user_id=user.id,
-    )
+    # Multimodal image analysis using Gemini 3.8 Flash Vision with persistent typing heartbeat
+    stop_photo_event = asyncio.Event()
+    typing_photo_task = asyncio.create_task(_keep_typing(context.bot, message.chat_id, stop_photo_event))
+    try:
+        result = await asyncio.to_thread(
+            concierge_agent.analyze_resident_image,
+            image_bytes=bytes(photo_bytes),
+            caption=caption,
+            user_id=user.id,
+        )
+    finally:
+        stop_photo_event.set()
+        await typing_photo_task
 
     intent = result.get("intent", "RESIDENT_QUESTION")
     topic = result.get("topic", "general")
@@ -617,8 +741,10 @@ def create_bot_app() -> Application:
 
     # Callback handler for resident interactive 1-tap quick action menu
     app.add_handler(CallbackQueryHandler(handle_quick_menu_callback, pattern=r"^menu_"))
+    app.add_handler(CallbackQueryHandler(handle_fallback_callback, pattern=r"^fallback_"))
 
     # Callback handler for admin interactive inline moderation buttons
+    app.add_handler(CallbackQueryHandler(handle_stats_callback, pattern=r"^stats_"))
     app.add_handler(CallbackQueryHandler(handle_moderation_callback, pattern=r"^mod_"))
     app.add_handler(CallbackQueryHandler(handle_feedback_callback, pattern=r"^fb_"))
 

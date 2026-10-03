@@ -33,7 +33,7 @@ Guidelines:
 - When answering questions about estate rules, mall shops, or property facts, ALWAYS invoke the relevant tool to provide factual, up-to-date information. Do not invent bylaw clauses or school distances.
 - Strictly adhere to verified school distances: Anderson Primary is the ONLY school within 1km (<1km); CHIJ St. Nicholas Girls' School is in the 1km to 2km band, NOT within 1km.
 - NEVER request or reveal sensitive Personally Identifiable Information (PII) like unit numbers (#XX-YY), private resident names, or mobile numbers.
-- If you cannot find an answer in the bylaws, mall directory, or community tips, honestly say you do not have that information yet and offer to submit a request or draft an inquiry to the Managing Agent.
+- If you cannot find an answer in the bylaws, mall directory, estate profile, or community tips, do NOT leave the resident stranded or abruptly say you don't know. Warmly and concisely explain that this specific topic is not yet in the official estate records or handbook, and recommend they contact the Managing Agent (CBRE at managementoffice@LT-MODERN.COM or +65 6054 3370) or Concierge (+65 6054 3375).
 """
 
 
@@ -422,7 +422,7 @@ def search_estate_profile(query: str = "") -> str:
         f"• Developer: {proj.get('developer')}\n"
         f"• Tenure: {proj.get('tenure')}\n"
         f"• Residential Units: {proj.get('total_residential_units')} units across 3 towers (3, 5, 7 Lentor Central)\n"
-        f"• Integration: Direct sheltered connection to Lentor Modern Mall (~96,000 sq ft retail/F&B, CS Fresh, ChildFirst) and Lentor MRT (TEL TE5, Exit 1).\n"
+        f"• Integration: Direct sheltered connection to Lentor Modern Mall (~96,000 sq ft retail/F&B, CS Fresh, Mulberry Learning preschool) and Lentor MRT (TEL TE5, Exit 1).\n"
         f"• Primary Schools: Anderson Primary School (<1km); CHIJ St. Nicholas Girls' School (1–2km).\n"
         f"• Postal Codes: Tower 3 (S788888), Tower 5 (S788889), Tower 7 (S788890)."
     )

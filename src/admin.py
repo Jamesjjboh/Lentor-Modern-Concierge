@@ -5,8 +5,10 @@ import logging
 from typing import Optional
 
 from telegram import ForceReply, InlineKeyboardButton, InlineKeyboardMarkup, Update
+from telegram.error import BadRequest
 from telegram.ext import ContextTypes
 
+from src import analytics
 from src.config import ADMIN_TELEGRAM_ID
 from src.database import db_client
 
@@ -329,31 +331,51 @@ async def handle_reply_command(update: Update, context: ContextTypes.DEFAULT_TYP
 
 
 async def handle_admin_stats_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """Admin command `/admin_stats` showing total users, activity, feedback, and content gaps."""
+    """Admin command `/admin_stats [7|30|all]` showing the text-first analytics dashboard."""
     user = update.effective_user
     if not user or not is_admin(user.id):
         if update.message:
             await update.message.reply_text("⛔ This command is restricted to estate administrators.")
         return
 
-    stats = db_client.get_analytics_summary()
-    unanswered_lines = ""
-    for idx, q in enumerate(stats.get("unanswered_examples", []), start=1):
-        unanswered_lines += f"\n  {idx}. \"{q}\""
+    days: Optional[int] = 7
+    if context.args:
+        arg = context.args[0].lower().rstrip("d")
+        if arg == "all":
+            days = None
+        elif arg.isdigit() and int(arg) > 0:
+            days = int(arg)
 
-    if not unanswered_lines:
-        unanswered_lines = "\n  (No unanswered queries logged yet 🎉)"
-
-    total_fb = stats.get("total_feedback", 0)
-    unresolved_fb = stats.get("unresolved_feedback", 0)
-
-    report = (
-        f"📊 *Lentor Modern Concierge Analytics*\n\n"
-        f"👥 *Total Registered Households:* {stats.get('total_users', 0)}\n"
-        f"💬 *Total Queries Logged:* {stats.get('total_queries', 0)}\n"
-        f"💡 *Resident Feedback:* {total_fb} total ({unresolved_fb} new)\n"
-        f"❓ *Unanswered Content Gaps ({stats.get('unanswered_count', 0)}):*{unanswered_lines}\n\n"
-        f"_Use this report to identify missing bylaws, bug reports, or untracked mall shops._"
-    )
+    stats = db_client.get_analytics_summary(days=days)
     if update.message:
-        await update.message.reply_text(report, parse_mode="Markdown")
+        await update.message.reply_text(
+            analytics.format_dashboard(stats),
+            reply_markup=analytics.stats_keyboard(days),
+            parse_mode="Markdown",
+        )
+
+
+async def handle_stats_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Handles the admin dashboard inline buttons (7d / 30d / All / Full gap list / Refresh)."""
+    query = update.callback_query
+    if not query:
+        return
+    await query.answer()
+
+    user_id = update.effective_user.id if update.effective_user else 0
+    if not is_admin(user_id):
+        await query.edit_message_text("⛔ This dashboard is restricted to estate administrators.")
+        return
+
+    view, days = analytics.parse_stats_callback(query.data or "stats_7")
+    stats = db_client.get_analytics_summary(days=days)
+    text = analytics.format_gaps(stats) if view == "gaps" else analytics.format_dashboard(stats)
+    try:
+        await query.edit_message_text(
+            text,
+            reply_markup=analytics.stats_keyboard(days),
+            parse_mode="Markdown",
+        )
+    except BadRequest as e:
+        if "not modified" not in str(e).lower():
+            logger.error(f"Failed to update stats dashboard: {e}")

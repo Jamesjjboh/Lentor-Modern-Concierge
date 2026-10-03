@@ -86,8 +86,23 @@ flowchart TD
 * Admin command: `/broadcast 📢 Lift maintenance for Tower 1 tomorrow from 10am to 12pm.`
 * Iterates through all registered users in Firestore with safety rate-limiting (25 msgs/sec).
 
-### 3. Product Analytics & Content Gaps (`/admin_stats`)
-* Displays total registered households, total query volume, feedback counts, and a list of **unanswered questions** (highlighting missing estate documentation or untracked mall shops).
+### 3. Product Analytics & Content Gaps (`/admin_stats [7|30|all]`)
+An instant, text-first dashboard (no chart rendering), with inline buttons `[ 7d ] [ 30d ] [ All ] [ 📋 Full gap list ] [ 🔄 Refresh ]`.
+
+| Metric | Definition |
+| :--- | :--- |
+| **Registered users** | Unique Telegram accounts that have started or messaged the bot. This is **not** a household count: one home may have several users, and no unit numbers are collected (privacy by design). |
+| **New / Active 7d / Active 30d** | Users first seen in the window, and users active in the last 7 / 30 days. |
+| **Adoption ≈** | Registered users ÷ 605 units. An approximation only (users, not households). |
+| **Questions asked** | Typed and photo questions in the window. Quick-menu taps are tracked separately and are *not* counted as questions. |
+| **Answer rate** | Share of questions the bot could answer, detected from the reply wording (e.g. "I don't have…", "No shops found…", "couldn't find…"), not just two fixed phrases. |
+| **Top topics** | Questions grouped by the tool used (handbook, mall, transit/estate profile, tips, etc.). |
+| **Quick-menu taps** | How often each `/menu` button is used. |
+| **Content gaps** | Unanswered questions, de-duplicated and ranked by how often they were asked (`"Is there a pet salon?" ×7`). |
+| **Feedback** | Totals, new/unresolved count, breakdown by type (bug / data correction / feature request) and age of the oldest unresolved item. |
+
+* **Daily sparkline:** a 7-day question trend, e.g. `▁▃▅▂▇▄▂`.
+* **Conversational analytics (admin only):** just ask in chat, e.g. *"What did residents ask most this week?"* or *"How many users do we have?"*. Gemini answers using only the verified aggregates (never raw resident messages) and cites exact numbers.
 
 ### 4. Multimodal Vision & Photo Ingestion
 * Residents can snap photos of mall flyers, opening hours notices, or appliance error codes directly in Telegram without typing.
@@ -178,20 +193,29 @@ Lentor Modern Concierge/
 │   ├── raw/                  # Raw PDFs & Telegram exports (strictly git-ignored)
 │   └── processed/            # Cleaned, PII-scrubbed JSON knowledge chunks
 ├── scripts/
-│   └── cleanup-policy.json   # Artifact Registry lifecycle policy (keeps max 2 builds)
+│   ├── cleanup-policy.json   # Artifact Registry lifecycle policy (keeps max 2 builds)
+│   └── ingest_knowledge.py   # Knowledge ingestion pipeline (PDFs, chat exports, ResiQ)
 ├── src/
 │   ├── __init__.py
 │   ├── config.py             # Decoupled environment & model settings
 │   ├── parser.py             # PDF extractor & Singapore PII scrubber
-│   ├── database.py           # Firestore client & O(1) query models
-│   ├── agent.py              # Gemini 3.8 Flash agent & 5 tools
-│   ├── admin.py              # In-chat moderation callbacks & /broadcast engine
-│   └── bot.py                # Telegram bot application & webhook runner
+│   ├── database.py           # Firestore client & query models
+│   ├── agent.py              # Gemini 3.8 Flash agent & 7 tools
+│   ├── analytics.py          # Admin analytics engine: metrics, content gaps, dashboard, Q&A
+│   ├── admin.py              # In-chat moderation callbacks, /broadcast & /admin_stats
+│   └── bot.py                # Telegram bot, 1-tap /menu & webhook runner
+├── tests/
+│   └── test_analytics.py     # Unit tests for the analytics engine
 ├── Dockerfile                # Production Cloud Run container specification
 ├── deploy.sh                 # Zero-downtime deployment script with webhook registration
 ├── requirements.txt          # Python dependencies
 ├── CHANGELOG.md              # Semantic release history
 └── README.md                 # Project documentation
+```
+
+### Run the tests
+```bash
+PYTHONPATH=. python -m unittest tests.test_analytics
 ```
 
 ---

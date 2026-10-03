@@ -5,7 +5,7 @@ Runs via long-polling in local development, and supports webhook for Cloud Run d
 
 import logging
 import os
-from telegram import Chat, Update
+from telegram import Chat, InlineKeyboardButton, InlineKeyboardMarkup, Update
 from telegram.constants import ChatAction
 from telegram.ext import (
     Application,
@@ -41,8 +41,32 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
+def get_quick_menu_keyboard() -> InlineKeyboardMarkup:
+    """Returns the 6-button interactive 1-tap quick action keyboard for residents."""
+    keyboard = [
+        [
+            InlineKeyboardButton("🏢 Estate Contacts", callback_data="menu_contacts"),
+            InlineKeyboardButton("🏊 Facilities & Gym", callback_data="menu_facilities"),
+        ],
+        [
+            InlineKeyboardButton("🚇 Transit & Buses", callback_data="menu_transit"),
+            InlineKeyboardButton("🏬 Mall & Deals", callback_data="menu_mall"),
+        ],
+        [
+            InlineKeyboardButton("🔨 Moving & Reno", callback_data="menu_reno"),
+            InlineKeyboardButton("📱 iPlus Living Guide", callback_data="menu_iplus"),
+        ],
+    ]
+    return InlineKeyboardMarkup(keyboard)
+
+
+def get_back_to_menu_keyboard() -> InlineKeyboardMarkup:
+    """Returns a Back to Quick Menu button."""
+    return InlineKeyboardMarkup([[InlineKeyboardButton("◀️ Back to Quick Menu", callback_data="menu_main")]])
+
+
 async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """Handles /start command, registers resident, and provides concierge onboarding."""
+    """Handles /start command, registers resident, and provides concierge onboarding with 1-tap quick actions."""
     user = update.effective_user
     if not user or not update.message:
         return
@@ -56,25 +80,138 @@ async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     welcome_text = (
         f"👋 Welcome to the *Lentor Modern Digital Concierge*, {user.first_name or 'Resident'}!\n\n"
-        f"I am your 24/7 digital resident companion for Lentor Modern. You can ask me anything about "
-        f"estate by-laws, facility bookings, mall directory, or crowdsourced neighbour tips.\n\n"
-        f"Here are a few common things you can do:\n"
+        f"I am your 24/7 resident companion for Lentor Modern. You can chat with me naturally in plain text, "
+        f"send photos of notices/defects, or tap below for instant 1-tap resident shortcuts:\n\n"
         f"• 🔨 *Renovations:* _\"What are the renovation working hours and deposit amounts?\"_\n"
         f"• 🚚 *Deliveries & Moving:* _\"Where is the residential loading bay and what is the height limit?\"_\n"
         f"• 🏬 *Mall Directory:* _\"What time does CS Fresh close? Is there a clinic in the mall?\"_\n"
-        f"• 🏊 *Facilities & Parking:* _\"What are the gym hours and BBQ booking rules?\"_\n"
-        f"• 🛠️ *Defects & Inquiries:* _\"How do I report common property defects or contact the Managing Agent?\"_\n"
-        f"• 📸 *Photo Assistance:* _Send a photo of an appliance error code, or snap a notice board to ask a question!_\n\n"
-        f"💡 *Got a helpful tip for your neighbours?*\n"
-        f"Snap a photo of any mall promo or notice, or type:\n"
-        f"`/tip <topic> <your tip>` (e.g. `/tip mall CS Fresh sushi discounts start after 8:30pm`)\n\n"
-        f"🛠️ *Feedback or Bug Report?*\n"
-        f"Help improve this bot! Type `/feedback <suggestion>` or `/bug <issue>` to message the developer (@jamesjjboh) directly.\n\n"
-        f"How can I assist you today?"
+        f"• 🏊 *Facilities & Gym:* _\"What are the gym hours and BBQ booking rules?\"_\n"
+        f"• 🚇 *Transit & Bus:* _\"What time is the last train to Woodlands or Bayshore?\"_\n"
+        f"• 📸 *Photo Inquiries:* _Send a photo of an appliance error code or snap a notice board!_\n\n"
+        f"Tap an option below to start immediately:"
     )
-    await update.message.reply_text(welcome_text, parse_mode="Markdown")
+    await update.message.reply_text(
+        welcome_text,
+        reply_markup=get_quick_menu_keyboard(),
+        parse_mode="Markdown",
+    )
 
 
+async def menu_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Handles /menu command, displaying the interactive 1-tap quick action menu."""
+    if not update.message:
+        return
+    await update.message.reply_text(
+        "🛎️ *Lentor Modern Quick Actions Menu:*\nTap any topic below for instant information:",
+        reply_markup=get_quick_menu_keyboard(),
+        parse_mode="Markdown",
+    )
+
+
+async def handle_quick_menu_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Handles 1-tap interactive menu selections instantly without consuming LLM tokens."""
+    query = update.callback_query
+    if not query:
+        return
+    await query.answer()
+
+    action = query.data
+    user = query.from_user
+
+    if action == "menu_main":
+        main_text = (
+            f"👋 *Lentor Modern Quick Actions Menu:*\n\n"
+            f"Select any topic below for instant information, or type your question below:"
+        )
+        await query.edit_message_text(
+            text=main_text,
+            reply_markup=get_quick_menu_keyboard(),
+            parse_mode="Markdown",
+        )
+        return
+
+    back_markup = get_back_to_menu_keyboard()
+
+    if action == "menu_contacts":
+        text = (
+            "🏢 *Primary On-Site Estate Contacts:*\n\n"
+            "• *Managing Agent (CBRE):*\n"
+            "  📍 9 Lentor Central, Level 3\n"
+            "  📞 `+65 6054 3370` (Mon–Fri 9am–6pm, Sat 9am–1pm)\n"
+            "  ✉️ `managementoffice@LT-MODERN.COM`\n\n"
+            "• *Residential Concierge Desk (24/7):*\n"
+            "  📞 `+65 6054 3375` | ✉️ `concierge@LT-MODERN.COM`\n\n"
+            "• *Security Control Room (24/7 Emergency):*\n"
+            "  📞 `+65 6054 3379`\n\n"
+            "• *Developer CST (Defects & Novade Support):*\n"
+            "  📞 `6433 9342` | ✉️ `LMcustomerservice@lentormodern.com.sg`\n"
+            "  Main Contractor: Lian Beng Construction (1988) Pte Ltd"
+        )
+    elif action == "menu_facilities":
+        text = (
+            "🏊 *Recreational Facilities Guide:*\n\n"
+            "• 🏋️ *Indoor Gym (Level 4 Clubhouse):* *6:00 AM – 10:00 PM daily*\n"
+            "  _Extended from 8am for morning workouts! Automated door access cuts off at 10pm sharp._\n"
+            "• 🏊 *50m Lap Pool & Pools (Level 4):* 7:00 AM – 10:00 PM daily\n"
+            "• 🎾 *Tennis Court (Level 4):* 8:00 AM – 10:00 PM (Book via iPlus Living)\n"
+            "• 🍖 *Sky Dining & BBQ Pavilions (Level 14):* Closes 10:00 PM (Book via iPlus Living)\n"
+            "• 🎱 *Clubhouse Function Room (Level 4):* Closes 10:00 PM (Book via iPlus Living)\n"
+            "• 🚗 *Car Washing Bays (Level 3 Carpark):* Lots 245, 259, 292 (Water tap key from Concierge)"
+        )
+    elif action == "menu_transit":
+        text = (
+            "🚇 *Transit & Bus Guide (Lentor TE5):*\n\n"
+            "• *Lentor MRT Station (TE5):* Seamless sheltered access via Exit 1 to B1/L1.\n\n"
+            "⏱️ *First & Last Train Timings:*\n"
+            "• *Northbound (Towards Woodlands North TE1 / RTS Link):*\n"
+            "  First Train: Mon–Sat `05:58` | Sun/PH `06:18`\n"
+            "  Last Train: `00:27` (to Woodlands N), `00:44` (terminating at Woodlands TE2)\n"
+            "• *Southbound (Towards Bayshore TE29 / Marina Bay TE20):*\n"
+            "  First Train: Mon–Sat `05:52` | Sun/PH `06:12`\n"
+            "  Last Train: `23:49` (to Bayshore), `00:05` (to Outram Park), `00:15` (to Caldecott)\n\n"
+            "🚌 *Buses at Exit 1 (Bus Stop 55341):*\n"
+            "• *Bus 825:* Feeder loop to Yio Chu Kang MRT & AMK 628 Market\n"
+            "• *Bus 855:* Direct to Upper Thomson cafe stretch & HarbourFront\n"
+            "• *Bus 852:* Direct to SIM / Ngee Ann Poly & Bukit Batok"
+        )
+    elif action == "menu_mall":
+        text = (
+            "🏬 *Lentor Modern Mall Highlights:*\n\n"
+            "• 🛒 *CS Fresh Supermarket:* Basement 1 (#B1-11 to 16) | 08:00 – 22:00 daily\n"
+            "• 👶 *ChildFirst Childcare:* Level 2 (#02-01)\n"
+            "• 🏷️ *Resident Discounts (31 Merchants):* Flash your Resident Access Card for 5%–15% off at Burger King, KFC, Ajumma's, QB Premium, Tim Hortons, etc.\n"
+            "• 🎟️ *GuocoLand e-Vouchers:* Accepted at 11 participating outlets\n"
+            "• 📲 *ResiQ Digital Portal:* Queue for QB Premium or order food online at [resiq-lm.vercel.app](https://resiq-lm.vercel.app/)\n"
+            "• 🅿️ *Mall Carpark:* 10-min grace period; EV charging at B1 Lots 39–42"
+        )
+    elif action == "menu_reno":
+        text = (
+            "🔨 *Moving In & Renovation Rules:*\n\n"
+            "• ⏰ *Working Hours:* Mon–Fri 9am–5pm, Sat 9am–1pm\n"
+            "  _STRICTLY NO noisy works on Sundays & Public Holidays._\n"
+            "• 💰 *Security Deposit:* S$1,000 (non-hacking) / S$2,000 (hacking)\n"
+            "• 🚚 *Residential Loading Bay:* Accessible via Lentor Central ramp (Height limit: 3.8m)\n"
+            "• 🛗 *Lift Padding:* Must book with Estate Office 3 days prior ($300 penalty if unpadded)\n"
+            "• 🎨 *Official Balcony Paint:* Dulux Thick Smoke (`96YR 09/033`)\n"
+            "• 🎨 *Official Interior Paint:* Intermatt BS E55 (White)"
+        )
+    elif action == "menu_iplus":
+        text = (
+            "📱 *iPlus Living App & Intercom Setup:*\n\n"
+            "1. *Download App:* Search 'iPlus Living' on Apple App Store / Google Play Store.\n"
+            "2. *Account Activation:* Register with your email and Property Activation Code (found in your CBRE Welcome Letter).\n"
+            "3. *Smart Intercom Buzzer:* Link your mobile under 'Visitor Access'. When guests or delivery riders dial your unit at lobby intercoms, your phone video rings — tap 'Unlock' to open the lobby glass door remotely!\n"
+            "4. *Facility Bookings:* Book BBQ, Tennis, Function Room 14–30 days in advance (1 peak session/week per unit, $100–$200 deposit).\n"
+            "5. *Support:* Email `managementoffice@LT-MODERN.COM` or call `+65 6054 3370`."
+        )
+    else:
+        text = "Please select an option from the menu."
+
+    await query.edit_message_text(
+        text=text,
+        reply_markup=back_markup,
+        parse_mode="Markdown",
+    )
 
 
 async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -85,6 +222,7 @@ async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     help_text = (
         "🤖 *Lentor Modern Concierge Commands:*\n\n"
         "• Just message me directly with any question about estate rules, facilities, or mall shops.\n"
+        "• `/menu` — Open 1-tap interactive resident quick actions.\n"
         "• `/tip <topic> <advice>` — Submit a community tip for admin review.\n"
         "• `/feedback <suggestion>` — Send feature ideas or feedback directly to developer @jamesjjboh.\n"
         "• `/bug <issue>` — Report an inaccurate answer or technical bug.\n"
@@ -94,7 +232,11 @@ async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "• `/broadcast <message>` — Send estate broadcast to registered residents.\n"
         "• `/admin_stats` — View resident activity, feedback, and content gaps."
     )
-    await update.message.reply_text(help_text, parse_mode="Markdown")
+    await update.message.reply_text(
+        help_text,
+        reply_markup=get_quick_menu_keyboard(),
+        parse_mode="Markdown",
+    )
 
 
 async def tip_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -464,6 +606,7 @@ def create_bot_app() -> Application:
 
     # Command handlers
     app.add_handler(CommandHandler("start", start_command))
+    app.add_handler(CommandHandler("menu", menu_command))
     app.add_handler(CommandHandler("help", help_command))
     app.add_handler(CommandHandler("tip", tip_command))
     app.add_handler(CommandHandler("feedback", feedback_command))
@@ -471,6 +614,9 @@ def create_bot_app() -> Application:
     app.add_handler(CommandHandler("reply", handle_reply_command))
     app.add_handler(CommandHandler("broadcast", handle_broadcast_command))
     app.add_handler(CommandHandler("admin_stats", handle_admin_stats_command))
+
+    # Callback handler for resident interactive 1-tap quick action menu
+    app.add_handler(CallbackQueryHandler(handle_quick_menu_callback, pattern=r"^menu_"))
 
     # Callback handler for admin interactive inline moderation buttons
     app.add_handler(CallbackQueryHandler(handle_moderation_callback, pattern=r"^mod_"))

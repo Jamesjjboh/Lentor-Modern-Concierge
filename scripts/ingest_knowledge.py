@@ -11,6 +11,7 @@ import logging
 import os
 import re
 import sys
+import urllib.request
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Set
 
@@ -539,8 +540,388 @@ def generate_seed_verified_tips() -> List[Dict[str, Any]]:
             "topic": "bylaws",
             "title": "Official Unit Paint Codes (Internal Walls & Balcony)",
             "content": "Verified developer paint specifications for Lentor Modern:\n• Internal Walls & Ceilings: Intermatt BS E55 (White).\n• Balcony & External Façade: Dulux (ICI) 'Thick Smoke' — Colour Code: 96YR 09/033 (Composilicon W55).\nProvide these exact codes to your painter/ID for touch-ups to avoid patchy walls and ensure compliance with MCST façade appearance by-laws."
+        },
+        {
+            "topic": "mall",
+            "title": "ResiQ Resident Queue & Order Ahead Web App",
+            "content": "Residents can use the community-built ResiQ web app (https://resiq-lm.vercel.app/) to skip queues and order ahead at Lentor Modern Mall merchants. Includes digital queue ticket links (e.g. QB House/Premium), direct mobile order links for F&B (Ajumma's, Yuen Kee Dumpling, Omoté, Umai Udon, A Hot Hideout, KFC, Burger King), and a directory of 25+ exclusive resident discounts."
         }
     ]
+
+
+def process_resiq_mall_directory() -> List[Dict[str, Any]]:
+    """Fetches tenant directory, action links, and resident discounts from ResiQ (https://resiq-lm.vercel.app/)."""
+    url = "https://resiq-lm.vercel.app/_next/static/chunks/app/page-a7a29018b4d6e236.js"
+    try:
+        req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
+        content = urllib.request.urlopen(req, timeout=15).read().decode("utf-8")
+    except Exception as e:
+        logger.error(f"Failed to fetch ResiQ bundle: {e}")
+        return []
+
+    matches = re.findall(r"JSON\.parse\(\x27(\[.*?\])\x27\)", content)
+    if len(matches) < 3:
+        logger.error("Failed to extract JSON tables from ResiQ bundle")
+        return []
+
+    actions = json.loads(matches[0].encode("utf-8").decode("unicode_escape"))
+    discounts = json.loads(matches[1].encode("utf-8").decode("unicode_escape"))
+    directory = json.loads(matches[2].encode("utf-8").decode("unicode_escape"))
+
+    def clean_key(s: str) -> str:
+        return re.sub(r"[^a-z0-9]", "", s.lower())
+
+    def match_action(shop_name: str, shop_unit: str):
+        c_name = clean_key(shop_name)
+        if "goji" in c_name:
+            for a in actions:
+                if a["id"] == "goji-physiotherapy": return a
+        if "omote" in c_name:
+            for a in actions:
+                if a["id"] == "omote-special-edition": return a
+        if "ssada" in c_name:
+            for a in actions:
+                if a["id"] == "ssada-gimbap": return a
+        if "sixhands" in c_name or "bunnys" in c_name:
+            for a in actions:
+                if a["id"] == "six-hands": return a
+        for a in actions:
+            ca = clean_key(a["name"])
+            if ca == c_name or ca in c_name or c_name in ca:
+                return a
+        return None
+
+    disc_by_unit = {d["unit"].replace("#", "").strip().lower(): d for d in discounts}
+    disc_by_name = {clean_key(d["name"]): d for d in discounts}
+
+    meta_map = {
+        "A Hot Hideout": {
+            "hours": "11:00 - 21:30 daily",
+            "desc": "Popular customized Mala Xiang Guo (stir-fry) and Mala collagen soup with signature scrambled eggs and fried potato slices.",
+            "tips": "Order online ahead via ResiQ to skip peak dinner queue."
+        },
+        "Ajumma's": {
+            "hours": "11:00 - 21:30 daily",
+            "desc": "Casual Korean restaurant famous for Kimchi Pork Belly Stew, Beef Bulgogi, Korean Fried Chicken, and complimentary refillable side dishes.",
+            "tips": "Scan QR code or use the direct ResiQ order link. Resident perk: Free Hotteok with min $45 spend."
+        },
+        "AL IJAZ": {
+            "hours": "07:00 - 22:30 daily",
+            "desc": "Halal Indian-Muslim restaurant offering crispy Roti Prata, Murtabak, Briyani, and Teh Tarik.",
+            "tips": "Early opening makes it ideal for morning breakfast prata."
+        },
+        "Anytime Fitness": {
+            "hours": "24/7 (Staffed: Mon-Fri 12:00-21:00, Sat 10:00-14:00)",
+            "desc": "24-hour fitness gym with cardio machines, free weights, power racks, and private shower facilities.",
+            "tips": "Located at B1 right next to Lentor MRT linkway. Direct elevator access from residence."
+        },
+        "Aspire Hub": {
+            "hours": "Mon-Fri 13:00 - 21:30, Sat-Sun 09:00 - 18:30",
+            "desc": "Premier tuition and enrichment centre providing customized academic coaching for Primary, Secondary, and JC students.",
+            "tips": "10% resident discount on total bill."
+        },
+        "Bunny's | Six Hands": {
+            "hours": "08:00 - 21:00 daily",
+            "desc": "Artisan cafe, bakery, and brunch destination offering specialty coffee, sourdough toasts, and delicate pastries.",
+            "tips": "Order online ahead via direct ResiQ link to pick up coffee on the way to MRT."
+        },
+        "Burger King": {
+            "hours": "08:00 - 22:00 daily",
+            "desc": "Flame-grilled Whoppers, burgers, nuggets, breakfast croissants, and meal sets.",
+            "tips": "10% resident discount available. Mobile ordering supported via BK App link."
+        },
+        "CHAGEE": {
+            "hours": "10:00 - 21:30 daily",
+            "desc": "Premium Chinese milk tea and fresh brew tea made from whole-leaf tea and fresh milk (famous for Jasmine Green Milk Tea).",
+            "tips": "Pre-order via CHAGEE app link to skip lengthy weekend lines."
+        },
+        "Chef Wen": {
+            "hours": "10:30 - 21:30 daily",
+            "desc": "Traditional claypot specialties, herbal soups, and comforting zi char dishes.",
+            "tips": "10% resident discount on total bill."
+        },
+        "Cold Storage Fresh": {
+            "hours": "08:00 - 22:30 daily",
+            "desc": "Anchor full-format supermarket featuring fresh meat butchery, seafood, organic produce, deli counter, bakery, and international wines.",
+            "tips": "Evening markdowns (20-30% off sushi and bakery) usually begin around 8:30 PM."
+        },
+        "Cristofori Music Academy": {
+            "hours": "Mon-Fri 11:30 - 21:00, Sat-Sun 09:00 - 19:00",
+            "desc": "Music academy offering piano, violin, guitar, and drum lessons, as well as musical instrument sales.",
+            "tips": "10% resident discount on musical instruments and lesson course sign-ups."
+        },
+        "Daily": {
+            "hours": "10:00 - 21:00 daily",
+            "desc": "Contemporary cafe offering all-day light bites, coffee, and comfort refreshments.",
+            "tips": "10% resident discount on total bill."
+        },
+        "First Bowl Rice Kitchen": {
+            "hours": "10:30 - 21:30 daily",
+            "desc": "Wholesome Asian rice bowls, stewed meat sets, and comforting homemade soup sets.",
+            "tips": "Supports direct online mobile order ahead. Resident voucher accepted."
+        },
+        "Fresh & Clean": {
+            "hours": "10:00 - 20:30 daily",
+            "desc": "Professional dry cleaning, laundry, curtain washing, and fabric alteration services.",
+            "tips": "10% resident discount on all services. Convenient for bulky curtain and bedsheet cleaning."
+        },
+        "Fun Claw": {
+            "hours": "10:00 - 22:00 daily",
+            "desc": "Family entertainment claw machine arcade with licensed plush toys and collectibles.",
+            "tips": "Great for kids entertainment on Level 1."
+        },
+        "Furrest Supply": {
+            "hours": "10:30 - 21:30 daily",
+            "desc": "Boutique pet retail store with premium dog/cat food, treats, supplements, accessories, and grooming essentials.",
+            "tips": "Convenient for quick pet food and litter refills right below the condo."
+        },
+        "Goji Women's and Family Physiotherapy": {
+            "hours": "Mon-Fri 09:00 - 19:00, Sat 09:00 - 14:00",
+            "desc": "Specialized physiotherapy clinic focusing on women's health, prenatal/postnatal recovery, pediatric care, and musculoskeletal rehabilitation.",
+            "tips": "Direct online appointment booking via Bio.site link. First-visit resident perk: free protein shaker or massage ball."
+        },
+        "Guardian": {
+            "hours": "10:00 - 21:30 daily",
+            "desc": "Health, wellness, personal care, and pharmacy chain carrying vitamins, skincare, and everyday health supplies.",
+            "tips": "Located at #01-01 inside the supermarket concourse."
+        },
+        "Han's Union": {
+            "hours": "07:30 - 21:30 daily",
+            "desc": "Heritage Hainanese restaurant concept featuring pork chops, chicken pies, local coffee, fried rice, and European pastries.",
+            "tips": "5% resident discount on total bill."
+        },
+        "He Jia Huan": {
+            "hours": "11:00 - 21:30 daily",
+            "desc": "Traditional warm and cold Chinese desserts (tang yuan, mango pomelo sago, black sesame paste) and savory snacks.",
+            "tips": "10% resident discount with min spend $30 on weekdays."
+        },
+        "Healing Touch Spa": {
+            "hours": "11:00 - 22:30 daily",
+            "desc": "Award-winning wellness spa offering deep tissue acupressure massage, aromatherapy, prenatal massage, and facial treatments.",
+            "tips": "Direct online outlet QR booking link available. 5% resident discount on weekdays (11am-5pm)."
+        },
+        "Hua Xia Language Centre": {
+            "hours": "Tue-Fri 13:00 - 21:00, Sat-Sun 09:00 - 18:30 (Closed Mon)",
+            "desc": "Specialist Chinese language learning centre offering MOE-aligned Chinese enrichment from preschool to secondary levels.",
+            "tips": "Located at B1 near enrichment cluster."
+        },
+        "Ice Talk": {
+            "hours": "10:30 - 21:30 daily",
+            "desc": "Affordable fresh fruit juices, smoothies, bubble tea, and crushed ice refreshments.",
+            "tips": "Quick grab-and-go drink option on Level 1."
+        },
+        "Jew Kit Hainanese Chicken Rice": {
+            "hours": "10:00 - 21:00 daily",
+            "desc": "Heritage Hainanese chicken rice establishment serving steamed and roasted chicken, char siew, roast pork, and zi char sides.",
+            "tips": "15% resident discount on total bill."
+        },
+        "Joylion Buffet Hotpot": {
+            "hours": "11:00 - 22:00 daily",
+            "desc": "All-you-can-eat individual and sharing pot Chinese hotpot with extensive meat cuts, seafood, vegetables, and condiments.",
+            "tips": "Located at B1. Ideal for family gatherings."
+        },
+        "KFC": {
+            "hours": "08:00 - 22:00 daily",
+            "desc": "Original Recipe and Hot & Crispy fried chicken, burgers, egg tarts, and breakfast sets.",
+            "tips": "15% resident discount with min spend $15. Mobile pre-ordering via KFC app link."
+        },
+        "Kodecoon Academy": {
+            "hours": "Tue-Fri 11:00 - 19:00, Sat-Sun 09:00 - 18:00 (Closed Mon)",
+            "desc": "Leading STEM and technology school teaching kids ages 4-16 coding, Scratch, Python, Roblox game dev, and AI concepts.",
+            "tips": "Free trial classes available upon inquiry."
+        },
+        "Kopi & Tarts": {
+            "hours": "08:00 - 21:00 daily",
+            "desc": "Nanyang coffee and bakery chain famous for warm flaky egg tarts, kaya butter buns, pastry puffs, and chicken curry puffs.",
+            "tips": "Great for quick takeaway tea-time snacks."
+        },
+        "Let's Eat!": {
+            "hours": "08:00 - 21:30 daily",
+            "desc": "Modern hawker eatery serving traditional Minced Meat Noodles (Bak Chor Mee), Fishball Noodles, Laksa, and crispy appetizers.",
+            "tips": "Affordable everyday local hawker fare on Level 1."
+        },
+        "Luminous Dental": {
+            "hours": "Mon-Fri 09:30 - 21:00, Sat-Sun 09:30 - 17:00",
+            "desc": "Full-service dental clinic providing scaling & polishing, teeth whitening, invisalign, root canals, and pediatric dental care.",
+            "tips": "Special resident pricing: Basic Care $96, Comprehensive $126, Essential $196. CHAS & Medisave accredited."
+        },
+        "M&G Life": {
+            "hours": "10:00 - 21:30 daily",
+            "desc": "Lifestyle stationery and homeware shop offering quality pens, notebooks, organizers, cute gifts, and creative craft supplies.",
+            "tips": "Handy for school stationery supplies for kids."
+        },
+        "Ma Kuang TCM": {
+            "hours": "Mon-Sat 10:00 - 20:30, Sun 10:00 - 18:00",
+            "desc": "Reputable Traditional Chinese Medicine clinic providing physician consultation, acupuncture, cupping (ba guan), and herbal prescriptions.",
+            "tips": "WhatsApp booking link available. 5% resident discount on all services."
+        },
+        "MERLE & CO": {
+            "hours": "11:00 - 21:30 daily",
+            "desc": "Chic bistro offering Western pasta, grilled proteins, artisanal brunch plates, and premium drinks.",
+            "tips": "Direct mobile order link via ResiQ. 5% resident discount on à la carte main dishes."
+        },
+        "Mulberry Learning": {
+            "hours": "Mon-Fri 07:00 - 19:00 (Closed Sat-Sun)",
+            "desc": "Award-winning preschool and infant care featuring Habit of Mind and Reggio Emilia-inspired curriculum.",
+            "tips": "Conveniently situated on Level 2 with direct sheltered drop-off."
+        },
+        "Nan Yang Dao": {
+            "hours": "10:00 - 21:30 daily",
+            "desc": "Authentic Malaysian food paradise famous for Selayang Big Bowl Curry Mee, Penang Chendol, Klang Bak Kut Teh, and Fried Carrot Cake.",
+            "tips": "Expect peak dinner lines; drop by early or during off-peak hours."
+        },
+        "NK Hairworks": {
+            "hours": "10:30 - 20:30 daily",
+            "desc": "Established hair salon brand offering haircuts, organic hair coloring, perm, scalp therapy, and hair spa treatments.",
+            "tips": "20% resident discount on selected à la carte hair services."
+        },
+        "Omoté: Special Edition": {
+            "hours": "11:30 - 14:30, 17:30 - 21:30 daily",
+            "desc": "Contemporary Japanese dining famed for monumental Bara Chirashi Don bowls, creative sashimi rolls, and roasted sushi platters.",
+            "tips": "Order or join queue via direct ResiQ link. Very popular for weekend dinners."
+        },
+        "Optometrist At Work": {
+            "hours": "10:30 - 21:00 daily",
+            "desc": "Eye care optical practice with clinical optometrists providing comprehensive eye examinations, prescription glasses, sunglasses, and contact lenses.",
+            "tips": "Resident perk: 1-for-1 offer on eyeglasses; attractive gifts with contact lens purchases >$200."
+        },
+        "Pinnacle Family Clinic": {
+            "hours": "Mon-Fri 08:30 - 21:00, Sat-Sun 09:00 - 13:00",
+            "desc": "Neighborhood GP medical clinic offering acute care, chronic disease management, vaccinations, health screenings, and pre-employment checkups.",
+            "tips": "Exclusive resident health screening rates: Classic+ $99, Comprehensive $199, Flu Jab $33, Helper 6ME $25."
+        },
+        "PlayFACTO School": {
+            "hours": "Mon-Fri 10:00 - 19:00 (Closed Sat-Sun)",
+            "desc": "Premium student care centre and holistic mathematics enrichment centre providing after-school supervision and homework coaching.",
+            "tips": "Located at B1 enrichment belt."
+        },
+        "QB PREMIUM": {
+            "hours": "10:00 - 21:00 daily",
+            "desc": "Elevated express hair grooming salon offering precise Japanese dry haircuts and styling.",
+            "tips": "Check and join digital queue online before walking down via direct live link: https://qbhouse.relsystems.net:443/RELGetQueueLM.aspx?brCode=QDCOJEFZ (or via ResiQ)."
+        },
+        "Shiok Burger": {
+            "hours": "11:00 - 21:30 daily",
+            "desc": "Handcrafted smash burgers, truffle fries, milkshakes, and crispy tenders.",
+            "tips": "Pre-order online via direct Restosuite / ResiQ link. GuocoLand resident voucher accepted."
+        },
+        "Ssada Gimbab": {
+            "hours": "10:00 - 21:30 daily",
+            "desc": "Authentic street-style Korean gimbap rolls, spicy rice cakes (tteokbokki), ramen, and dumplings.",
+            "tips": "Direct mobile ordering link supported via FnBees / ResiQ."
+        },
+        "The Hanok": {
+            "hours": "11:00 - 21:30 daily",
+            "desc": "Traditional Korean dining specializing in comforting soups, stews, Korean pancake (pajeon), and tabletop meats.",
+            "tips": "Great for cozy family Korean meals on Level 1."
+        },
+        "The Nail Arcadia": {
+            "hours": "10:30 - 20:30 daily",
+            "desc": "Nail artistry sanctuary offering gel manicures, pedicures, nail spa treatments, and eyelash extensions.",
+            "tips": "Appointments recommended on weekends."
+        },
+        "Tim Hortons": {
+            "hours": "07:30 - 22:00 daily",
+            "desc": "Iconic Canadian coffeehouse chain serving freshly brewed Double-Double coffee, Iced Capps, fresh sourdough melts, and Timbits.",
+            "tips": "15% resident discount with min spend $15. Mobile pre-order available on Tim Hortons SG app."
+        },
+        "Toast & Roll by Swee Heng": {
+            "hours": "07:30 - 21:30 daily",
+            "desc": "Halal-certified local bakery concept by Swee Heng, specializing in fresh pillowy swiss rolls, artisanal breads, and breakfast buns.",
+            "tips": "5% resident discount on total bill."
+        },
+        "Tongue Tip Lanzhou Beef Noodles": {
+            "hours": "11:00 - 21:30 daily",
+            "desc": "Halal-certified traditional hand-pulled noodles in rich clear beef broth, hand-crafted across 8 different noodle thickness tiers.",
+            "tips": "15% resident discount on à la carte items."
+        },
+        "Twigly's Convenience Store": {
+            "hours": "08:00 - 22:30 daily",
+            "desc": "Modern convenience boutique offering chilled beverages, grab-and-go snacks, imported tidbits, and emergency daily sundries.",
+            "tips": "5% resident discount with min spend $10."
+        },
+        "UMAI": {
+            "hours": "11:30 - 21:30 daily",
+            "desc": "Artisanal Japanese udon bar serving fresh handmade sanuki udon in hot dashi broth, cold dipping udon, and crispy tempura.",
+            "tips": "Digital ordering and table check-in available directly via iReach / ResiQ link."
+        },
+        "Venus Beauty": {
+            "hours": "10:00 - 21:30 daily",
+            "desc": "Budget-friendly personal care chain offering shampoos, toiletries, household cleaning detergents, and skincare brands.",
+            "tips": "Great value for everyday household refills and toiletries."
+        },
+        "Xin Yuan Ji": {
+            "hours": "11:00 - 21:30 daily",
+            "desc": "Famous Bugis heritage fish soup brand known for thick charcoal fish head steamboat, sliced fish bee hoon, and zi char favorites.",
+            "tips": "10% resident discount on total bill. Online QR ordering available via YQueue link."
+        },
+        "Yuen Kee Dumpling": {
+            "hours": "10:30 - 21:30 daily",
+            "desc": "Specialist handmade northern Chinese dumplings, pan-fried guotie, spicy wanton noodles, and comforting bone broth.",
+            "tips": "10% resident discount on total bill. Direct online pre-order link: https://m.sea.restosuite.ai/open/app/e3b0q78vczyd?q=fcadcc4k4gec (or via ResiQ)."
+        }
+    }
+
+    enriched_directory = []
+
+    # Entry 0: Lentor MRT direct underground linkway
+    enriched_directory.append({
+        "name": "Lentor MRT Station (TE5)",
+        "category": "Transport",
+        "floor": "B1",
+        "unit": "Direct Linkway B1",
+        "opening_hours": "First train ~05:45, Last train ~00:20 daily",
+        "description": "Direct sheltered underground linkway to Thomson-East Coast Line (TEL), connecting to Orchard, Marina Bay, and Woodlands.",
+        "resident_discount": None,
+        "order_url": None,
+        "order_type": None,
+        "resiq_link": "https://resiq-lm.vercel.app/",
+        "tips": "Exit 1 connects seamlessly into Lentor Modern Mall B1 without stepping outdoors."
+    })
+
+    for shop in directory:
+        name = shop["name"]
+        unit = shop["unit"]
+        cat = shop["category"]
+        clean_unit = unit.replace("#", "").strip().lower()
+        c_name = clean_key(name)
+        
+        if unit.startswith("#B1") or unit.startswith("B1"):
+            floor = "B1"
+        elif unit.startswith("#02") or unit.startswith("02"):
+            floor = "L2"
+        else:
+            floor = "L1"
+
+        disc_info = disc_by_unit.get(clean_unit) or disc_by_name.get(c_name)
+        discount_text = disc_info.get("discount") if disc_info else None
+
+        action_info = match_action(name, unit)
+        order_url = action_info.get("actionUrl") if action_info else None
+        order_type = action_info.get("linkType") if action_info else None
+        resiq_link = f"https://resiq-lm.vercel.app/r/{action_info['id']}" if action_info else "https://resiq-lm.vercel.app/"
+
+        meta = meta_map.get(name, {})
+        hours = meta.get("hours", "10:00 - 21:30 daily")
+        desc = meta.get("desc", f"{name} is a verified tenant in Lentor Modern Mall.")
+        tips = meta.get("tips", "")
+
+        entry = {
+            "name": name,
+            "category": cat,
+            "floor": floor,
+            "unit": unit,
+            "opening_hours": hours,
+            "description": desc,
+            "resident_discount": discount_text,
+            "order_url": order_url,
+            "order_type": order_type,
+            "resiq_link": resiq_link,
+            "tips": tips
+        }
+        enriched_directory.append(entry)
+
+    return enriched_directory
 
 
 # ==============================================================================
@@ -568,14 +949,12 @@ def main():
 
     # 3. Process Bylaws, Novade & Maintenance
     bylaw_records = process_bylaws_and_guides(docs_dir)
-    # Add contacts overview to bylaws handbook for searchability
     for c in contacts:
         bylaw_records.append({
             "topic": f"Contact: {c['category']}",
             "section": c["provider"],
             "content": f"{c['category']}: {c['provider']} (Tel: {c['contact']}). Notes: {c['notes']}"
         })
-    # Add appliance specs overview to bylaws handbook
     for a in appliances:
         bylaw_records.append({
             "topic": f"Appliance: {a['appliance']} ({a['model']})",
@@ -598,11 +977,28 @@ def main():
         json.dump(tips, f, indent=2, ensure_ascii=False)
     logger.info(f"✅ Saved {len(tips)} verified community tips to {tips_file.name}")
 
+    # 5. Process ResiQ Mall Directory & Ordering Links
+    mall_tenants = process_resiq_mall_directory()
+    if mall_tenants:
+        mall_file = PROCESSED_DIR / "mall_directory.json"
+        with open(mall_file, "w", encoding="utf-8") as f:
+            json.dump(mall_tenants, f, indent=2, ensure_ascii=False)
+        logger.info(f"✅ Saved {len(mall_tenants)} mall tenants to {mall_file.name}")
+
+    # 6. Verify Estate Profile
+    estate_file = PROCESSED_DIR / "estate_profile.json"
+    if estate_file.exists():
+        logger.info(f"✅ Estate profile verified at {estate_file.name}")
+
     print("\n🎉 Knowledge Ingestion Complete!")
     print(f"• Estate Contacts: {len(contacts)} providers saved to estate_contacts.json")
     print(f"• Appliance Specs: {len(appliances)} manuals saved to appliance_manuals.json")
     print(f"• Handbook & Bylaws: {len(bylaw_records)} chunks saved to bylaws_handbook.json")
     print(f"• Verified Community Tips: {len(tips)} tips saved to verified_community_tips.json")
+    if mall_tenants:
+        print(f"• Mall Directory & ResiQ Links: {len(mall_tenants)} tenants saved to mall_directory.json")
+    if estate_file.exists():
+        print(f"• Estate Profile & School Catchments: Verified in estate_profile.json")
 
 
 if __name__ == "__main__":

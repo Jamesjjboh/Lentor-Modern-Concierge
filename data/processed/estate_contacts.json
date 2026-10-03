@@ -1,5 +1,37 @@
 [
   {
+    "category": "Managing Agent (Management Office / MCST)",
+    "provider": "CBRE Pte. Ltd. (Lentor Modern Management Office)",
+    "contact": "+65 6054 3370",
+    "email": "managementoffice@LT-MODERN.COM",
+    "location": "9 Lentor Central, Level 3, Singapore 788891",
+    "hours": "Mondays to Fridays: 9:00 AM – 6:00 PM; Saturdays: 9:00 AM – 1:00 PM (Closed Sundays & PH)",
+    "notes": "Estate management, renovation permits (Form 2.0), moving/bulky delivery approvals (Form 2.1), car park transponders, bylaw enforcement"
+  },
+  {
+    "category": "Residential Concierge",
+    "provider": "Lentor Modern On-Site Concierge Team",
+    "contact": "+65 6054 3375",
+    "email": "concierge@LT-MODERN.COM",
+    "hours": "24 Hours Daily (24/7)",
+    "notes": "Resident inquiries, concierge assistance, visitor guidance, parcel reception protocols"
+  },
+  {
+    "category": "Security Control Room / Guardhouse",
+    "provider": "Lentor Modern 24/7 Security Control",
+    "contact": "+65 6054 3379",
+    "hours": "24 Hours Daily (24/7 Hotline)",
+    "notes": "24/7 estate security hotline, barrier gate assistance, fiber riser keys, after-hours emergency response"
+  },
+  {
+    "category": "Developer Customer Service Team (Defects & Handover)",
+    "provider": "Lentor Modern Pte. Ltd. (GuocoLand CST)",
+    "contact": "6433 9342",
+    "email": "LMcustomerservice@lentormodern.com.sg",
+    "hours": "Mondays to Fridays: 9:00 AM – 6:00 PM (Closed Saturdays, Sundays & PH)",
+    "notes": "Handover defects queries, Novade app login/submission support, joint inspection scheduling with main contractor Lian Beng"
+  },
+  {
     "category": "Air Conditioning (ACMV)",
     "provider": "Mitsubishi Electric Asia Pte Ltd",
     "contact": "6473 2308",

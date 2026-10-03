@@ -1,0 +1,359 @@
+{
+  "project_overview": {
+    "development_name": "Lentor Modern",
+    "developer": "GuocoLand Limited (Lentor Modern Pte. Ltd.)",
+    "architect": "ADDP Architects LLP",
+    "landscape_architect": "Ortus Design Pte Ltd",
+    "main_contractor": "Lian Beng Construction (1988) Pte Ltd",
+    "civil_structural_engineer": "KCL Consultants Pte Ltd",
+    "mechanical_electrical_engineer": "Belmacs Pte Ltd",
+    "quantity_surveyor": "Asia Infrastructure Solutions Singapore Pte Ltd",
+    "tenure": "99-year Leasehold (commencing 30 December 2020)",
+    "expected_top": "2026",
+    "legal_completion": "2029",
+    "site_area_sqft": 186001,
+    "site_area_sqm": 17279.9,
+    "plot_ratio": 3.5,
+    "total_residential_units": 605,
+    "residential_towers": 3,
+    "storeys_per_tower": 25,
+    "management_and_contacts": {
+      "managing_agent": {
+        "company": "CBRE Pte. Ltd.",
+        "office_location": "9 Lentor Central, Level 3, Singapore 788891",
+        "telephone": "+65 6054 3370",
+        "email": "managementoffice@LT-MODERN.COM",
+        "hours": "Mondays to Fridays: 9:00 AM – 6:00 PM; Saturdays: 9:00 AM – 1:00 PM (Closed Sundays & PH)"
+      },
+      "residential_concierge": {
+        "telephone": "+65 6054 3375",
+        "email": "concierge@LT-MODERN.COM",
+        "hours": "24 Hours Daily (24/7)"
+      },
+      "security_control_room": {
+        "telephone": "+65 6054 3379",
+        "hours": "24 Hours Daily (24/7 Hotline)"
+      },
+      "developer_customer_service": {
+        "entity": "Lentor Modern Pte. Ltd. (GuocoLand CST)",
+        "telephone": "6433 9342",
+        "email": "LMcustomerservice@lentormodern.com.sg",
+        "hours": "Mondays to Fridays: 9:00 AM – 6:00 PM (Closed Sat, Sun & PH)"
+      }
+    },
+    "towers": [
+      {
+        "tower_number": 3,
+        "address": "3 Lentor Central, Singapore 788888",
+        "storeys": 25,
+        "description": "Residential Tower 3, direct lift access to residential lobby and basement retail/MRT linkway."
+      },
+      {
+        "tower_number": 5,
+        "address": "5 Lentor Central, Singapore 788889",
+        "storeys": 25,
+        "description": "Residential Tower 5, direct lift access to residential lobby and basement retail/MRT linkway."
+      },
+      {
+        "tower_number": 7,
+        "address": "7 Lentor Central, Singapore 788890",
+        "storeys": 25,
+        "description": "Residential Tower 7, direct lift access to residential lobby and basement retail/MRT linkway."
+      }
+    ],
+    "unit_mix": [
+      {
+        "category": "1-Bedroom + Flex",
+        "subtype": "1 Bed 1 Bath + Flex (Type A1 / A1S)",
+        "size_sqft": "527 sq ft (49 sqm)",
+        "bathrooms": "1 Bath",
+        "units_count": 63,
+        "percentage": "10.4%",
+        "layout_features": "Includes 1 master bedroom, 1 bathroom, living/dining area, open kitchenette, balcony, and a versatile flex space (study/nursery)."
+      },
+      {
+        "category": "2-Bedroom + Flex",
+        "total_units": 231,
+        "percentage": "38.2%",
+        "configurations": [
+          {
+            "subtype": "2 Bed 1 Bath + Flex (Type B1 / B1-G / B1-R)",
+            "size_sqft": "678 sq ft (63 sqm)",
+            "bathrooms": "1 Bath (semi-ensuite / jack-and-jill access)",
+            "units_count": 84,
+            "layout_features": "Dumbbell layout with bedrooms on opposite sides of living room for maximum privacy, entrance walkway, 1 bathroom, and flex room."
+          },
+          {
+            "subtype": "2 Bed 2 Bath + Flex (Type B2 / B2-G / B2-R)",
+            "size_sqft": "732 sq ft (68 sqm)",
+            "bathrooms": "2 Baths (Master Ensuite + Common Bath)",
+            "units_count": 147,
+            "layout_features": "Highly popular dumbbell layout with entrance foyer opening directly into kitchen, 2 full bathrooms (master ensuite + common bath), and flex room."
+          }
+        ]
+      },
+      {
+        "category": "3-Bedroom + Flex",
+        "total_units": 248,
+        "percentage": "41.0%",
+        "configurations": [
+          {
+            "subtype": "3 Bed 2 Bath + Flex (Types C1, C2, C3)",
+            "size_sqft_range": "969 - 990 sq ft (90 - 92 sqm)",
+            "types_detail": "Type C1 (969 sq ft), Type C2 (980 sq ft), Type C3 (990 sq ft)",
+            "bathrooms": "2 Baths (Master Ensuite + Common Bath)",
+            "layout_features": "Squarish and efficient layout, enclosed kitchen, 2 full bathrooms, living/dining extending to balcony, and flex room for study or home office."
+          },
+          {
+            "subtype": "3 Bed 3 Bath + Flex with Yard (Types C4, C5, C6)",
+            "size_sqft_range": "1,109 - 1,130 sq ft (103 - 105 sqm)",
+            "types_detail": "Type C4 (1,109 sq ft), Type C5 (1,130 sq ft), Type C6 (1,130 sq ft)",
+            "bathrooms": "3 Baths (Master Ensuite + Common Bath + Kitchen/Yard WC; listed as 3 Baths on PropertyGuru/EdgeProp)",
+            "layout_features": "Premium family layout with larger enclosed kitchen, dedicated utility yard, household shelter, kitchen WC / 3rd bath, and flex room."
+          }
+        ]
+      },
+      {
+        "category": "4-Bedroom + Flex",
+        "subtype": "4 Bed 4 Bath + Flex (Type D1 / D1-G / D1-R)",
+        "size_sqft": "1,528 sq ft (142 sqm)",
+        "bathrooms": "4 Baths (Master Ensuite + Junior Master Ensuite + Common Bath + Yard WC)",
+        "units_count": 63,
+        "percentage": "10.4%",
+        "layout_features": "Only 4-bedroom layout in Lentor Modern. Features two ensuite bedrooms (Master + Junior Master), common bath, flex room, generous balcony, enclosed kitchen, utility room, yard, and WC."
+      }
+    ]
+  },
+  "schools_proximity": {
+    "moe_primary_registration_rule": "Under the Ministry of Education (MOE) Primary 1 Registration Framework, home-school distance is officially calculated as the shortest straight-line distance from the specific residential block/tower to the school reference point via Singapore Land Authority (SLA) OneMap SchoolQuery. Priority tiers are: (1) Within 1km, (2) 1km to 2km, and (3) Outside 2km.",
+    "primary_schools": {
+      "within_1km": [
+        {
+          "name": "Anderson Primary School",
+          "distance": "~650m - 720m",
+          "address": "19 Ang Mo Kio Avenue 9, Singapore 569788",
+          "status": "The ONLY primary school strictly within the 1km radius of Lentor Modern.",
+          "official_verification": "SLA OneMap SchoolQuery & MOE SchoolFinder verified."
+        }
+      ],
+      "within_1km_to_2km": [
+        {
+          "name": "CHIJ St. Nicholas Girls' School (Primary)",
+          "distance": "~1.21km - 1.36km",
+          "address": "501 Ang Mo Kio Street 13, Singapore 569405",
+          "status": "Strictly in the 1km to 2km band. NOT within 1km.",
+          "notes": "Lentor Modern residents qualify under the 1km - 2km priority band (Phase 2C / Phase 2B). It is not within 1km despite marketing claims on generic property websites.",
+          "official_verification": "SLA OneMap SchoolQuery & MOE SchoolFinder verified."
+        },
+        {
+          "name": "Mayflower Primary School",
+          "distance": "~1.20km - 1.30km",
+          "address": "200 Ang Mo Kio Avenue 5, Singapore 569878",
+          "status": "Within 1km to 2km priority band.",
+          "official_verification": "SLA OneMap SchoolQuery verified."
+        },
+        {
+          "name": "Ang Mo Kio Primary School",
+          "distance": "~1.55km - 1.65km",
+          "address": "20 Ang Mo Kio Avenue 3, Singapore 569920",
+          "status": "Within 1km to 2km priority band.",
+          "official_verification": "SLA OneMap SchoolQuery verified."
+        }
+      ]
+    },
+    "secondary_and_tertiary_institutions": [
+      {
+        "name": "CHIJ St. Nicholas Girls' School (Secondary)",
+        "distance": "~1.3km",
+        "level": "Secondary"
+      },
+      {
+        "name": "Mayflower Secondary School",
+        "distance": "~1.1km",
+        "level": "Secondary"
+      },
+      {
+        "name": "Anderson Secondary School",
+        "distance": "~1.4km",
+        "level": "Secondary"
+      },
+      {
+        "name": "Presbyterian High School",
+        "distance": "~1.8km",
+        "level": "Secondary"
+      },
+      {
+        "name": "Yio Chu Kang Secondary School",
+        "distance": "~1.7km",
+        "level": "Secondary"
+      },
+      {
+        "name": "Anderson Serangoon Junior College (ASRJC)",
+        "distance": "~1.6km",
+        "level": "Junior College"
+      },
+      {
+        "name": "Nanyang Polytechnic (NYP)",
+        "distance": "~2.1km",
+        "level": "Tertiary / Polytechnic"
+      }
+    ]
+  },
+  "commercial_and_amenities": {
+    "mall_name": "Lentor Modern Mall",
+    "commercial_gfa_sqft": 96000,
+    "retail_levels": ["Basement 1", "Level 1", "Level 2"],
+    "anchor_supermarket": {
+      "name": "CS Fresh (Cold Storage)",
+      "size_sqft": 12000,
+      "location": "Basement 1 (#B1-11 to #B1-16)",
+      "operating_hours": "08:00 - 22:00 daily"
+    },
+    "childcare_centre": {
+      "name": "ChildFirst Childcare Centre",
+      "size_sqft": 10000,
+      "location": "Level 2 (#02-01)"
+    },
+    "total_retail_and_fnb_tenants": 53,
+    "resident_privileges": {
+      "participating_outlets": 31,
+      "validity": "Valid till 31 December 2026",
+      "redemption_method": "Flash physical Lentor Modern Resident Access Card or GuocoLand Privileges Card prior to payment",
+      "guocoland_evouchers": "Accepted at 11 participating outlets including Ajumma's, Burger King, KFC, First Bowl Rice Kitchen, Healing Touch Spa, Merle & Co, QB Premium, Shiok Burger, Ssada Gimbap, Xin Yuan Ji, and Yuen Kee Dumpling."
+    },
+    "digital_portal_and_queuing": {
+      "name": "ResiQ Lentor Modern Resident Portal",
+      "url": "https://resiq-lm.vercel.app/",
+      "features": "Direct ordering and digital queuing links for merchants including QB Premium haircuts, Ajumma's, Yuen Kee Dumpling, etc."
+    },
+    "carpark_and_ev": {
+      "location": "Basement 1 Mall Carpark",
+      "grace_period": "10 minutes complimentary",
+      "car_rates": "$1.20 for 1st hour, $0.50 per subsequent 30 minutes (Mondays to Sundays & PH, All Day)",
+      "motorcycle_rates": "$0.65 per hour",
+      "ev_charging": "Lots 39 to 42 at Basement 1",
+      "residential_parking": "Separate private residential car park with barrier access."
+    }
+  },
+  "connectivity_and_transport": {
+    "mrt_integration": {
+      "station_name": "Lentor MRT Station (TE5)",
+      "line": "Thomson-East Coast Line (TEL)",
+      "connection": "Seamless, fully sheltered direct linkway from B1 and Level 1 via Lentor MRT Exit 1",
+      "station_exits": [
+        {"exit": "Exit 1", "description": "Direct integrated sheltered connection into Lentor Modern Mall (B1/L1) & residential lift lobbies"},
+        {"exit": "Exit 2", "description": "Lentor Drive, Lentor Estate landed enclave"},
+        {"exit": "Exit 3", "description": "Lentor Loop, Lentor Hills Residences & Hillock Green"},
+        {"exit": "Exit 4", "description": "Lentor Central, Bullion Park"},
+        {"exit": "Exit 5", "description": "Yio Chu Kang Road / Lentor Modern Bus Stop"}
+      ],
+      "first_and_last_train_timings": {
+        "northbound_woodlands_north": {
+          "direction": "Towards Woodlands North (TE1) / RTS Link to Johor Bahru",
+          "platform": "Platform A",
+          "first_train_mon_sat": "05:58",
+          "first_train_sun_ph": "06:18",
+          "last_train_to_woodlands_north": "00:27",
+          "last_train_terminating_at_woodlands": "00:44"
+        },
+        "southbound_bayshore": {
+          "direction": "Towards Bayshore (TE29) / Marina Bay (TE20)",
+          "platform": "Platform B",
+          "first_train_mon_sat": "05:52",
+          "first_train_sun_ph": "06:12",
+          "last_train_to_bayshore": "23:49",
+          "last_train_terminating_at_outram_park": "00:05",
+          "last_train_terminating_at_caldecott": "00:15"
+        }
+      },
+      "key_destinations_transit_time": [
+        {"destination": "Bright Hill (Interchange with future CRL)", "stops": 2, "time_mins": 4},
+        {"destination": "Caldecott (Interchange with Circle Line)", "stops": 4, "time_mins": 8},
+        {"destination": "Orchard (Interchange with North-South Line)", "stops": 9, "time_mins": 16},
+        {"destination": "Outram Park (Interchange with East-West & North-East Lines)", "stops": 13, "time_mins": 23},
+        {"destination": "Shenton Way / Marina Bay Financial Centre", "stops": 14, "time_mins": 25},
+        {"destination": "Gardens by the Bay", "stops": 16, "time_mins": 29},
+        {"destination": "Woodlands North (Direct link to RTS Link to Johor Bahru)", "stops": 5, "time_mins": 10}
+      ]
+    },
+    "bus_services_and_stops": [
+      {
+        "stop_name": "Lentor Stn Exit 1 (Bus Stop 55341)",
+        "location": "Along Lentor Drive, directly outside Lentor Modern Mall / Exit 1",
+        "services": [
+          {
+            "bus_number": "825",
+            "type": "Dedicated Feeder Loop",
+            "route": "Lentor Estate ↺ Yio Chu Kang MRT & Bus Interchange (via Ang Mo Kio Ave 4 & Ave 9, Anderson Primary School, Ang Mo Kio 628 Market)",
+            "operating_hours": "Mondays to Fridays: 06:00 – 20:30; Saturdays: 06:00 – 14:00 (No service on Sundays & Public Holidays)"
+          },
+          {
+            "bus_number": "855",
+            "type": "Trunk Service",
+            "route": "Yishun Temp Interchange ⇌ HarbourFront Interchange (via Lentor Ave, Upper Thomson Rd cafe stretch, Marymount, Farrer Rd, Queensway, Bukit Merah)",
+            "operating_hours": "05:30 – 23:30 daily"
+          },
+          {
+            "bus_number": "852",
+            "type": "Trunk Service",
+            "route": "Yishun Temp Interchange ⇌ Bukit Batok Interchange (via Lentor, Ang Mo Kio Ave 6, Marymount, Lornie Hwy, Clementi Rd / SIM / Ngee Ann Poly, Beauty World)",
+            "operating_hours": "05:45 – 23:30 daily"
+          }
+        ]
+      },
+      {
+        "stop_name": "Opp Lentor Stn Exit 1 (Bus Stop 55349)",
+        "location": "Across Lentor Drive",
+        "services": [
+          {
+            "bus_number": "825, 852, 855",
+            "route": "Northbound services towards Yishun / Khatib"
+          }
+        ]
+      },
+      {
+        "stop_name": "Along Yio Chu Kang Road (Bus Stops 55019 / 55011 - ~3 mins walk)",
+        "location": "Yio Chu Kang Road near Lentor Modern junction",
+        "services": [
+          {
+            "bus_number": "851",
+            "route": "Yishun ⇌ Bukit Merah (via Ang Mo Kio, Thomson, Novena, Bugis, Chinatown)"
+          },
+          {
+            "bus_number": "853 / 853M",
+            "route": "Yishun ⇌ Lorong 1 Geylang (853M operates on Sundays & Public Holidays via Upper Serangoon)"
+          },
+          {
+            "bus_number": "652",
+            "route": "City Direct Express: Morning peak express service direct to CBD (Anson Rd, Robinson Rd, Marina Blvd, Shenton Way); evening return"
+          }
+        ]
+      }
+    ],
+    "road_networks": [
+      "Seletar Expressway (SLE)",
+      "Central Expressway (CTE)",
+      "Tampines Expressway (TPE)",
+      "Upcoming North-South Corridor (NSC)"
+    ]
+  },
+  "parks_and_nature": [
+    {
+      "name": "Lentor Hillock Park",
+      "distance": "Directly adjacent (~1.7 ha park)",
+      "connection": "Directly connected via covered walkways and linear green finger park connector."
+    },
+    {
+      "name": "Thomson Nature Park",
+      "distance": "~1.5km"
+    },
+    {
+      "name": "Lower Peirce Reservoir Park",
+      "distance": "~1.8km"
+    },
+    {
+      "name": "Bishan-Ang Mo Kio Park",
+      "distance": "~2.5km"
+    }
+  ]
+}

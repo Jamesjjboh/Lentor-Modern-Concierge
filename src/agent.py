@@ -24,7 +24,7 @@ You have access to 7 specialized tools:
 3. `get_verified_community_tips`: Use to retrieve crowdsourced neighbour advice (e.g. delivery bay access, induction cooker lock quirks, aircon piping SWG requirements, evening grocery discounts).
 4. `generate_mcst_email_draft`: Use when a resident needs to formally email the Managing Agent (MA) to report a defect, common property issue, or submit a request.
 5. `submit_tip_to_moderation`: Use when a resident shares a new helpful tip, discovery, or advice that should be added to the community knowledge base.
-6. `submit_developer_feedback`: Use when a resident provides feedback about the bot itself, reports a bug, mentions an error or inaccuracy in an answer, or suggests a new feature for the concierge developer (@jamesjjboh).
+6. `submit_developer_feedback`: Use when a resident provides feedback about the bot itself, reports a bug, mentions an error or inaccuracy in an answer, or suggests a new feature for the concierge creator & admin (@jamesjjboh).
 7. `search_estate_profile`: Use to look up verified development and estate facts: developer (GuocoLand), tenure (99-yr from 2020), total 605 units across 3 towers of 25 storeys, postal codes (3 Lentor Central S788888, 5 S788889, 7 S788890), unit types & bathroom configurations (1BR+F 527sf 1-bath; 2BR+F with 678sf 1-bath vs 732sf 2-bath; 3BR+F with 969-990sf 2-bath vs 1109-1130sf 3-bath/yard WC; 4BR+F 1528sf 4-bath), transit links (Lentor MRT TE5 direct link, first/last train timings, station exits, bus stops & routes 825, 855, 852, 851, 652), and official MOE primary school proximity (Anderson Primary is strictly the ONLY primary school <1km; CHIJ St. Nicholas Girls' School is 1-2km, NOT within 1km).
 
 
@@ -243,7 +243,7 @@ def submit_tip_to_moderation(topic: str, tip_text: str, user_id: int = 0) -> str
 
 # --- Tool 6: Developer Feedback & Bug Submission ---
 def submit_developer_feedback(category: str, details: str, user_id: int = 0) -> str:
-    """Submits resident feedback, bug reports, feature requests, or handbook corrections directly to the bot developer (@jamesjjboh).
+    """Submits resident feedback, bug reports, feature requests, or handbook corrections directly to the bot creator & admin (@jamesjjboh).
     Use this tool whenever a resident expresses feedback, reports a bug or hallucination, mentions an error in an answer, or suggests a new bot feature.
     Args:
         category: One of ['bug', 'feature_request', 'data_correction', 'general']
@@ -259,7 +259,7 @@ def submit_developer_feedback(category: str, details: str, user_id: int = 0) -> 
             message=details,
         )
         return (
-            f"Thank you! Your feedback ({category}) has been submitted directly to the concierge developer (@jamesjjboh) "
+            f"Thank you! Your feedback ({category}) has been submitted directly to the concierge creator & admin (@jamesjjboh) "
             f"(Reference ID: {fb_id}). James reviews all resident feedback to continuously improve the concierge."
         )
     except Exception as e:
@@ -552,7 +552,7 @@ If FEEDBACK_SUBMISSION:
 - Determine the topic/category: one of ["bug", "feature_request", "data_correction", "general"].
 - Title: A concise title (e.g., "Handbook Hours Inaccuracy", "Bot Display Error").
 - Tip: Clear description of the bug or feedback.
-- Friendly reply thanking the resident and confirming it has been delivered directly to developer @jamesjjboh.
+- Friendly reply thanking the resident and confirming it has been delivered directly to project creator & admin @jamesjjboh.
 
 If RESIDENT_QUESTION:
 - Inspect the visual details (e.g., error code 'L' on induction cooker, defect sticker, facility sign).

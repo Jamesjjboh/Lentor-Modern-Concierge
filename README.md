@@ -58,16 +58,17 @@ flowchart TD
 
 ---
 
-## 🛠️ The 6 Autonomous Agent Tools
+## 🛠️ The 7 Autonomous Agent Tools
 
 | Tool | Purpose | Data Source |
 | :--- | :--- | :--- |
 | `search_bylaws_and_handbook(query)` | Queries official MCST by-laws, paint specifications (Intermatt BS E55, Dulux Thick Smoke 96YR 09/033), 8 appliance manuals (SMEG, Yale, Rheem, Mitsubishi), 21 supplier hotlines, Novade defect logging, and renovation rules. | `data/processed/bylaws_handbook.json` + `appliance_manuals.json` + `estate_contacts.json` |
-| `search_mall_directory(category, shop_name)` | Looks up Lentor Modern Mall shops (CS Fresh, Minmed Clinic, Guardian, Toast Box), floor levels (`B1`, `L1`), and hours. | `data/processed/mall_directory.json` |
-| `get_verified_community_tips(topic)` | Retrieves verified crowdsourced neighbour tips (Level 2 delivery intercom, 3.0m height clearance, smart switch neutral wire requirements, paint codes). | `data/processed/verified_community_tips.json` + Firestore approved tips |
-| `generate_mcst_email_draft(issue_type, details)` | Formats structured, professional inquiries ready to copy-paste to the Managing Agent (MA). | Dynamic Agent Template |
-| `submit_tip_to_moderation(topic, tip_text)` | Automatically structures resident discoveries and queues them for admin approval. | Firestore `community_tips/` queue |
-| `submit_developer_feedback(category, details)` | Automatically captures resident feedback, bug reports, or handbook corrections and routes them directly to the developer. | Firestore `resident_feedback/` queue |
+| `search_mall_directory(category, shop_name)` | Looks up Lentor Modern Mall shops (CS Fresh, Minmed Clinic, Guardian, Toast Box), floor levels (`B1`, `L1`), hours, direct online ordering/queuing links (via ResiQ), and verified resident discounts. | `data/processed/mall_directory.json` |
+| `get_verified_community_tips(topic)` | Retrieves verified crowdsourced neighbour tips (Level 2 delivery intercom, 3.8m loading bay clearance, induction lock quirks, aircon piping SWG requirements, evening grocery discounts). | `data/processed/verified_community_tips.json` + Firestore approved tips |
+| `generate_mcst_email_draft(issue_type, details)` | Formats structured, professional inquiries addressed to the Managing Agent (CBRE at `managementoffice@LT-MODERN.COM`). | Dynamic Agent Template |
+| `submit_tip_to_moderation(topic, tip_text)` | Automatically structures resident discoveries and queues them for admin moderation. | Firestore `community_tips/` queue |
+| `submit_developer_feedback(category, details)` | Captures resident suggestions, bug reports, or data corrections and routes them directly to the bot creator & admin (@jamesjjboh). | Firestore `resident_feedback/` queue |
+| `search_estate_profile(query)` | Looks up verified estate specs (GuocoLand, 605 units across 3 towers), unit mix & bathroom configurations, Lentor MRT (TE5) first/last train timings, bus lines (825, 855, 852), and official MOE primary school proximity tiers (Anderson Primary strictly <1km; CHIJ St. Nicholas 1–2km). | `data/processed/estate_profile.json` |
 
 ---
 

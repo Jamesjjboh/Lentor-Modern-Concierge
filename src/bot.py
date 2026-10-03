@@ -224,7 +224,7 @@ async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "• Just message me directly with any question about estate rules, facilities, or mall shops.\n"
         "• `/menu` — Open 1-tap interactive resident quick actions.\n"
         "• `/tip <topic> <advice>` — Submit a community tip for admin review.\n"
-        "• `/feedback <suggestion>` — Send feature ideas or feedback directly to developer @jamesjjboh.\n"
+        "• `/feedback <suggestion>` — Send feature ideas or feedback directly to project creator & admin @jamesjjboh.\n"
         "• `/bug <issue>` — Report an inaccurate answer or technical bug.\n"
         "• `/help` — View this assistance message.\n\n"
         "*Admin Commands:*\n"
@@ -312,7 +312,7 @@ async def feedback_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     await message.reply_text(
         "🙏 *Thank you for your feedback!*\n\n"
-        "Your suggestion has been delivered directly to the project developer (@jamesjjboh). "
+        "Your suggestion has been delivered directly to the project creator & admin (@jamesjjboh). "
         "We continuously improve the Lentor Modern Concierge based on resident input.",
         parse_mode="Markdown",
     )
@@ -364,7 +364,7 @@ async def bug_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     await message.reply_text(
         "🛠️ *Thank you for reporting this issue!*\n\n"
-        "Your report has been dispatched directly to developer @jamesjjboh to investigate and patch.",
+        "Your report has been dispatched directly to project creator & admin @jamesjjboh to investigate and patch.",
         parse_mode="Markdown",
     )
 
@@ -401,7 +401,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 await context.bot.send_message(
                     chat_id=target_user_id,
                     text=(
-                        f"📩 *Message from Developer (@jamesjjboh):*\n\n"
+                        f"📩 *Message from Project Creator & Admin (@jamesjjboh):*\n\n"
                         f"\"{admin_reply_text}\""
                     ),
                     parse_mode="Markdown",

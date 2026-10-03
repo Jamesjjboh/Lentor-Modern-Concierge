@@ -63,7 +63,7 @@ flowchart TD
 | Tool | Purpose | Data Source |
 | :--- | :--- | :--- |
 | `search_bylaws_and_handbook(query)` | Queries official MCST by-laws, paint specifications (Intermatt BS E55, Dulux Thick Smoke 96YR 09/033), 8 appliance manuals (SMEG, Yale, Rheem, Mitsubishi), 21 supplier hotlines, Novade defect logging, and renovation rules. | `data/processed/bylaws_handbook.json` + `appliance_manuals.json` + `estate_contacts.json` |
-| `search_mall_directory(category, shop_name)` | Looks up Lentor Modern Mall shops (CS Fresh, Minmed Clinic, Guardian, Toast Box), floor levels (`B1`, `L1`), hours, direct online ordering/queuing links (via ResiQ), and verified resident discounts. | `data/processed/mall_directory.json` |
+| `search_mall_directory(category, shop_name)` | Looks up Lentor Modern Mall shops (CS Fresh, Minmed Clinic, Guardian, Toast Box, Mulberry Learning childcare), floor levels (`B1`, `L1`, `L2`), hours, direct online ordering/queuing links (via ResiQ), and verified resident discounts. | `data/processed/mall_directory.json` |
 | `get_verified_community_tips(topic)` | Retrieves verified crowdsourced neighbour tips (Level 2 delivery intercom, 3.8m loading bay clearance, induction lock quirks, aircon piping SWG requirements, evening grocery discounts). | `data/processed/verified_community_tips.json` + Firestore approved tips |
 | `generate_mcst_email_draft(issue_type, details)` | Formats structured, professional inquiries addressed to the Managing Agent (CBRE at `managementoffice@LT-MODERN.COM`). | Dynamic Agent Template |
 | `submit_tip_to_moderation(topic, tip_text)` | Automatically structures resident discoveries and queues them for admin moderation. | Firestore `community_tips/` queue |
@@ -115,7 +115,24 @@ An instant, text-first dashboard (no chart rendering), with inline buttons `[ 7d
 * **Instant Admin Notification:** Pushes a card with resident details directly to Admin's private Telegram.
 * **Native Swipe-to-Reply:** Admin simply swipes left on the notification card like a normal chat message, types their response, and hits send. The bot routes the message directly into the resident's 1-on-1 chat.
 * **Tap-to-Reply:** Inline button `[ 💬 Reply ]` triggers Telegram `ForceReply` for 1-tap mobile reply mode.
-* **Serverless Resilient:** Stores message mappings in Firestore (`admin_reply_mappings/`) so swipe-to-reply works seamlessly even after Cloud Run cold starts.
+* **Serverless Resilient:** Stores message mappings in Firestore (`admin_reply_mappings/`) so swipe-to-reply works seamlessly even after Cloud Run restarts.
+
+### 6. Interactive 1-Tap Quick Menu (`/menu`)
+* Residents can pull up immediate answers without consuming AI tokens:
+  * **Estate Contacts:** Managing Agent (CBRE), Concierge Desk, 24/7 Security Hotline, and Customer Service.
+  * **Facilities & Gym:** Gym hours (6am–10pm), pool hours (7am–10pm), tennis court, BBQ, and car wash bays.
+  * **Transit & Buses:** Lentor MRT (TE5) first/last train timings and Exit 1 buses (825, 855, 852).
+  * **Mall & Deals:** CS Fresh, Mulberry Learning, ResiQ ordering links, and 31 merchant resident discounts.
+  * **Moving & Reno:** Renovation hours, deposit schedule, loading bay clearance (3.8m), and official paint codes.
+  * **iPlus Living Guide:** Mobile intercom buzzer video setup, property activation codes, and facility booking rules.
+
+### 7. Responsive UX: Persistent Typing Heartbeat & 1-Tap Fallback Action Cards
+* **Typing Indicator Heartbeat:** Background heartbeat task continuously refreshes Telegram's `ChatAction.TYPING` every 3.5 seconds, ensuring residents always see that the bot is actively thinking and working on their question.
+* **Warm Container Response:** Cloud Run maintains `--min-instances 1` to eliminate container cold starts.
+* **Empathetic Concierge Fallback Cards:** If a resident asks a question outside existing bylaws or directories, the bot provides warm concierge signposting and attaches 1-tap action buttons:
+  * `[ ✉️ Draft Email to MA ]`: Generates a formatted inquiry email to CBRE (`managementoffice@LT-MODERN.COM`).
+  * `[ 🏢 On-Site Contacts ]`: Displays estate office phone hotlines and locations.
+  * `[ ◀️ Quick Menu ]`: Jumps back to main quick shortcuts.
 
 ---
 
@@ -123,7 +140,7 @@ An instant, text-first dashboard (no chart rendering), with inline buttons `[ 7d
 
 | Cloud Component | Service Tier | Monthly Cost |
 | :--- | :--- | :--- |
-| **Hosting** | Google Cloud Run (`asia-southeast1`) | **\$0.00** (Scales to 0 instances when idle) |
+| **Hosting** | Google Cloud Run (`asia-southeast1`) | **\$0.00** (Free Tier includes 2 million requests + 360,000 GiB-seconds / month; warm instance with 512MiB memory) |
 | **Database** | Google Cloud Firestore (Native Mode) | **\$0.00** (Uses <1% of 50k free reads/day) |
 | **Storage / Registry** | Google Artifact Registry | **\$0.00** (Automated cleanup keeps $\le 2$ builds, < 380 MB of 500 MB Free Tier) |
 | **AI Inference** | Google Gemini 3.8 Flash (with 3.5 / 3.1 fallback cascade) | **\$0.00** (Generous API tier) |

@@ -1,0 +1,75 @@
+[
+  {
+    "appliance": "SMEG Induction 2 Zone Hob",
+    "model": "SI2321D",
+    "category": "kitchen_appliances",
+    "features": "2 induction cooking zones with power booster, touch slider control, automatic pan detection, timer, and controls lock.",
+    "child_lock_procedure": "To activate or deactivate the Controls Lock / Child Lock: With at least one cooking zone active, press and hold the Key Symbol button for at least 1 second. The LED display lights up for 2 seconds to confirm lock. When locked, an 'L' appears on the display. Hold for 1 second again to unlock.",
+    "cleaning_instructions": "Clean once a week using ordinary glass ceramic cleaner. Never use abrasive sponges, scouring pads, or harsh chemical sprays. Always dry with clean cloth.",
+    "troubleshooting": "If code 'L' appears, the child lock is active (hold Key button for 1 second). If 'E' or error numbers flash, turn off the hob at the main isolator switch for 30 seconds and switch back on.",
+    "supplier_contact": "SMEG Singapore: 6950 0910"
+  },
+  {
+    "appliance": "SMEG Front Load Washer Dryer",
+    "model": "WDJ852ESG (8kg Wash / 5kg Dry)",
+    "category": "kitchen_appliances",
+    "features": "15 programs including Quick 15', Allergy Care, Steam Refresh, Eco 40-60, and Auto Dry.",
+    "child_lock_procedure": "Press and hold the 'Spin' and 'Option' buttons simultaneously for 3 seconds to engage or disengage child lock. A key/lock icon appears on the LED display.",
+    "maintenance": "Clean the drain pump filter located at the bottom right corner every 2-3 months. Run Drum Clean cycle monthly without laundry to prevent mold.",
+    "troubleshooting": "E01/E02: Water inlet issue (check tap is turned on). E03: Drainage error (clean drain pump filter at bottom right). E04: Door lock error (ensure door is firmly closed).",
+    "supplier_contact": "SMEG Singapore: 6950 0910"
+  },
+  {
+    "appliance": "SMEG Built-In Convectional Oven",
+    "model": "SF6300TVX",
+    "category": "kitchen_appliances",
+    "features": "6 cooking functions (Static, Fan Assisted, Circulaire, Eco, Large Grill, Fan Grill), 50°C to 250°C temperature range, electronic clock/timer.",
+    "operating_instructions": "Turn the Left knob to select desired cooking function, turn the Right knob to select temperature. Set the central electronic timer for automatic cooking shutoff.",
+    "cleaning": "Clean enamel cavity using warm soapy water and microfiber cloth. The inner door glass can be unclipped and removed for thorough cleaning.",
+    "supplier_contact": "SMEG Singapore: 6950 0910"
+  },
+  {
+    "appliance": "SMEG Telescopic Cooker Hood",
+    "model": "KSET62E",
+    "category": "kitchen_appliances",
+    "features": "Telescopic pull-out extraction hood with 3-speed slider controls and twin LED spotlights.",
+    "maintenance": "Metal grease filters should be unlatched and washed in warm soapy water or dishwasher every month. If operating in recirculation mode, charcoal filters must be replaced every 4-6 months.",
+    "supplier_contact": "SMEG Singapore: 6950 0910"
+  },
+  {
+    "appliance": "Yale Digital Door Lock",
+    "model": "YDM7116A",
+    "category": "access_control",
+    "features": "Fingerprint recognition, RFID key card / tag, Master/User PIN code, physical override key, and mobile Bluetooth/Zigbee access.",
+    "battery_replacement": "Uses 4x AA 1.5V Alkaline batteries (located behind interior battery cover). DO NOT use rechargeable batteries. Low battery alarm sounds when battery drops below 4.5V.",
+    "emergency_jumpstart": "If the batteries are completely drained and you are locked outside, touch a standard 9V rectangular battery to the emergency power terminals at the bottom of the exterior lock body, then enter your PIN or scan fingerprint.",
+    "pin_setup": "Remove battery cover, press 'I' (Registration) button, enter current Master PIN followed by #, press 1 for User PIN, enter new 4-10 digit PIN followed by #, press 'I' button to complete.",
+    "supplier_contact": "Assa Abloy (Yale): 6591 8868"
+  },
+  {
+    "appliance": "Rheem Ceiling Electric Storage Water Heater",
+    "model": "Rheem Classic / Horizontal Series",
+    "category": "plumbing_heating",
+    "features": "Heavy gauge steel tank with vitreous enamel coating, CFC-free polyurethane insulation, safety temperature relief valve.",
+    "operating_instructions": "Switch on the water heater wall switch (with neon indicator) 15-20 minutes before bathing. The heater keeps water hot for several hours thanks to thermal insulation.",
+    "safety_note": "Never turn on heater if water supply has been cut off or if tank is empty. Ensure pressure relief valve discharge pipe is free of obstruction.",
+    "supplier_contact": "Rheem Singapore: 6872 2043"
+  },
+  {
+    "appliance": "Mitsubishi Electric Wall Mounted Multi-Split Air Conditioning",
+    "model": "Mitsubishi Electric Inverter Multi-Split (R32 / R410A)",
+    "category": "cooling_acmv",
+    "features": "Econo Cool energy saving mode, Nano Platinum / Catechin air filter, horizontal & vertical auto vane, 24-hour timer.",
+    "maintenance": "Slide out air filters every 2 weeks, wash with clean water and dry thoroughly in shade. Chemical servicing recommended every 6-9 months to maintain copper piping SWG warranty.",
+    "remote_quirk": "If remote does not respond, press the 'RESET' button with a pin or replace 2x AAA batteries. Ensure the outdoor condenser isolator switch at the aircon ledge is switched ON.",
+    "supplier_contact": "Mitsubishi Electric: 6473 2308"
+  },
+  {
+    "appliance": "Smart Letter Box Electronic Lock",
+    "model": "S301",
+    "category": "access_control",
+    "features": "Touch numeric keypad, master code, user code, low battery warning.",
+    "pin_reset": "Default factory PIN is 1234. To change: Enter * [Current PIN] #, press 1, enter [New 4-digit PIN] #.",
+    "supplier_contact": "Metform Industries: 6757 2822"
+  }
+]

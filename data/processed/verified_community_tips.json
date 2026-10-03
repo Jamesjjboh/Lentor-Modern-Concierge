@@ -1,27 +1,157 @@
 [
   {
-    "tip_id": "tip_seed_1",
-    "topic": "aircon",
-    "content": "For 3-bedroom and 4-bedroom units, the outdoor aircon ledge accommodates up to 2 multi-split condensing units. Make sure your aircon installer uses copper piping grade 22 SWG as mandated by building management, otherwise MA will reject the installation during inspection."
+    "topic": "defects",
+    "title": "Estimated Timeline for Defects and Renovation",
+    "content": "When planning your move-in timeline, expect defect checks and rectifications to take approximately one month. Subsequent renovation works typically require an additional 4 to 6 weeks."
   },
   {
-    "tip_id": "tip_seed_2",
-    "topic": "wifi",
-    "content": "When NetLink Trust comes to activate your fiber, remember to tell the security guardhouse at Tower 1 that your installer needs the riser key for your floor. If you don't collect the key before the installer goes up, they often reschedule."
+    "topic": "defects",
+    "title": "Prerequisites for Starting Defect Inspection",
+    "content": "Defect inspections should only begin after key collection and the setup of your water and electricity accounts. Note that there is a complimentary 7-day period of electricity and water provided immediately after handover."
   },
   {
-    "tip_id": "tip_seed_3",
-    "topic": "deliveries",
-    "content": "For bulky furniture deliveries (Taobao, IKEA, Courts), remind delivery drivers that the residential loading bay entrance is on Lentor Hills Road (not the mall car park entrance on Lentor Central). Height limit is 3.8m."
+    "topic": "defects",
+    "title": "Logging Defects via the Novade App",
+    "content": "All identified defects must be itemized with photos and logged through the developer's Novade app. After logging, you should coordinate with the customer service officer assigned during your key collection to arrange a joint inspection date with the main contractor."
   },
   {
-    "tip_id": "tip_seed_4",
-    "topic": "mall",
-    "content": "CS Fresh has a daily discount on sushi boxes and pre-packed salads starting around 8:30 PM (20% off) and increasing up to 30%-40% after 9:30 PM."
+    "topic": "defects",
+    "title": "Homeowner Presence During Rectification Works",
+    "content": "Homeowners do not need to be present in the unit during the rectification period. The contractor will access the unit independently to complete the repairs. Rectification works can take up to 30 days depending on the volume of touch-ups required, after which a final handover check is conducted."
   },
   {
-    "tip_id": "tip_seed_5",
+    "topic": "defects",
+    "title": "Phased Key Collection and Unit Readiness",
+    "content": "Key collection and handovers are processed in batches rather than all at once. The timing of your key collection depends on when your specific unit passes the developer's internal inspections and when the law firms are notified of unit readiness."
+  },
+  {
     "topic": "appliances",
-    "content": "If your kitchen induction hob starts beeping with an 'L' symbol, the child safety lock has been accidentally engaged. Hold down the key/lock icon for 3 full seconds until the beep stops."
+    "title": "Developer-Provided Kitchen and Laundry Appliances",
+    "content": "Lentor Modern units come equipped with essential appliances provided by the developer, which include a refrigerator, an oven, and a washer/dryer."
+  },
+  {
+    "topic": "appliances",
+    "title": "Smart Home Hub and Integration Capabilities",
+    "content": "The developer provides a smart home hub/console designed to manage intercom systems, access control, lighting, and CCTV. This system can be integrated with a mobile application for remote management."
+  },
+  {
+    "topic": "appliances",
+    "title": "Smart Switch Wiring Limitation (No Neutral Wire)",
+    "content": "Please note that no neutral wire is provided behind the lighting switches. If you plan to install smart home switches, you will need to source smart switches that do not require a neutral wire."
+  },
+  {
+    "topic": "appliances",
+    "title": "Dishwasher Space and Tabletop Alternatives",
+    "content": "As dedicated space or plumbing for a built-in dishwasher is not explicitly indicated in the standard unit provisions, residents interested in a dishwasher may need to consider compact tabletop models that fit on existing countertops."
+  },
+  {
+    "topic": "logistics",
+    "title": "House Moving and Bulky Delivery Hours",
+    "content": "Bulky deliveries and moving activities are restricted to Mondays through Fridays from 9:00 AM to 6:00 PM, and Saturdays from 9:00 AM to 1:00 PM. Residents are required to submit Form 2.1 (Application for House Moving and Bulky Delivery) to the management prior to scheduling moving activities."
+  },
+  {
+    "topic": "logistics",
+    "title": "Delivery Drop-offs and Intercom Access via Level 2",
+    "content": "The Level 1 intercom is intentionally deactivated by management to avoid congestion along the mall driveway and prevent damage to unpadded lobbies. Advise delivery riders and couriers to proceed to the Level 2 car park lobby to access the intercom for entry."
+  },
+  {
+    "topic": "logistics",
+    "title": "Height Clearance Restrictions for Heavy Lorries",
+    "content": "Vehicles exceeding 3 meters in height cannot clear the ramp to the Level 2 car park. If receiving bulky deliveries via high-clearance lorries, residents must meet delivery personnel at Level 1 to coordinate manual intake or escort."
+  },
+  {
+    "topic": "logistics",
+    "title": "Granting Visitor and Courier Lift Access via iPlus App",
+    "content": "To allow couriers up to your doorstep, they must buzz your unit number at the tower lobby intercom. Releasing the entrance via the iPlus Living app automatically activates access for your specific floor in the lift. If visitors or couriers tailgate through the lobby doors without buzzing your unit, the lift will not permit them to select your residential floor."
+  },
+  {
+    "topic": "logistics",
+    "title": "Lift Access Card Registration Workaround",
+    "content": "The residential lift readers experience a short processing delay when scanning cards. Wait 1 to 2 seconds after tapping your card before pressing the destination floor button to ensure it registers. Tapping repeatedly or pressing the floor button twice may deselect the level."
+  },
+  {
+    "topic": "bylaws",
+    "title": "Balcony Zip Blind Installation Guidelines",
+    "content": "Installation of zip track blinds at the balcony is permitted, subject to the requirements in the resident handbook. Homeowners can obtain the handbook and approved color specifications from the Managing Agent (MA) on or after the day of key collection."
+  },
+  {
+    "topic": "bylaws",
+    "title": "Balcony Structural Variations for Blinds",
+    "content": "When measuring or getting quotes for balcony outdoor blinds, note that one side of the balcony features a half-height wall. This means the blind panels will not be uniform in height, which can reduce the overall cost of installation."
+  },
+  {
+    "topic": "bylaws",
+    "title": "Invisible Grille Installation",
+    "content": "Invisible grilles are allowed for balcony installation. Residents planning to install them often pair them with zip blinds, with options like Teflon-coated grilles being considered. Ensure you verify the approved specifications with the Managing Agent."
+  },
+  {
+    "topic": "bylaws",
+    "title": "Function Room Amenities",
+    "content": "The condominium's function room includes a pool (billiard) table available for resident booking and use."
+  },
+  {
+    "topic": "mall",
+    "title": "Mall Opening Timeline and Childcare Status",
+    "content": "According to official developer correspondence, Lentor Modern Mall is projected to open to the public in early 2026. The developer is currently in discussions with various childcare providers to finalize the anchor preschool tenant."
+  },
+  {
+    "topic": "mall",
+    "title": "Visitor Access Route from MRT and Taxi Stand",
+    "content": "For visitors arriving via MRT or taxi, the primary pedestrian access route to the residential blocks is through the concierge entrance located near Burger King. Residents may need to escort guests if they do not use this entrance."
+  },
+  {
+    "topic": "mall",
+    "title": "Vehicle Entrance and Slip Road Layout",
+    "content": "The development features a single-lane 'IN' slip road shared by both residents and the public. This lane subsequently splits, directing residential traffic to the left and mall-bound traffic to the right."
+  },
+  {
+    "topic": "mall",
+    "title": "Burner Bin Location",
+    "content": "A burner bin is located outside the mall area, situated near the entrance of the carpark along the grass strip."
+  },
+  {
+    "topic": "mall",
+    "title": "Retailer Updates and Directory",
+    "content": "The official Lentor Modern website (lentormodern.com.sg) has been updated with an 'Opening Soon: F&B and Essentials' section. Confirmed upcoming tenants include CS Fresh (supermarket), Pinnacle Clinic, and Omote."
+  },
+  {
+    "topic": "appliances",
+    "title": "SMEG Induction Hob 'L' Code Unlock",
+    "content": "When code 'L' appears on your SMEG induction hob display, the Child Controls Lock is engaged. With at least one zone powered, press and hold the Key Symbol button for 1-2 seconds until the LED turns off."
+  },
+  {
+    "topic": "logistics",
+    "title": "Fiber Broadband Riser Key for Internet Setup",
+    "content": "For Singtel, Starhub, or Simba fiber broadband activation, telecom technicians need access to the floor's fiber riser closet. Request the riser key from the 24/7 Security Guardhouse 15 minutes before your technician arrives."
+  },
+  {
+    "topic": "logistics",
+    "title": "Residential Loading Bay & Bulky Deliveries",
+    "content": "Delivery trucks for Taobao, furniture, or appliances should enter via the residential car park ramp on Lentor Central (height limit 3.8m). Inform security at the barrier that it is a residential delivery."
+  },
+  {
+    "topic": "defects",
+    "title": "Novade App Defect Reporting Workflow",
+    "content": "When logging defects in Novade, take one wide photo showing the whole wall/floor and one close-up macro photo with blue masking tape marking the spot. This avoids contractors rejecting tickets for 'location unclear'."
+  },
+  {
+    "topic": "bylaws",
+    "title": "Balcony Ziprak & External Blind Restrictions",
+    "content": "Exterior balcony blinds must comply with GuocoLand / MCST uniform colour and material by-laws (dark grey / charcoal perforated zip blinds). Unapproved colours will fail inspection and forfeit renovation deposit."
+  },
+  {
+    "topic": "mall",
+    "title": "CS Fresh Evening Grocery Discounts",
+    "content": "CS Fresh supermarket at B1 of Lentor Modern Mall regularly discounts sushi, ready-to-eat bento boxes, and fresh bakery items by 20% to 30% daily starting from 8:30 PM."
+  },
+  {
+    "topic": "appliances",
+    "title": "Yale Digital Lock Emergency 9V Jumpstart",
+    "content": "If your Yale main door lock batteries are completely flat, touch a standard rectangular 9V battery against the two external contact pins below the lock keypad to power the lock temporarily and enter your PIN."
+  },
+  {
+    "topic": "cooling",
+    "title": "Aircon SWG Copper Piping Specifications",
+    "content": "When engaging third-party aircon servicing or relocation, ensure contractors strictly adhere to GuocoLand's specification of SWG 22 (0.71mm thickness) copper piping to maintain building warranty."
   }
 ]

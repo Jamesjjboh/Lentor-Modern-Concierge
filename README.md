@@ -42,9 +42,11 @@ flowchart TD
     end
 
     subgraph KnowledgeData["Clean Knowledge Layer (data/processed/)"]
-        Tool1 --- K1[("bylaws_handbook.json")]
+        Tool1 --- K1[("bylaws_handbook.json<br/>(Bylaws, Specs & Contacts)")]
+        Tool1 --- K4[("appliance_manuals.json<br/>(SMEG, Yale, Rheem, Aircon)")]
+        Tool1 --- K5[("estate_contacts.json<br/>(21 Supplier Hotlines)")]
         Tool2 --- K2[("mall_directory.json")]
-        Tool3 --- K3[("verified_community_tips.json")]
+        Tool3 --- K3[("verified_community_tips.json<br/>(31 Verified Resident Tips)")]
     end
 
     subgraph DatabaseLayer["Cloud Persistence & Moderation"]
@@ -60,9 +62,9 @@ flowchart TD
 
 | Tool | Purpose | Data Source |
 | :--- | :--- | :--- |
-| `search_bylaws_and_handbook(query)` | Queries official MCST by-laws, renovation working hours, deposit schedules, lift booking rules, and defect protocols. | `data/processed/bylaws_handbook.json` |
+| `search_bylaws_and_handbook(query)` | Queries official MCST by-laws, 8 appliance user manuals (SMEG, Yale, Rheem, Mitsubishi), 21 supplier hotlines, Novade defect logging, and renovation rules. | `data/processed/bylaws_handbook.json` + `appliance_manuals.json` + `estate_contacts.json` |
 | `search_mall_directory(category, shop_name)` | Looks up Lentor Modern Mall shops (CS Fresh, Minmed Clinic, Guardian, Toast Box), floor levels (`B1`, `L1`), and hours. | `data/processed/mall_directory.json` |
-| `get_verified_community_tips(topic)` | Retrieves verified crowdsourced neighbour tips (loading bay directions, induction cooker lock quirks, aircon copper piping SWG requirements). | `data/processed/verified_community_tips.json` + Firestore approved tips |
+| `get_verified_community_tips(topic)` | Retrieves verified crowdsourced neighbour tips (Level 2 delivery intercom, 3.0m height clearance, smart switch neutral wire requirements). | `data/processed/verified_community_tips.json` + Firestore approved tips |
 | `generate_mcst_email_draft(issue_type, details)` | Formats structured, professional inquiries ready to copy-paste to the Managing Agent (MA). | Dynamic Agent Template |
 | `submit_tip_to_moderation(topic, tip_text)` | Automatically structures resident discoveries and queues them for admin approval. | Firestore `community_tips/` queue |
 | `submit_developer_feedback(category, details)` | Automatically captures resident feedback, bug reports, or handbook corrections and routes them directly to the developer. | Firestore `resident_feedback/` queue |

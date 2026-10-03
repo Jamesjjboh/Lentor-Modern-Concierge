@@ -7,6 +7,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.3.0] - 2026-10-03
+
+### Added
+- **Official Developer Documentation & Appliance Manual Ingestion**:
+  - Extracted 44 official GuocoLand handover PDFs into structured knowledge stores (`data/processed/`).
+  - Added full operational, maintenance, and error code guides for 8 home appliances:
+    - SMEG Induction Hob (`SI2321D`): Child lock ('L') unlock steps, power booster, weekly cleaning.
+    - SMEG Washer-Dryer (`WDJ852ESG`): Wash/dry cycles, error codes (`E01`-`E04`), drain pump maintenance.
+    - SMEG Convectional Oven (`SF6300TVX`), Cooker Hood (`KSET62E`), and Fridge (`FC60EN3XL`).
+    - Yale Digital Lock (`YDM7116A`): PIN setup, RFID pairing, emergency 9V battery jumpstart.
+    - Rheem Storage Water Heater: Operation, safety relief valve, thermostat.
+    - Mitsubishi Wall Mounted Aircon: Modes, vane positioning, filter cleaning cadence.
+    - Smart Letterbox Lock (`S301`): PIN reset and programming.
+  - Added official contacts directory (`estate_contacts.json`) covering 21 suppliers (Mitsubishi, SMEG, Yale, Fermax, TK Elevator, Carera, SP Services, City Energy).
+  - Added Novade Defect Inspection guide and BCA 12-month Defect Liability Period (DLP) protocol.
+  - Added material maintenance guides for engineered timber flooring, wall/floor tiles, solid surfaces, and windows.
+- **Telegram Resident Chat Export Synthesis**:
+  - Ingested 14 Telegram HTML chat files (9,802 messages) from verified owners and resident groups.
+  - Applied automated filtering to eliminate 1,649 conversational chatter messages and 239 commercial ads / group buys (durians, ID packages, curtain pitches, marketplace sales).
+  - Enforced strict Singapore PII sanitization (redacting `#XX-YY` unit numbers, `+65` numbers, and personal names).
+  - Synthesized 31 verified, high-impact resident tips and workarounds into `verified_community_tips.json` (Level 2 delivery intercom access, 3.0m car park height limit, smart switch neutral wire requirements, and Novade defect photo practices).
+
+---
+
 ## [1.2.0] - 2026-10-03
 
 ### Added

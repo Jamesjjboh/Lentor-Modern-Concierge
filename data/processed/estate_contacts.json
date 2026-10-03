@@ -1,0 +1,128 @@
+[
+  {
+    "category": "Air Conditioning (ACMV)",
+    "provider": "Mitsubishi Electric Asia Pte Ltd",
+    "contact": "6473 2308",
+    "notes": "VRV / Wall Mounted Aircon servicing & warranty"
+  },
+  {
+    "category": "Aluminium Windows & Sliding Doors",
+    "provider": "Hungsen Engineering Pte Ltd",
+    "contact": "6339 2131",
+    "notes": "Balcony sliding glass doors, window gaskets"
+  },
+  {
+    "category": "Intercom & Access Card Security",
+    "provider": "Fermax Asia Pte Ltd",
+    "contact": "6259 0700",
+    "notes": "Audio/video intercom, residential access cards"
+  },
+  {
+    "category": "Bi-fold Doors",
+    "provider": "PD Door Pte Ltd",
+    "contact": "6776 6666",
+    "notes": "Bathroom and kitchen bi-fold doors"
+  },
+  {
+    "category": "Digital Lockset (Main Door)",
+    "provider": "Assa Abloy Singapore (Yale)",
+    "contact": "6591 8868",
+    "notes": "Yale YDM7116A digital lock support & RFID pairing"
+  },
+  {
+    "category": "Engineered Timber Flooring",
+    "provider": "T. J. Seang Holdings Pte Ltd",
+    "contact": "6745 0434",
+    "notes": "Bedroom timber flooring care and repair"
+  },
+  {
+    "category": "Electric Storage Water Heater",
+    "provider": "Rheem Manufacturing Company",
+    "contact": "6872 2043",
+    "notes": "Ceiling storage water heater servicing"
+  },
+  {
+    "category": "Gas Water Heater",
+    "provider": "Ferroli - Casa (S) Pte Ltd",
+    "contact": "9747 8743 (WhatsApp)",
+    "notes": "Town gas water heater units"
+  },
+  {
+    "category": "Home Fire Alarm Device (HFAD)",
+    "provider": "Fermax Asia Pte Ltd",
+    "contact": "6259 0700",
+    "notes": "Smoke detector & fire alarm sensor"
+  },
+  {
+    "category": "Kitchen Appliances (SMEG)",
+    "provider": "SMEG Singapore",
+    "contact": "6950 0910",
+    "notes": "Induction hob, oven, washer-dryer, cooker hood, fridge"
+  },
+  {
+    "category": "Smart Letter Box Lock",
+    "provider": "Metform Industries Pte Ltd",
+    "contact": "6757 2822",
+    "notes": "S301 digital letterbox lock"
+  },
+  {
+    "category": "Passenger & Service Lifts",
+    "provider": "TK Elevator (Singapore) Pte Ltd",
+    "contact": "6890 1640",
+    "notes": "24/7 lift rescue & maintenance"
+  },
+  {
+    "category": "Pocket Sliding Doors",
+    "provider": "Slide & Hide System (S) Pte Ltd",
+    "contact": "6369 9988",
+    "notes": "Concealed sliding door hardware"
+  },
+  {
+    "category": "Smart Home Automation",
+    "provider": "Fermax Asia Pacific Pte Ltd",
+    "contact": "6259 0700",
+    "notes": "Smart home hub, lighting module, Zigbee gateway"
+  },
+  {
+    "category": "Sanitary Ware & Fittings",
+    "provider": "Carera Bathroom Pte Ltd",
+    "contact": "6533 0455",
+    "notes": "Basin taps, shower mixers, WC flushing systems"
+  },
+  {
+    "category": "Shower Screens",
+    "provider": "Jin Yuan Engineering (S) Pte Ltd",
+    "contact": "6481 5622",
+    "notes": "Tempered glass shower screen & door seals"
+  },
+  {
+    "category": "Floor & Wall Tiles",
+    "provider": "Masonry Pte Ltd",
+    "contact": "6352 8981",
+    "notes": "Living room & bathroom tiles"
+  },
+  {
+    "category": "Cabinetry & Wardrobes",
+    "provider": "King Hup Construction Pte Ltd",
+    "contact": "6220 5653",
+    "notes": "Built-in wardrobes, vanity drawers, kitchen cabinets"
+  },
+  {
+    "category": "Main Contractor",
+    "provider": "Lian Beng Construction (1988) Pte Ltd",
+    "contact": "Via Managing Agent / BSC",
+    "notes": "Handover defects rectification & structural works"
+  },
+  {
+    "category": "City Energy (Town Gas)",
+    "provider": "City Energy Pte Ltd",
+    "contact": "1800-555-1661",
+    "notes": "Gas supply turn-on appointment"
+  },
+  {
+    "category": "SP Group (Electricity & Water)",
+    "provider": "SP Services Ltd",
+    "contact": "1800-222-2333",
+    "notes": "Utilities meter activation & billing"
+  }
+]

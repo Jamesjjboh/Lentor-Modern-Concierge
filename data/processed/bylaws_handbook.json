@@ -1,42 +1,172 @@
 [
   {
-    "topic": "Renovation Hours & Rules",
-    "section": "By-Law 4.1: Fitting Out & Renovation Guidelines",
-    "content": "Permitted renovation hours are Monday to Friday: 09:00 - 17:00. Strictly NO noisy work or renovation permitted on Saturdays, Sundays, and Public Holidays. Heavy hacking and drilling are only allowed between 09:00 - 13:00 on weekdays to minimize disturbance. Contractors must register daily at the security guardhouse."
+    "topic": "Handover Defects & BSC Inspection (Novade)",
+    "section": "Defect Reporting Protocol",
+    "content": "Official defect reporting at Lentor Modern is conducted via the Novade Quality mobile app. Step 1: Log in with credentials provided during key collection. Step 2: Tap 'Lodge a Defect', select your unit, unit location (e.g. Master Bedroom, Living Room), and defect element (e.g. Tiles, Painting, Joinery). Step 3: Attach clear photos with close-up and wide perspective. Step 4: Submit ticket. Status will progress: 'Pending Contractor' -> 'Under Rectification' -> 'Ready for Joint Inspection'. Joint inspection must be signed off on the app once repairs are satisfied."
   },
   {
-    "topic": "Renovation Deposit & Submissions",
-    "section": "By-Law 4.3: Renovation Deposit",
-    "content": "A refundable renovation deposit of $2,000 (standard units) or $3,000 (penthouses/large units) along with a non-refundable admin fee of $109 (inclusive of GST) must be submitted to the Managing Agent at least 7 working days prior to commencement of works. Deposit is refunded within 30 days after joint inspection confirms no damage to common property."
+    "topic": "Defect Liability Period (DLP)",
+    "section": "Warranty Guidelines",
+    "content": "Under the BCA Standard Sale & Purchase Agreement, Lentor Modern has a 12-month Defect Liability Period (DLP) starting from the Notice of Vacant Possession. The developer and main contractor (Lian Beng) are legally required to rectify any defects arising from defective materials or workmanship within 30 days of notification. Report defects as early as possible before starting major renovation hacking to avoid dispute on liability."
   },
   {
-    "topic": "Moving In, Moving Out & Delivery Regulations",
-    "section": "By-Law 5.0: Moving Procedures & Lift Booking",
-    "content": "Moving in/out must be booked with the Concierge / Managing Agent at least 3 business days in advance. Moving hours: Monday to Saturday 09:00 - 17:00. Strictly no moving activities on Sundays and Public Holidays. A refundable deposit of $500 is required for lift padding and protection. Max loading bay clearance height is 3.8m."
+    "topic": "Engineered Timber Flooring Maintenance",
+    "section": "Interior Care Guidelines",
+    "content": "Bedroom flooring at Lentor Modern is engineered timber. Maintenance rules: 1. NEVER wet mop with standing water (causes warping or buckling). Use a damp microfiber cloth with neutral PH timber cleaner. 2. Keep balcony sliding doors closed during heavy rain to prevent water ingress. 3. Apply felt pads under furniture legs (bed frames, chairs, tables) to prevent deep scratches. 4. Avoid dragging heavy luggage or furniture."
   },
   {
-    "topic": "Aircon Ledge & Balcony Rules",
-    "section": "By-Law 7.2: Air-Conditioner Ledge & Facade Uniformity",
-    "content": "Aircon ledges are strictly reserved for condensing units. Residents are prohibited from placing storage items, racks, or clothes drying equipment on aircon ledges for safety and fire regulations. Balcony screens must comply with developer-approved motorized zip screen specifications and colors (Grey tone matching facade)."
+    "topic": "Renovation Working Hours & Moving By-Laws",
+    "section": "MCST Renovation By-Laws",
+    "content": "Renovation working hours: Monday to Friday: 9:00 AM – 5:00 PM; Saturday: 9:00 AM – 1:00 PM. STRICTLY NO noisy work (drilling, hacking, demolition) on Sundays and Public Holidays. Deposit: S$1,000 for non-hacking, S$2,000 for hacking works (refundable upon completion). Lift padding must be booked with the estate office at least 3 days prior to moving bulky items to protect lift finishes (failure incurs S$300 penalty)."
   },
   {
-    "topic": "Fiber Broadband & Utility Risers",
-    "section": "By-Law 6.4: Common Utility Risers & Telecom Access",
-    "content": "Fiber broadband telecom risers are located at common lift lobbies on each floor and are kept locked for fire safety. To unlock the riser for OpenNet / NetLink Trust / Telco fiber installation technicians, residents or their contractors must request the master riser key from the Ground Floor Security Guardhouse / Concierge. The technician's pass must be deposited."
+    "topic": "Residential Loading Bay & Delivery Access",
+    "section": "Estate Logistics",
+    "content": "Residential delivery loading bays are accessed via the dedicated residential ramp along Lentor Central (separate from the commercial Lentor Modern Mall loading dock). Height limit: 3.8 metres for the residential loading area. Heavy vehicles exceeding 4.2m must coordinate with security. Delivery riders can access towers via the B1 / Level 1 residential lobbies with intercom buzzer clearance from residents."
   },
   {
-    "topic": "Facilities Booking & Operating Hours",
-    "section": "By-Law 8.0: Recreational Facilities",
-    "content": "Gymnasium: 06:00 - 22:00 daily (access via resident RFID card / mobile app). Swimming Pool & Jacuzzi: 07:00 - 22:00 daily (cleaning on Tuesdays 08:00 - 11:00). BBQ Pavilions: Session 1 (10:00 - 15:00), Session 2 (17:00 - 22:00). BBQ bookings require a $50 refundable cleaning deposit. Max 10 guests per BBQ booking."
+    "topic": "Contact: Air Conditioning (ACMV)",
+    "section": "Mitsubishi Electric Asia Pte Ltd",
+    "content": "Air Conditioning (ACMV): Mitsubishi Electric Asia Pte Ltd (Tel: 6473 2308). Notes: VRV / Wall Mounted Aircon servicing & warranty"
   },
   {
-    "topic": "Parking & Vehicle Access",
-    "section": "By-Law 9.1: Car Park System & Resident Season Parking",
-    "content": "Lentor Modern utilizes an Electronic Road Pricing (ERP) / In-Vehicle Unit (IU) carpark barrier system. Each residential unit is entitled to 1 complimentary first-car season parking lot. Second car applications are subject to availability and council balloting at $150/month. Visitor parking rates apply after a 15-minute grace period."
+    "topic": "Contact: Aluminium Windows & Sliding Doors",
+    "section": "Hungsen Engineering Pte Ltd",
+    "content": "Aluminium Windows & Sliding Doors: Hungsen Engineering Pte Ltd (Tel: 6339 2131). Notes: Balcony sliding glass doors, window gaskets"
   },
   {
-    "topic": "Defects Liability Period (DLP) & Handover",
-    "section": "Handover Guide 2.0: Defect Rectification Protocol",
-    "content": "The 12-month Defects Liability Period (DLP) begins from the Notice of Vacant Possession. Residents must log defects via the official GuocoLand resident mobile app or submit the Defect List to the Customer Service Centre / Handover Office on Level 4. Defect contractor appointments must be confirmed with the Handover team."
+    "topic": "Contact: Intercom & Access Card Security",
+    "section": "Fermax Asia Pte Ltd",
+    "content": "Intercom & Access Card Security: Fermax Asia Pte Ltd (Tel: 6259 0700). Notes: Audio/video intercom, residential access cards"
+  },
+  {
+    "topic": "Contact: Bi-fold Doors",
+    "section": "PD Door Pte Ltd",
+    "content": "Bi-fold Doors: PD Door Pte Ltd (Tel: 6776 6666). Notes: Bathroom and kitchen bi-fold doors"
+  },
+  {
+    "topic": "Contact: Digital Lockset (Main Door)",
+    "section": "Assa Abloy Singapore (Yale)",
+    "content": "Digital Lockset (Main Door): Assa Abloy Singapore (Yale) (Tel: 6591 8868). Notes: Yale YDM7116A digital lock support & RFID pairing"
+  },
+  {
+    "topic": "Contact: Engineered Timber Flooring",
+    "section": "T. J. Seang Holdings Pte Ltd",
+    "content": "Engineered Timber Flooring: T. J. Seang Holdings Pte Ltd (Tel: 6745 0434). Notes: Bedroom timber flooring care and repair"
+  },
+  {
+    "topic": "Contact: Electric Storage Water Heater",
+    "section": "Rheem Manufacturing Company",
+    "content": "Electric Storage Water Heater: Rheem Manufacturing Company (Tel: 6872 2043). Notes: Ceiling storage water heater servicing"
+  },
+  {
+    "topic": "Contact: Gas Water Heater",
+    "section": "Ferroli - Casa (S) Pte Ltd",
+    "content": "Gas Water Heater: Ferroli - Casa (S) Pte Ltd (Tel: 9747 8743 (WhatsApp)). Notes: Town gas water heater units"
+  },
+  {
+    "topic": "Contact: Home Fire Alarm Device (HFAD)",
+    "section": "Fermax Asia Pte Ltd",
+    "content": "Home Fire Alarm Device (HFAD): Fermax Asia Pte Ltd (Tel: 6259 0700). Notes: Smoke detector & fire alarm sensor"
+  },
+  {
+    "topic": "Contact: Kitchen Appliances (SMEG)",
+    "section": "SMEG Singapore",
+    "content": "Kitchen Appliances (SMEG): SMEG Singapore (Tel: 6950 0910). Notes: Induction hob, oven, washer-dryer, cooker hood, fridge"
+  },
+  {
+    "topic": "Contact: Smart Letter Box Lock",
+    "section": "Metform Industries Pte Ltd",
+    "content": "Smart Letter Box Lock: Metform Industries Pte Ltd (Tel: 6757 2822). Notes: S301 digital letterbox lock"
+  },
+  {
+    "topic": "Contact: Passenger & Service Lifts",
+    "section": "TK Elevator (Singapore) Pte Ltd",
+    "content": "Passenger & Service Lifts: TK Elevator (Singapore) Pte Ltd (Tel: 6890 1640). Notes: 24/7 lift rescue & maintenance"
+  },
+  {
+    "topic": "Contact: Pocket Sliding Doors",
+    "section": "Slide & Hide System (S) Pte Ltd",
+    "content": "Pocket Sliding Doors: Slide & Hide System (S) Pte Ltd (Tel: 6369 9988). Notes: Concealed sliding door hardware"
+  },
+  {
+    "topic": "Contact: Smart Home Automation",
+    "section": "Fermax Asia Pacific Pte Ltd",
+    "content": "Smart Home Automation: Fermax Asia Pacific Pte Ltd (Tel: 6259 0700). Notes: Smart home hub, lighting module, Zigbee gateway"
+  },
+  {
+    "topic": "Contact: Sanitary Ware & Fittings",
+    "section": "Carera Bathroom Pte Ltd",
+    "content": "Sanitary Ware & Fittings: Carera Bathroom Pte Ltd (Tel: 6533 0455). Notes: Basin taps, shower mixers, WC flushing systems"
+  },
+  {
+    "topic": "Contact: Shower Screens",
+    "section": "Jin Yuan Engineering (S) Pte Ltd",
+    "content": "Shower Screens: Jin Yuan Engineering (S) Pte Ltd (Tel: 6481 5622). Notes: Tempered glass shower screen & door seals"
+  },
+  {
+    "topic": "Contact: Floor & Wall Tiles",
+    "section": "Masonry Pte Ltd",
+    "content": "Floor & Wall Tiles: Masonry Pte Ltd (Tel: 6352 8981). Notes: Living room & bathroom tiles"
+  },
+  {
+    "topic": "Contact: Cabinetry & Wardrobes",
+    "section": "King Hup Construction Pte Ltd",
+    "content": "Cabinetry & Wardrobes: King Hup Construction Pte Ltd (Tel: 6220 5653). Notes: Built-in wardrobes, vanity drawers, kitchen cabinets"
+  },
+  {
+    "topic": "Contact: Main Contractor",
+    "section": "Lian Beng Construction (1988) Pte Ltd",
+    "content": "Main Contractor: Lian Beng Construction (1988) Pte Ltd (Tel: Via Managing Agent / BSC). Notes: Handover defects rectification & structural works"
+  },
+  {
+    "topic": "Contact: City Energy (Town Gas)",
+    "section": "City Energy Pte Ltd",
+    "content": "City Energy (Town Gas): City Energy Pte Ltd (Tel: 1800-555-1661). Notes: Gas supply turn-on appointment"
+  },
+  {
+    "topic": "Contact: SP Group (Electricity & Water)",
+    "section": "SP Services Ltd",
+    "content": "SP Group (Electricity & Water): SP Services Ltd (Tel: 1800-222-2333). Notes: Utilities meter activation & billing"
+  },
+  {
+    "topic": "Appliance: SMEG Induction 2 Zone Hob (SI2321D)",
+    "section": "kitchen_appliances",
+    "content": "SMEG Induction 2 Zone Hob (SI2321D): 2 induction cooking zones with power booster, touch slider control, automatic pan detection, timer, and controls lock. Troubleshooting: If code 'L' appears, the child lock is active (hold Key button for 1 second). If 'E' or error numbers flash, turn off the hob at the main isolator switch for 30 seconds and switch back on. Supplier Hotline: SMEG Singapore: 6950 0910"
+  },
+  {
+    "topic": "Appliance: SMEG Front Load Washer Dryer (WDJ852ESG (8kg Wash / 5kg Dry))",
+    "section": "kitchen_appliances",
+    "content": "SMEG Front Load Washer Dryer (WDJ852ESG (8kg Wash / 5kg Dry)): 15 programs including Quick 15', Allergy Care, Steam Refresh, Eco 40-60, and Auto Dry. Troubleshooting: E01/E02: Water inlet issue (check tap is turned on). E03: Drainage error (clean drain pump filter at bottom right). E04: Door lock error (ensure door is firmly closed). Supplier Hotline: SMEG Singapore: 6950 0910"
+  },
+  {
+    "topic": "Appliance: SMEG Built-In Convectional Oven (SF6300TVX)",
+    "section": "kitchen_appliances",
+    "content": "SMEG Built-In Convectional Oven (SF6300TVX): 6 cooking functions (Static, Fan Assisted, Circulaire, Eco, Large Grill, Fan Grill), 50°C to 250°C temperature range, electronic clock/timer. Troubleshooting:  Supplier Hotline: SMEG Singapore: 6950 0910"
+  },
+  {
+    "topic": "Appliance: SMEG Telescopic Cooker Hood (KSET62E)",
+    "section": "kitchen_appliances",
+    "content": "SMEG Telescopic Cooker Hood (KSET62E): Telescopic pull-out extraction hood with 3-speed slider controls and twin LED spotlights. Troubleshooting:  Supplier Hotline: SMEG Singapore: 6950 0910"
+  },
+  {
+    "topic": "Appliance: Yale Digital Door Lock (YDM7116A)",
+    "section": "access_control",
+    "content": "Yale Digital Door Lock (YDM7116A): Fingerprint recognition, RFID key card / tag, Master/User PIN code, physical override key, and mobile Bluetooth/Zigbee access. Troubleshooting:  Supplier Hotline: Assa Abloy (Yale): 6591 8868"
+  },
+  {
+    "topic": "Appliance: Rheem Ceiling Electric Storage Water Heater (Rheem Classic / Horizontal Series)",
+    "section": "plumbing_heating",
+    "content": "Rheem Ceiling Electric Storage Water Heater (Rheem Classic / Horizontal Series): Heavy gauge steel tank with vitreous enamel coating, CFC-free polyurethane insulation, safety temperature relief valve. Troubleshooting:  Supplier Hotline: Rheem Singapore: 6872 2043"
+  },
+  {
+    "topic": "Appliance: Mitsubishi Electric Wall Mounted Multi-Split Air Conditioning (Mitsubishi Electric Inverter Multi-Split (R32 / R410A))",
+    "section": "cooling_acmv",
+    "content": "Mitsubishi Electric Wall Mounted Multi-Split Air Conditioning (Mitsubishi Electric Inverter Multi-Split (R32 / R410A)): Econo Cool energy saving mode, Nano Platinum / Catechin air filter, horizontal & vertical auto vane, 24-hour timer. Troubleshooting:  Supplier Hotline: Mitsubishi Electric: 6473 2308"
+  },
+  {
+    "topic": "Appliance: Smart Letter Box Electronic Lock (S301)",
+    "section": "access_control",
+    "content": "Smart Letter Box Electronic Lock (S301): Touch numeric keypad, master code, user code, low battery warning. Troubleshooting:  Supplier Hotline: Metform Industries: 6757 2822"
   }
 ]

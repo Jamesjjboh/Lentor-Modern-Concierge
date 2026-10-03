@@ -26,6 +26,9 @@ class DatabaseClient:
         self._mock_logs: List[Dict[str, Any]] = []
         self._mock_tips: Dict[str, Dict[str, Any]] = {}
         self._mock_tip_counter = 1
+        self._mock_feedback: Dict[str, Dict[str, Any]] = {}
+        self._mock_feedback_counter = 1
+        self._mock_reply_mappings: Dict[str, Dict[str, Any]] = {}
 
         self._init_client()
 
@@ -237,9 +240,126 @@ class DatabaseClient:
         )
         return [int(d.id) for d in docs]
 
+    # --- Resident Feedback & Developer 2-Way Reply ---
+    def submit_feedback(
+        self,
+        user_id: int,
+        username: Optional[str],
+        first_name: Optional[str],
+        category: str,
+        message: str,
+        has_image: bool = False,
+        image_summary: Optional[str] = None,
+    ) -> str:
+        """Stores resident feedback or bug report with status 'new'."""
+        now = datetime.now(timezone.utc).isoformat()
+        feedback_data = {
+            "user_id": str(user_id),
+            "username": username,
+            "first_name": first_name,
+            "category": category,
+            "message": message,
+            "has_image": has_image,
+            "image_summary": image_summary,
+            "created_at": now,
+            "status": "new",
+            "admin_reply": None,
+            "replied_at": None,
+        }
+
+        if self._mock_mode or not self.db:
+            fb_id = f"fb_{self._mock_feedback_counter}"
+            self._mock_feedback_counter += 1
+            feedback_data["feedback_id"] = fb_id
+            self._mock_feedback[fb_id] = feedback_data
+            return fb_id
+
+        doc_ref = self.db.collection("resident_feedback").document()
+        feedback_data["feedback_id"] = doc_ref.id
+        doc_ref.set(feedback_data)
+        return doc_ref.id
+
+    def save_admin_reply_mapping(
+        self,
+        admin_message_id: int,
+        user_id: int,
+        resident_name: str,
+        feedback_id: str,
+    ):
+        """Saves a mapping from the Telegram message ID sent to admin to the resident's user ID."""
+        mapping_data = {
+            "admin_message_id": admin_message_id,
+            "user_id": str(user_id),
+            "resident_name": resident_name,
+            "feedback_id": feedback_id,
+            "created_at": datetime.now(timezone.utc).isoformat(),
+        }
+        msg_key = str(admin_message_id)
+        if self._mock_mode or not self.db:
+            self._mock_reply_mappings[msg_key] = mapping_data
+            return
+
+        self.db.collection("admin_reply_mappings").document(msg_key).set(mapping_data)
+
+    def get_admin_reply_mapping(self, admin_message_id: int) -> Optional[Dict[str, Any]]:
+        """Retrieves resident mapping info for a replied-to admin message ID."""
+        msg_key = str(admin_message_id)
+        if self._mock_mode or not self.db:
+            return self._mock_reply_mappings.get(msg_key)
+
+        doc = self.db.collection("admin_reply_mappings").document(msg_key).get()
+        if doc.exists:
+            return doc.to_dict()
+        return None
+
+    def update_feedback_status(
+        self,
+        feedback_id: str,
+        status: str,
+        admin_reply: Optional[str] = None,
+    ) -> bool:
+        """Updates status of a feedback entry ('replied' or 'resolved')."""
+        now = datetime.now(timezone.utc).isoformat()
+        update_data = {
+            "status": status,
+            "updated_at": now,
+        }
+        if admin_reply:
+            update_data["admin_reply"] = admin_reply
+            update_data["replied_at"] = now
+
+        if self._mock_mode or not self.db:
+            if feedback_id in self._mock_feedback:
+                self._mock_feedback[feedback_id].update(update_data)
+                return True
+            return False
+
+        doc_ref = self.db.collection("resident_feedback").document(feedback_id)
+        doc = doc_ref.get()
+        if not doc.exists:
+            return False
+        doc_ref.update(update_data)
+        return True
+
+    def get_feedback_stats(self) -> Dict[str, Any]:
+        """Returns counts of total feedback and unresolved items."""
+        if self._mock_mode or not self.db:
+            total = len(self._mock_feedback)
+            unresolved = len([fb for fb in self._mock_feedback.values() if fb.get("status") == "new"])
+            return {"total_feedback": total, "unresolved_feedback": unresolved}
+
+        try:
+            docs = list(self.db.collection("resident_feedback").limit(500).stream())
+            total = len(docs)
+            unresolved = len([d for d in docs if d.to_dict().get("status") == "new"])
+            return {"total_feedback": total, "unresolved_feedback": unresolved}
+        except Exception:
+            return {"total_feedback": 0, "unresolved_feedback": 0}
+
     # --- Analytics & Content Gaps ---
     def get_analytics_summary(self) -> Dict[str, Any]:
-        """Summarizes total users, total queries, and unresolved queries for admin."""
+        """Summarizes total users, total queries, content gaps, and feedback counts."""
+        fb_stats = self.get_feedback_stats()
         if self._mock_mode or not self.db:
             total_users = len(self._mock_users)
             total_queries = len(self._mock_logs)
@@ -252,6 +372,8 @@ class DatabaseClient:
                 "total_queries": total_queries,
                 "unanswered_count": len(unanswered),
                 "unanswered_examples": unanswered[:5],
+                "total_feedback": fb_stats["total_feedback"],
+                "unresolved_feedback": fb_stats["unresolved_feedback"],
             }
 
         users_count = len(list(self.db.collection("users").limit(1000).stream()))
@@ -267,6 +389,8 @@ class DatabaseClient:
             "total_users": users_count,
             "unanswered_count": len(unanswered_queries),
             "unanswered_examples": unanswered_queries[:5],
+            "total_feedback": fb_stats["total_feedback"],
+            "unresolved_feedback": fb_stats["unresolved_feedback"],
         }
 
 

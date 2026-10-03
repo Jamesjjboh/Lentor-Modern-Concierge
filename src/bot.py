@@ -18,14 +18,20 @@ from telegram.ext import (
 from telegram.request import HTTPXRequest
 
 
+import re
+
 from src.admin import (
     handle_admin_stats_command,
     handle_broadcast_command,
+    handle_feedback_callback,
     handle_moderation_callback,
+    handle_reply_command,
+    is_admin,
+    notify_admin_new_feedback,
     notify_admin_new_tip,
 )
 from src.agent import concierge_agent, submit_tip_to_moderation
-from src.config import ENVIRONMENT, PORT, TELEGRAM_BOT_TOKEN, WEBHOOK_URL
+from src.config import ADMIN_TELEGRAM_ID, ENVIRONMENT, PORT, TELEGRAM_BOT_TOKEN, WEBHOOK_URL
 from src.database import db_client
 
 logging.basicConfig(
@@ -62,6 +68,8 @@ async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
         f"💡 *Got a helpful tip for your neighbours?*\n"
         f"Snap a photo of any mall promo or notice, or type:\n"
         f"`/tip <topic> <your tip>` (e.g. `/tip mall CS Fresh sushi discounts start after 8:30pm`)\n\n"
+        f"🛠️ *Feedback or Bug Report?*\n"
+        f"Help improve this bot! Type `/feedback <suggestion>` or `/bug <issue>` to message the developer (@jamesjjboh) directly.\n\n"
         f"How can I assist you today?"
     )
     await update.message.reply_text(welcome_text, parse_mode="Markdown")
@@ -78,10 +86,13 @@ async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "🤖 *Lentor Modern Concierge Commands:*\n\n"
         "• Just message me directly with any question about estate rules, facilities, or mall shops.\n"
         "• `/tip <topic> <advice>` — Submit a community tip for admin review.\n"
+        "• `/feedback <suggestion>` — Send feature ideas or feedback directly to developer @jamesjjboh.\n"
+        "• `/bug <issue>` — Report an inaccurate answer or technical bug.\n"
         "• `/help` — View this assistance message.\n\n"
         "*Admin Commands:*\n"
+        "• `/reply <user_id> <message>` — Send direct message to a resident.\n"
         "• `/broadcast <message>` — Send estate broadcast to registered residents.\n"
-        "• `/admin_stats` — View resident activity and content gaps."
+        "• `/admin_stats` — View resident activity, feedback, and content gaps."
     )
     await update.message.reply_text(help_text, parse_mode="Markdown")
 
@@ -94,7 +105,7 @@ async def tip_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     if not context.args or len(context.args) < 2:
         await update.message.reply_text(
-            "Format: `/tip <topic> <your tip>`\nExample: `/tip wifi Ask security for Tower 1 riser key early`",
+            "Format: `/tip <topic> <your tip>`\nExample: `/tip mall CS Fresh sushi discounts start after 8:30pm`",
             parse_mode="Markdown",
         )
         return
@@ -113,12 +124,161 @@ async def tip_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     )
 
 
+async def feedback_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Allows residents to submit feature ideas or general feedback to the developer."""
+    user = update.effective_user
+    message = update.message
+    if not user or not message:
+        return
+
+    if update.effective_chat and update.effective_chat.type != Chat.PRIVATE:
+        await message.reply_text("Please message me in a 1-on-1 private chat to submit feedback!")
+        return
+
+    db_client.get_or_create_user(user_id=user.id, username=user.username, first_name=user.first_name)
+
+    if not context.args:
+        await message.reply_text(
+            "💡 *How to share feedback or feature ideas:*\n\n"
+            "Type `/feedback <your idea or suggestion>`\n"
+            "Example: `/feedback Could you add Lentor MRT train arrival timings?`\n\n"
+            "You can also attach a screenshot with the caption `/feedback`!",
+            parse_mode="Markdown",
+        )
+        return
+
+    feedback_text = " ".join(context.args)
+    category = "feature_request" if any(w in feedback_text.lower() for w in ["feature", "add", "can you", "could you"]) else "general"
+
+    fb_id = db_client.submit_feedback(
+        user_id=user.id,
+        username=user.username,
+        first_name=user.first_name,
+        category=category,
+        message=feedback_text,
+    )
+
+    await notify_admin_new_feedback(
+        context=context,
+        feedback_id=fb_id,
+        user_id=user.id,
+        username=user.username,
+        first_name=user.first_name,
+        category=category,
+        message=feedback_text,
+    )
+
+    await message.reply_text(
+        "🙏 *Thank you for your feedback!*\n\n"
+        "Your suggestion has been delivered directly to the project developer (@jamesjjboh). "
+        "We continuously improve the Lentor Modern Concierge based on resident input.",
+        parse_mode="Markdown",
+    )
+
+
+async def bug_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Allows residents to report incorrect answers, hallucinations, or bugs."""
+    user = update.effective_user
+    message = update.message
+    if not user or not message:
+        return
+
+    if update.effective_chat and update.effective_chat.type != Chat.PRIVATE:
+        await message.reply_text("Please message me in a 1-on-1 private chat to report bugs!")
+        return
+
+    db_client.get_or_create_user(user_id=user.id, username=user.username, first_name=user.first_name)
+
+    if not context.args:
+        await message.reply_text(
+            "🐛 *How to report a bug or incorrect information:*\n\n"
+            "Type `/bug <details of the issue>`\n"
+            "Example: `/bug The gym opening hour is actually 6:00 AM on weekdays.`\n\n"
+            "You can also attach a screenshot with the caption `/bug`!",
+            parse_mode="Markdown",
+        )
+        return
+
+    bug_text = " ".join(context.args)
+    category = "data_correction" if any(w in bug_text.lower() for w in ["wrong", "hour", "time", "incorrect", "actually"]) else "bug"
+
+    fb_id = db_client.submit_feedback(
+        user_id=user.id,
+        username=user.username,
+        first_name=user.first_name,
+        category=category,
+        message=bug_text,
+    )
+
+    await notify_admin_new_feedback(
+        context=context,
+        feedback_id=fb_id,
+        user_id=user.id,
+        username=user.username,
+        first_name=user.first_name,
+        category=category,
+        message=bug_text,
+    )
+
+    await message.reply_text(
+        "🛠️ *Thank you for reporting this issue!*\n\n"
+        "Your report has been dispatched directly to developer @jamesjjboh to investigate and patch.",
+        parse_mode="Markdown",
+    )
+
+
 async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Processes incoming 1-on-1 resident messages through the Gemini 3.8 Flash Agent."""
     user = update.effective_user
     message = update.message
     if not user or not message or not message.text:
         return
+
+    # Admin Swipe-to-Reply or ForceReply intercept
+    if is_admin(user.id) and message.reply_to_message:
+        replied_msg = message.reply_to_message
+        mapping = db_client.get_admin_reply_mapping(replied_msg.message_id)
+        target_user_id = None
+        target_name = "Resident"
+        feedback_id = None
+
+        if mapping:
+            target_user_id = int(mapping["user_id"])
+            target_name = mapping.get("resident_name", "Resident")
+            feedback_id = mapping.get("feedback_id")
+        else:
+            # Fallback regex extraction from text or caption: User ID: `12345678`
+            content_to_check = replied_msg.text or replied_msg.caption or ""
+            match = re.search(r"User ID:\*? `?(\d+)`?", content_to_check)
+            if match:
+                target_user_id = int(match.group(1))
+
+        if target_user_id:
+            admin_reply_text = message.text.strip()
+            try:
+                await context.bot.send_message(
+                    chat_id=target_user_id,
+                    text=(
+                        f"📩 *Message from Developer (@jamesjjboh):*\n\n"
+                        f"\"{admin_reply_text}\""
+                    ),
+                    parse_mode="Markdown",
+                )
+                if feedback_id:
+                    db_client.update_feedback_status(
+                        feedback_id=feedback_id,
+                        status="replied",
+                        admin_reply=admin_reply_text,
+                    )
+                await message.reply_text(
+                    f"✅ *Reply successfully delivered to {target_name} (`{target_user_id}`)!*",
+                    parse_mode="Markdown",
+                )
+                return
+            except Exception as e:
+                logger.error(f"Failed to forward admin reply to {target_user_id}: {e}")
+                await message.reply_text(f"⚠️ Failed to deliver reply to user `{target_user_id}`: {e}")
+                return
 
     # Guardrail: Encourage 1-on-1 usage
     if update.effective_chat and update.effective_chat.type != Chat.PRIVATE:
@@ -149,7 +309,6 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     # If the agent called submit_tip_to_moderation, find the tip and alert admin
     if "submit_tip_to_moderation" in tools_called:
-        # Check if there is an unreviewed pending tip from this user
         pending_tips = [
             t for t in getattr(db_client, "_mock_tips", {}).values()
             if t.get("submitted_by_user_id") == str(user.id) and t.get("status") == "pending"
@@ -163,11 +322,23 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 content=latest.get("content", ""),
             )
 
+    # If the agent called submit_developer_feedback, alert admin
+    if "submit_developer_feedback" in tools_called:
+        await notify_admin_new_feedback(
+            context=context,
+            feedback_id="agent_fb",
+            user_id=user.id,
+            username=user.username,
+            first_name=user.first_name,
+            category="chat_feedback",
+            message=user_query,
+        )
+
     await message.reply_text(response_text)
 
 
 async def handle_photo(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """Processes incoming photos from residents (tips or visual inquiries) via Gemini Vision."""
+    """Processes incoming photos from residents (tips, feedback, or visual inquiries) via Gemini Vision."""
     user = update.effective_user
     message = update.message
     if not user or not message or not message.photo:
@@ -236,6 +407,39 @@ async def handle_photo(update: Update, context: ContextTypes.DEFAULT_TYPE):
             agent_response=user_reply,
             answered_successfully=True,
         )
+    elif intent == "FEEDBACK_SUBMISSION" or any(k in caption.lower() for k in ["/feedback", "/bug"]):
+        # Submit to resident feedback queue
+        category = "bug" if "/bug" in caption.lower() or topic == "bug" else "feature_request"
+        fb_id = db_client.submit_feedback(
+            user_id=user.id,
+            username=user.username,
+            first_name=user.first_name,
+            category=category,
+            message=tip_content or caption or title,
+            has_image=True,
+            image_summary=title,
+        )
+
+        # Notify Admin with photo + swipe-to-reply / tap-to-reply buttons
+        await notify_admin_new_feedback(
+            context=context,
+            feedback_id=fb_id,
+            user_id=user.id,
+            username=user.username,
+            first_name=user.first_name,
+            category=category,
+            message=f"📸 [{title}]\n{tip_content or caption or 'Resident attached a screenshot/photo.'}",
+            photo_bytes=bytes(photo_bytes),
+        )
+
+        # Log query
+        db_client.log_query(
+            user_id=user.id,
+            user_query=f"[Photo Feedback] {caption}",
+            tools_called=["analyze_resident_image", "submit_developer_feedback"],
+            agent_response=user_reply,
+            answered_successfully=True,
+        )
     else:
         # Visual query / troubleshooting
         db_client.log_query(
@@ -262,11 +466,15 @@ def create_bot_app() -> Application:
     app.add_handler(CommandHandler("start", start_command))
     app.add_handler(CommandHandler("help", help_command))
     app.add_handler(CommandHandler("tip", tip_command))
+    app.add_handler(CommandHandler("feedback", feedback_command))
+    app.add_handler(CommandHandler("bug", bug_command))
+    app.add_handler(CommandHandler("reply", handle_reply_command))
     app.add_handler(CommandHandler("broadcast", handle_broadcast_command))
     app.add_handler(CommandHandler("admin_stats", handle_admin_stats_command))
 
     # Callback handler for admin interactive inline moderation buttons
     app.add_handler(CallbackQueryHandler(handle_moderation_callback, pattern=r"^mod_"))
+    app.add_handler(CallbackQueryHandler(handle_feedback_callback, pattern=r"^fb_"))
 
     # Photo handler for resident tip submissions and visual inquiries
     app.add_handler(MessageHandler(filters.PHOTO, handle_photo))

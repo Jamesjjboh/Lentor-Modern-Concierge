@@ -18,12 +18,13 @@ logger = logging.getLogger(__name__)
 SYSTEM_INSTRUCTION = """
 You are the Lentor Modern Digital Concierge, a helpful, polite, and accurate virtual concierge for the ~605 households of Lentor Modern (a premier integrated mixed-use development by GuocoLand in Singapore, atop Lentor Modern Mall and Lentor MRT).
 
-You have access to 5 specialized tools:
+You have access to 6 specialized tools:
 1. `search_bylaws_and_handbook`: Use to look up official MCST by-laws, renovation hours & deposits, facility booking rules, aircon ledge rules, moving & delivery bay procedures, and handover defect procedures.
 2. `search_mall_directory`: Use to look up shops, supermarkets (CS Fresh), clinics, childcare, and eateries in Lentor Modern Mall, including floor levels (B1, L1) and operating hours.
 3. `get_verified_community_tips`: Use to retrieve crowdsourced neighbour advice (e.g. delivery bay access, induction cooker lock quirks, aircon piping SWG requirements, evening grocery discounts).
 4. `generate_mcst_email_draft`: Use when a resident needs to formally email the Managing Agent (MA) to report a defect, common property issue, or submit a request.
 5. `submit_tip_to_moderation`: Use when a resident shares a new helpful tip, discovery, or advice that should be added to the community knowledge base.
+6. `submit_developer_feedback`: Use when a resident provides feedback about the bot itself, reports a bug, mentions an error or inaccuracy in an answer, or suggests a new feature for the concierge developer (@jamesjjboh).
 
 
 Guidelines:
@@ -172,6 +173,31 @@ def submit_tip_to_moderation(topic: str, tip_text: str, user_id: int = 0) -> str
         return f"Failed to submit tip: {e}"
 
 
+# --- Tool 6: Developer Feedback & Bug Submission ---
+def submit_developer_feedback(category: str, details: str, user_id: int = 0) -> str:
+    """Submits resident feedback, bug reports, feature requests, or handbook corrections directly to the bot developer (@jamesjjboh).
+    Use this tool whenever a resident expresses feedback, reports a bug or hallucination, mentions an error in an answer, or suggests a new bot feature.
+    Args:
+        category: One of ['bug', 'feature_request', 'data_correction', 'general']
+        details: Clear description of the resident's feedback, correction, or requested feature.
+        user_id: Telegram user ID of the resident submitting feedback.
+    """
+    try:
+        fb_id = db_client.submit_feedback(
+            user_id=user_id,
+            username=None,
+            first_name=None,
+            category=category,
+            message=details,
+        )
+        return (
+            f"Thank you! Your feedback ({category}) has been submitted directly to the concierge developer (@jamesjjboh) "
+            f"(Reference ID: {fb_id}). James reviews all resident feedback to continuously improve the concierge."
+        )
+    except Exception as e:
+        return f"Failed to submit feedback: {e}"
+
+
 # Toolbelt registry
 TOOL_FUNCTIONS: List[Callable[..., Any]] = [
     search_bylaws_and_handbook,
@@ -179,6 +205,7 @@ TOOL_FUNCTIONS: List[Callable[..., Any]] = [
     get_verified_community_tips,
     generate_mcst_email_draft,
     submit_tip_to_moderation,
+    submit_developer_feedback,
 ]
 
 
@@ -258,11 +285,16 @@ class LentorAgent:
         Determines if it's a community tip submission or a visual query/troubleshooting.
         """
         if not self.client:
+            intent = "RESIDENT_QUESTION"
+            if "/tip" in caption.lower():
+                intent = "TIP_SUBMISSION"
+            elif any(k in caption.lower() for k in ["/feedback", "/bug", "bug", "feedback"]):
+                intent = "FEEDBACK_SUBMISSION"
             return {
-                "intent": "TIP_SUBMISSION" if "/tip" in caption.lower() else "RESIDENT_QUESTION",
+                "intent": intent,
                 "topic": "general",
-                "title": "Photo Discovery",
-                "tip": caption or "Resident submitted photo tip.",
+                "title": "Photo Submission",
+                "tip": caption or "Resident submitted photo.",
                 "user_reply": "📸 Photo received! In live mode, Gemini 3.8 Flash will analyze the text and details.",
             }
 
@@ -274,7 +306,8 @@ The resident included this caption: "{caption}".
 
 Evaluate the resident's intent:
 1. "TIP_SUBMISSION": The resident is sharing an informative poster, retail promotion, opening hours notice, or neighbour recommendation (or they explicitly included '/tip' in the caption).
-2. "RESIDENT_QUESTION": The resident is asking a question about what is shown in the image (e.g. an appliance error code on their induction hob, where something is located, a defect, or estate rule).
+2. "FEEDBACK_SUBMISSION": The resident is reporting a bug, bot error/hallucination, screenshot of an issue, or providing feedback (or they explicitly included '/feedback' or '/bug' in the caption).
+3. "RESIDENT_QUESTION": The resident is asking a question about what is shown in the image (e.g. an appliance error code on their induction hob, where something is located, a defect, or estate rule).
 
 If TIP_SUBMISSION:
 - Extract the core details from the image and caption.
@@ -284,16 +317,22 @@ If TIP_SUBMISSION:
 - Ensure strict PII scrubbing: DO NOT include private resident names, unit numbers (#XX-YY), or phone numbers.
 - Friendly reply confirming submission to moderation.
 
+If FEEDBACK_SUBMISSION:
+- Determine the topic/category: one of ["bug", "feature_request", "data_correction", "general"].
+- Title: A concise title (e.g., "Handbook Hours Inaccuracy", "Bot Display Error").
+- Tip: Clear description of the bug or feedback.
+- Friendly reply thanking the resident and confirming it has been delivered directly to developer @jamesjjboh.
+
 If RESIDENT_QUESTION:
 - Inspect the visual details (e.g., error code 'L' on induction cooker, defect sticker, facility sign).
 - Answer the resident's question directly, referencing known estate quirks (e.g. 'L' on induction hob = child lock; hold key for 3 seconds).
 
 Return a JSON object with this exact structure:
 {{
-  "intent": "TIP_SUBMISSION" or "RESIDENT_QUESTION",
+  "intent": "TIP_SUBMISSION" or "FEEDBACK_SUBMISSION" or "RESIDENT_QUESTION",
   "topic": "mall",
   "title": "Short Title",
-  "tip": "Extracted tip content (empty if RESIDENT_QUESTION)",
+  "tip": "Extracted tip or feedback description (empty if RESIDENT_QUESTION)",
   "user_reply": "Message to send to resident"
 }}
 """

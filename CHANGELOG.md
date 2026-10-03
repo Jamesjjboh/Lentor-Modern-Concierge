@@ -7,6 +7,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.2.0] - 2026-10-03
+
+### Added
+- **Resident Feedback & Bug Reporting System**:
+  - Dedicated `/feedback <suggestion>` and `/bug <issue>` commands for residents to report inaccuracies, software bugs, or propose new features.
+  - Multimodal bug screenshots supported: Residents can send photos with `/bug` or `/feedback` in the caption.
+  - Autonomous Agent tool `submit_developer_feedback`: Gemini autonomously detects when a resident complains about an answer or requests a feature in natural chat, automatically filing it.
+- **Native Swipe-to-Reply & Tap-to-Reply 2-Way Developer Communication**:
+  - Admin receives real-time notification in private Telegram chat with resident metadata.
+  - **Swipe-to-Reply:** Admin can swipe left on the notification card like a normal message, type the reply, and send.
+  - **Tap-to-Reply:** Inline button `[ 💬 Reply ]` triggers Telegram `ForceReply` for 1-tap keyboard focus.
+  - Bot relays developer messages directly into the resident's private chat.
+  - Persistent message mapping (`admin_reply_mappings/` in Firestore) guarantees swipe-to-reply works even across serverless cold starts.
+- **Feedback Analytics in `/admin_stats`**:
+  - Tracks total feedback received and unresolved/new feedback count in Firestore.
+
+---
+
 ## [1.1.0] - 2026-10-03
 
 ### Added

@@ -56,15 +56,16 @@ flowchart TD
 
 ---
 
-## 🛠️ The 5 Autonomous Agent Tools
+## 🛠️ The 6 Autonomous Agent Tools
 
 | Tool | Purpose | Data Source |
 | :--- | :--- | :--- |
 | `search_bylaws_and_handbook(query)` | Queries official MCST by-laws, renovation working hours, deposit schedules, lift booking rules, and defect protocols. | `data/processed/bylaws_handbook.json` |
 | `search_mall_directory(category, shop_name)` | Looks up Lentor Modern Mall shops (CS Fresh, Minmed Clinic, Guardian, Toast Box), floor levels (`B1`, `L1`), and hours. | `data/processed/mall_directory.json` |
-| `get_verified_community_tips(topic)` | Retrieves verified crowdsourced neighbour tips (Taobao loading bay directions, induction cooker lock quirks, aircon copper piping SWG requirements). | `data/processed/verified_community_tips.json` + Firestore approved tips |
+| `get_verified_community_tips(topic)` | Retrieves verified crowdsourced neighbour tips (loading bay directions, induction cooker lock quirks, aircon copper piping SWG requirements). | `data/processed/verified_community_tips.json` + Firestore approved tips |
 | `generate_mcst_email_draft(issue_type, details)` | Formats structured, professional inquiries ready to copy-paste to the Managing Agent (MA). | Dynamic Agent Template |
 | `submit_tip_to_moderation(topic, tip_text)` | Automatically structures resident discoveries and queues them for admin approval. | Firestore `community_tips/` queue |
+| `submit_developer_feedback(category, details)` | Automatically captures resident feedback, bug reports, or handbook corrections and routes them directly to the developer. | Firestore `resident_feedback/` queue |
 
 ---
 
@@ -83,13 +84,20 @@ flowchart TD
 * Iterates through all registered users in Firestore with safety rate-limiting (25 msgs/sec).
 
 ### 3. Product Analytics & Content Gaps (`/admin_stats`)
-* Displays total registered households, total query volume, and a list of **unanswered questions** (highlighting missing estate documentation or untracked mall shops).
+* Displays total registered households, total query volume, feedback counts, and a list of **unanswered questions** (highlighting missing estate documentation or untracked mall shops).
 
 ### 4. Multimodal Vision & Photo Ingestion
 * Residents can snap photos of mall flyers, opening hours notices, or appliance error codes directly in Telegram without typing.
-* **Auto-Intent Classification:** Automatically categorizes photos into either a *Community Tip* (e.g., CS Fresh promotions) or a *Resident Query* (e.g., induction cooker error code "L").
+* **Auto-Intent Classification:** Automatically categorizes photos into either a *Community Tip* (e.g., CS Fresh promotions), *Bug/Feedback* (with screenshot), or a *Resident Query* (e.g., induction cooker error code "L").
 * **Photo Moderation Cards:** For tips, pushes the resident's photo directly to the Admin's private Telegram chat with interactive inline `[ ✅ Approve ]` / `[ ❌ Reject ]` buttons.
 * **Privacy by Design:** Strict Singapore PII scrubber ensures unit numbers, phone numbers, and resident identities are stripped before publication.
+
+### 5. Native Swipe-to-Reply & Tap-to-Reply Resident Feedback
+* Residents can submit feature requests or report bugs via `/feedback <idea>`, `/bug <issue>`, or natural chat.
+* **Instant Admin Notification:** Pushes a card with resident details directly to Admin's private Telegram.
+* **Native Swipe-to-Reply:** Admin simply swipes left on the notification card like a normal chat message, types their response, and hits send. The bot routes the message directly into the resident's 1-on-1 chat.
+* **Tap-to-Reply:** Inline button `[ 💬 Reply ]` triggers Telegram `ForceReply` for 1-tap mobile reply mode.
+* **Serverless Resilient:** Stores message mappings in Firestore (`admin_reply_mappings/`) so swipe-to-reply works seamlessly even after Cloud Run cold starts.
 
 ---
 

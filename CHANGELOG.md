@@ -7,6 +7,39 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.5.0] - 2026-10-03
+
+### Added
+- **Persistent Typing Heartbeat Indicator**:
+  - Implemented background `_keep_typing` task running every 3.5s in `src/bot.py`, preventing Telegram's native typing indicator from expiring during agent tool execution and reasoning.
+- **Refined Unanswered Query Concierge Fallback Cards**:
+  - When the agent cannot find factual records for a query, it provides warm, polite signposting and attaches interactive 1-tap fallback buttons:
+    - `[ ✉️ Draft Email to MA ]`: Generates a pre-formatted email draft addressed to CBRE (`managementoffice@LT-MODERN.COM`).
+    - `[ 🏢 On-Site Contacts ]`: Instantly pulls up hotlines for Estate Management (+65 6054 3370), 24/7 Concierge (+65 6054 3375), and Security (+65 6054 3379).
+    - `[ ◀️ Quick Menu ]`: Returns to main resident shortcut menu.
+- **Warm Container Provisioning**:
+  - Configured Cloud Run `--min-instances 1` in `deploy.sh` to eliminate container cold starts, keeping response times snappy 24/7.
+- **Asynchronous Execution**:
+  - Offloaded synchronous agent and multimodal vision execution to `asyncio.to_thread`, keeping the event loop responsive.
+
+---
+
+## [1.4.0] - 2026-10-03
+
+### Added
+- **Honest Resident Product Analytics Engine (`/admin_stats`)**:
+  - Replaced ambiguous "registered households" metric with transparent, honest terminology: **Registered Residents (Telegram accounts)** out of 605 physical units.
+  - Added rolling time-window analytics (`7d`, `30d`, `all`) with interactive inline switcher buttons (`[ 7D ]`, `[ 30D ]`, `[ All ]`).
+  - Added daily activity sparkline and top topic volume tracking (Estate rules, Mall & shops, Community tips, MA drafts, Admin feedback, etc.).
+  - **Ranked Content Gaps**: Groups and counts repeated unanswered questions so admin can prioritize adding missing estate bylaws or mall tenant details.
+  - **Conversational Admin Q&A**: Admin can ask questions in natural language (e.g. *"what did residents ask most this week?"*) and receive structured analytics answers.
+- **Verified Mulberry Learning @ Lentor Directory Correction**:
+  - Replaced vague placeholder childcare reference with **Mulberry Learning @ Lentor** (`#02-01`, 1 Lentor Central S788887) across all estate profile data, community tips, and quick menus.
+- **Interactive Quick Actions Menu (`/menu`)**:
+  - 6 instant 1-tap resident shortcuts: Estate Contacts, Facilities & Gym, Transit & Buses, Mall & Deals, Moving & Reno, and iPlus Living Guide.
+
+---
+
 ## [1.3.1] - 2026-10-03
 
 ### Added

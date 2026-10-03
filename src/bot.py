@@ -533,7 +533,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     # Send immediate in-chat status message directly below the resident's question
     status_msg = await message.reply_text(
-        "🔍 <i>Thinking & searching estate records with Gemini AI...</i>",
+        "🔍 <i>Looking that up for you with Gemini AI...</i>",
         parse_mode="HTML",
     )
 

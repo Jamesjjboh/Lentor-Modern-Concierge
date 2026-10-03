@@ -138,7 +138,27 @@ def search_mall_directory(category: str = "", shop_name: str = "") -> str:
 
     scored_matches = [(score_match(t), t) for t in tenants if score_match(t) > 0]
     scored_matches.sort(key=lambda x: x[0], reverse=True)
-    matches = [t for _, t in scored_matches]
+    # If resident specifically asks about GuocoLand vouchers
+    if any(k in search_term for k in ["voucher", "vouchers", "evoucher", "e-voucher", "guocoland voucher"]):
+        voucher_shops = [t for t in tenants if t.get("accepts_guocoland_voucher")]
+        if voucher_shops:
+            fnb = [s for s in voucher_shops if "food" in s.get("category", "").lower() or "beverage" in s.get("category", "").lower()]
+            services = [s for s in voucher_shops if s not in fnb]
+
+            lines = [f"🎟️ Official Participating Merchants Accepting GuocoLand e-Vouchers ({len(voucher_shops)} Stores at Lentor Modern Mall):\n"]
+            lines.append("🍽️ Food & Beverages:")
+            for s in sorted(fnb, key=lambda x: x["name"]):
+                unit_str = f" ({s.get('unit')})" if s.get('unit') else ""
+                lines.append(f"• {s['name']}{unit_str}")
+
+            lines.append("\n🛍️ Retail, Services & Wellness:")
+            for s in sorted(services, key=lambda x: x["name"]):
+                unit_str = f" ({s.get('unit')})" if s.get('unit') else ""
+                cat_str = f" [{s.get('category')}]" if s.get('category') else ""
+                lines.append(f"• {s['name']}{unit_str}{cat_str}")
+
+            lines.append("\n💡 Source: Verified directly from official Lentor Modern Mall directory (https://www.lentormodern.com.sg/shops/). Flash e-vouchers at cashier counters prior to payment.")
+            return "\n".join(lines)
 
     if not matches:
         return f"No shops found in Lentor Modern Mall matching '{search_term}'. You can also browse the full resident portal at https://resiq-lm.vercel.app/."

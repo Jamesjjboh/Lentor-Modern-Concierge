@@ -126,7 +126,8 @@ An instant, text-first dashboard (no chart rendering), with inline buttons `[ 7d
   * **Moving & Reno:** Renovation hours, deposit schedule, loading bay clearance (3.8m), and official paint codes.
   * **iPlus Living Guide:** Mobile intercom buzzer video setup, property activation codes, and facility booking rules.
 
-### 7. Responsive UX: Persistent Typing Heartbeat & 1-Tap Fallback Action Cards
+### 7. Responsive UX: In-Chat Status Bubbles & 1-Tap Fallback Action Cards
+* **In-Chat Progress Status Bubble:** Matches modern interactive bot UX by posting immediate feedback directly below the resident's message (`🔍 Thinking & searching estate records with Gemini AI...` for text, `📥 Downloading image...` $\rightarrow$ `🔍 Analyzing with Gemini Vision AI...` for photos) and seamlessly editing it into the response.
 * **Typing Indicator Heartbeat:** Background heartbeat task continuously refreshes Telegram's `ChatAction.TYPING` every 3.5 seconds, ensuring residents always see that the bot is actively thinking and working on their question.
 * **Warm Container Response:** Cloud Run maintains `--min-instances 1` to eliminate container cold starts.
 * **Empathetic Concierge Fallback Cards:** If a resident asks a question outside existing bylaws or directories, the bot provides warm concierge signposting and attaches 1-tap action buttons:

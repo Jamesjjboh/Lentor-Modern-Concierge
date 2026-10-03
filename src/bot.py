@@ -531,6 +531,12 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     db_client.get_or_create_user(user_id=user.id, username=user.username, first_name=user.first_name)
     db_client.increment_user_query(user_id=user.id)
 
+    # Send immediate in-chat status message directly below the resident's question
+    status_msg = await message.reply_text(
+        "🔍 <i>Thinking & searching estate records with Gemini AI...</i>",
+        parse_mode="HTML",
+    )
+
     # Execute autonomous agent query non-blockingly with persistent typing heartbeat
     stop_typing_event = asyncio.Event()
     typing_task = asyncio.create_task(_keep_typing(context.bot, message.chat_id, stop_typing_event))
@@ -588,12 +594,23 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
             f"• Tap *Draft Email to MA* to generate a formatted email draft.\n"
             f"• Tap *On-Site Contacts* for estate office phone numbers."
         )
-        await message.reply_text(
-            fallback_prompt,
-            reply_markup=get_unanswered_fallback_keyboard(),
-        )
+        try:
+            await status_msg.edit_text(
+                fallback_prompt,
+                reply_markup=get_unanswered_fallback_keyboard(),
+                parse_mode="Markdown",
+            )
+        except Exception:
+            await status_msg.edit_text(
+                fallback_prompt,
+                reply_markup=get_unanswered_fallback_keyboard(),
+            )
     else:
-        await message.reply_text(response_text)
+        try:
+            await status_msg.edit_text(response_text, parse_mode="Markdown")
+        except Exception:
+            # Fallback to plain text if Markdown format is invalid
+            await status_msg.edit_text(response_text)
 
 
 async def handle_photo(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -615,15 +632,19 @@ async def handle_photo(update: Update, context: ContextTypes.DEFAULT_TYPE):
     # Indicate processing
     await context.bot.send_chat_action(chat_id=message.chat_id, action=ChatAction.TYPING)
 
+    # Immediate in-chat status message directly below the photo
+    status_msg = await message.reply_text("📥 <i>Downloading image...</i>", parse_mode="HTML")
+
     caption = message.caption or ""
     highest_res_photo = message.photo[-1]
 
     try:
         tg_file = await highest_res_photo.get_file()
         photo_bytes = await tg_file.download_as_bytearray()
+        await status_msg.edit_text("🔍 <i>Analyzing with Gemini Vision AI...</i>", parse_mode="HTML")
     except Exception as e:
         logger.error(f"Failed to download photo from user {user.id}: {e}")
-        await message.reply_text("Sorry, I had trouble downloading your photo. Please try sending it again.")
+        await status_msg.edit_text("❌ Sorry, I had trouble downloading your photo. Please try sending it again.")
         return
 
     # Multimodal image analysis using Gemini 3.8 Flash Vision with persistent typing heartbeat
@@ -716,7 +737,13 @@ async def handle_photo(update: Update, context: ContextTypes.DEFAULT_TYPE):
             answered_successfully=True,
         )
 
-    await message.reply_text(user_reply)
+    try:
+        await status_msg.edit_text(user_reply, parse_mode="Markdown")
+    except Exception:
+        try:
+            await status_msg.edit_text(user_reply)
+        except Exception:
+            await message.reply_text(user_reply)
 
 
 def create_bot_app() -> Application:

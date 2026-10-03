@@ -138,6 +138,8 @@ def search_mall_directory(category: str = "", shop_name: str = "") -> str:
 
     scored_matches = [(score_match(t), t) for t in tenants if score_match(t) > 0]
     scored_matches.sort(key=lambda x: x[0], reverse=True)
+    matches = [t for _, t in scored_matches]
+
     # If resident specifically asks about GuocoLand vouchers
     if any(k in search_term for k in ["voucher", "vouchers", "evoucher", "e-voucher", "guocoland voucher"]):
         voucher_shops = [t for t in tenants if t.get("accepts_guocoland_voucher")]

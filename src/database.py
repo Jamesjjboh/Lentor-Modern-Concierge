@@ -132,8 +132,14 @@ class DatabaseClient:
         doc_ref.set(log_entry)
         return doc_ref.id
 
-    # --- Community Tips & In-Chat Moderation ---
-    def submit_community_tip(self, user_id: int, topic: str, content: str) -> str:
+    def submit_community_tip(
+        self,
+        user_id: int,
+        topic: str,
+        content: str,
+        has_image: bool = False,
+        image_summary: Optional[str] = None,
+    ) -> str:
         """Submits a new tip into the moderation queue with status 'pending'."""
         now = datetime.now(timezone.utc).isoformat()
         tip_data = {
@@ -143,6 +149,8 @@ class DatabaseClient:
             "submitted_by_user_id": str(user_id),
             "submitted_at": now,
             "reviewed_at": None,
+            "has_image": has_image,
+            "image_summary": image_summary,
         }
 
         if self._mock_mode or not self.db:
@@ -155,6 +163,7 @@ class DatabaseClient:
         doc_ref = self.db.collection("community_tips").document()
         doc_ref.set(tip_data)
         return doc_ref.id
+
 
     def update_tip_status(self, tip_id: str, status: str) -> bool:
         """Admin action: approve or reject a community tip."""

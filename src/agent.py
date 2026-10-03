@@ -238,16 +238,103 @@ class LentorAgent:
                 return final_text, tools_called
 
             except Exception as e:
-                last_error = e
-                # If error is a transient 503 spike, try next candidate model
-                if "503" in str(e) or "UNAVAILABLE" in str(e):
-                    logger.warning(f"Model {current_model} returned 503. Cascading to next fallback model...")
+                if any(code in str(e) for code in ["503", "UNAVAILABLE", "402", "RESOURCE_EXHAUSTED", "429"]):
+                    logger.warning(f"Model {current_model} error ({e}). Cascading to next fallback model...")
                     continue
                 else:
                     logger.error(f"Error in Gemini agent query execution with {current_model}: {e}")
                     break
 
+
         return f"I encountered an unexpected issue processing your query: {last_error}. Please try again shortly.", tools_called
+
+    def analyze_resident_image(
+        self,
+        image_bytes: bytes,
+        caption: str = "",
+        user_id: int = 0,
+    ) -> Dict[str, Any]:
+        """Analyzes an image and optional caption using Gemini Vision.
+        Determines if it's a community tip submission or a visual query/troubleshooting.
+        """
+        if not self.client:
+            return {
+                "intent": "TIP_SUBMISSION" if "/tip" in caption.lower() else "RESIDENT_QUESTION",
+                "topic": "general",
+                "title": "Photo Discovery",
+                "tip": caption or "Resident submitted photo tip.",
+                "user_reply": "📸 Photo received! In live mode, Gemini 3.8 Flash will analyze the text and details.",
+            }
+
+        image_part = types.Part.from_bytes(data=image_bytes, mime_type="image/jpeg")
+
+        prompt = f"""
+You are the Lentor Modern Digital Concierge analyzing an image sent by a resident of Lentor Modern.
+The resident included this caption: "{caption}".
+
+Evaluate the resident's intent:
+1. "TIP_SUBMISSION": The resident is sharing an informative poster, retail promotion, opening hours notice, or neighbour recommendation (or they explicitly included '/tip' in the caption).
+2. "RESIDENT_QUESTION": The resident is asking a question about what is shown in the image (e.g. an appliance error code on their induction hob, where something is located, a defect, or estate rule).
+
+If TIP_SUBMISSION:
+- Extract the core details from the image and caption.
+- Determine the topic: one of ["mall", "services", "appliances", "bylaws", "food", "general"].
+- Title: A concise title (e.g., "CS Fresh Sushi Evening Discount", "Minmed Clinic Weekend Hours").
+- Tip: Clear, actionable, and structured advice for neighbours (including store unit number, floor, timings, discount percentage).
+- Ensure strict PII scrubbing: DO NOT include private resident names, unit numbers (#XX-YY), or phone numbers.
+- Friendly reply confirming submission to moderation.
+
+If RESIDENT_QUESTION:
+- Inspect the visual details (e.g., error code 'L' on induction cooker, defect sticker, facility sign).
+- Answer the resident's question directly, referencing known estate quirks (e.g. 'L' on induction hob = child lock; hold key for 3 seconds).
+
+Return a JSON object with this exact structure:
+{{
+  "intent": "TIP_SUBMISSION" or "RESIDENT_QUESTION",
+  "topic": "mall",
+  "title": "Short Title",
+  "tip": "Extracted tip content (empty if RESIDENT_QUESTION)",
+  "user_reply": "Message to send to resident"
+}}
+"""
+
+        candidate_models = [self.model]
+        for fallback in ["gemini-3.5-flash", "gemini-3.1-flash-lite"]:
+            if fallback not in candidate_models:
+                candidate_models.append(fallback)
+
+        config = types.GenerateContentConfig(
+            temperature=0.2,
+            response_mime_type="application/json",
+        )
+
+        for current_model in candidate_models:
+            try:
+                response = self.client.models.generate_content(
+                    model=current_model,
+                    contents=[image_part, prompt],
+                    config=config,
+                )
+                text = response.text or "{}"
+                data = json.loads(text)
+                return data
+            except Exception as e:
+                if any(code in str(e) for code in ["503", "UNAVAILABLE", "402", "RESOURCE_EXHAUSTED", "429"]):
+                    logger.warning(f"Model {current_model} error ({e}) during image analysis. Cascading...")
+                    continue
+                else:
+                    logger.error(f"Image analysis error with {current_model}: {e}")
+                    break
+
+
+        return {
+            "intent": "RESIDENT_QUESTION",
+            "topic": "general",
+            "title": "Photo Analysis",
+            "tip": "",
+            "user_reply": "I received your photo but had trouble processing the details. Could you please try again or describe what is in the photo?",
+        }
+
 
 
     def _simulated_response(self, user_query: str, user_id: int) -> Tuple[str, List[str]]:

@@ -7,6 +7,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.1.0] - 2026-10-03
+
+### Added
+- **Multimodal Gemini Vision for Resident Photos**:
+  - Residents can snap photos in chat (e.g. mall promo flyers, store opening hours, appliance error codes) instead of typing out lengthy descriptions.
+  - Automatic intent classification into `TIP_SUBMISSION` (queues for admin moderation) vs `RESIDENT_QUESTION` (instant visual troubleshooting, e.g. induction hob 'L' child lock).
+  - Automatic structured JSON extraction (`topic`, `title`, `tip`, `user_reply`) with strict PII scrubbing.
+- **Photo-Enabled Admin Moderation Cards**:
+  - Pushes the resident's photo directly to the Admin's private Telegram chat with interactive inline `[ ✅ Approve ]` and `[ ❌ Reject ]` buttons.
+  - Dynamically edits the photo caption on approval/rejection to prevent duplicate admin actions.
+- **Refined `/start` Onboarding Experience**:
+  - Updated identity to **Lentor Modern Digital Concierge**.
+  - Restructured onboarding prompts to highlight realistic resident scenarios: Renovations, Residential Loading Bay access, Mall Directory, Gym/BBQ facility booking, MA defect reporting, and Photo Assistance.
+- **Database Schema Extension**:
+  - Extended Firestore `community_tips/` documents with `has_image` (boolean) and `image_summary` (string) metadata.
+
+---
+
 ## [1.0.0] - 2026-10-03
 
 ### Added

@@ -21,7 +21,13 @@ def is_admin(user_id: int) -> bool:
     return user_id == ADMIN_TELEGRAM_ID
 
 
-async def notify_admin_new_tip(context: ContextTypes.DEFAULT_TYPE, tip_id: str, topic: str, content: str):
+async def notify_admin_new_tip(
+    context: ContextTypes.DEFAULT_TYPE,
+    tip_id: str,
+    topic: str,
+    content: str,
+    photo_bytes: Optional[bytes] = None,
+):
     """Pushes an interactive moderation alert directly to the Admin's private Telegram DM."""
     if not ADMIN_TELEGRAM_ID:
         logger.warning("ADMIN_TELEGRAM_ID not set; skipping admin tip notification.")
@@ -43,13 +49,22 @@ async def notify_admin_new_tip(context: ContextTypes.DEFAULT_TYPE, tip_id: str, 
     )
 
     try:
-        await context.bot.send_message(
-            chat_id=ADMIN_TELEGRAM_ID,
-            text=message_text,
-            reply_markup=reply_markup,
-            parse_mode="Markdown",
-        )
-        logger.info(f"Admin notified for tip: {tip_id}")
+        if photo_bytes:
+            await context.bot.send_photo(
+                chat_id=ADMIN_TELEGRAM_ID,
+                photo=photo_bytes,
+                caption=message_text,
+                reply_markup=reply_markup,
+                parse_mode="Markdown",
+            )
+        else:
+            await context.bot.send_message(
+                chat_id=ADMIN_TELEGRAM_ID,
+                text=message_text,
+                reply_markup=reply_markup,
+                parse_mode="Markdown",
+            )
+        logger.info(f"Admin notified for tip: {tip_id} (has_photo={bool(photo_bytes)})")
     except Exception as e:
         logger.error(f"Failed to send admin alert for tip {tip_id}: {e}")
 
@@ -64,29 +79,48 @@ async def handle_moderation_callback(update: Update, context: ContextTypes.DEFAU
     user_id = update.effective_user.id if update.effective_user else 0
 
     if not is_admin(user_id):
-        await query.edit_message_text("⛔ You are not authorized to moderate community tips.")
+        if query.message and query.message.photo:
+            await query.edit_message_caption(caption="⛔ You are not authorized to moderate community tips.")
+        else:
+            await query.edit_message_text("⛔ You are not authorized to moderate community tips.")
         return
 
     data = query.data or ""
     action, _, tip_id = data.partition(":")
 
+    original_text = ""
+    if query.message:
+        original_text = query.message.caption or query.message.text or ""
+
+    is_photo_message = bool(query.message and query.message.photo)
+
     if action == "mod_approve":
         success = db_client.update_tip_status(tip_id, "approved")
+        status_text = (
+            f"✅ *Tip Approved & Live!*\n\n{original_text}\n\n"
+            f"Status: Live in community tips knowledge base."
+        )
         if success:
-            await query.edit_message_text(
-                f"✅ *Tip Approved & Live!*\n\n{query.message.text if query.message else ''}\n\n"
-                f"Status: Live in community tips knowledge base.",
-                parse_mode="Markdown",
-            )
+            if is_photo_message:
+                await query.edit_message_caption(caption=status_text, parse_mode="Markdown")
+            else:
+                await query.edit_message_text(status_text, parse_mode="Markdown")
         else:
-            await query.edit_message_text("⚠️ Could not find or update this tip.")
+            if is_photo_message:
+                await query.edit_message_caption(caption="⚠️ Could not find or update this tip.")
+            else:
+                await query.edit_message_text("⚠️ Could not find or update this tip.")
 
     elif action == "mod_reject":
         db_client.update_tip_status(tip_id, "rejected")
-        await query.edit_message_text(
-            f"❌ *Tip Rejected.*\n\n{query.message.text if query.message else ''}\n\nStatus: Rejected.",
-            parse_mode="Markdown",
+        status_text = (
+            f"❌ *Tip Rejected.*\n\n{original_text}\n\nStatus: Rejected."
         )
+        if is_photo_message:
+            await query.edit_message_caption(caption=status_text, parse_mode="Markdown")
+        else:
+            await query.edit_message_text(status_text, parse_mode="Markdown")
+
 
 
 async def handle_broadcast_command(update: Update, context: ContextTypes.DEFAULT_TYPE):

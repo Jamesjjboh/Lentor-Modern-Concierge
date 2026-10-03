@@ -52,18 +52,20 @@ async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
         f"👋 Welcome to the *Lentor Modern Digital Concierge*, {user.first_name or 'Resident'}!\n\n"
         f"I am your 24/7 digital resident companion for Lentor Modern. You can ask me anything about "
         f"estate by-laws, facility bookings, mall directory, or crowdsourced neighbour tips.\n\n"
-        f"Here are a few common questions to get you started:\n"
+        f"Here are a few common things you can do:\n"
         f"• 🔨 *Renovations:* _\"What are the renovation working hours and deposit amounts?\"_\n"
         f"• 🚚 *Deliveries & Moving:* _\"Where is the residential loading bay and what is the height limit?\"_\n"
         f"• 🏬 *Mall Directory:* _\"What time does CS Fresh close? Is there a clinic in the mall?\"_\n"
         f"• 🏊 *Facilities & Parking:* _\"What are the gym hours and BBQ booking rules?\"_\n"
-        f"• 🛠️ *Defects & Inquiries:* _\"How do I report common property defects or contact the Managing Agent?\"_\n\n"
+        f"• 🛠️ *Defects & Inquiries:* _\"How do I report common property defects or contact the Managing Agent?\"_\n"
+        f"• 📸 *Photo Assistance:* _Send a photo of an appliance error code, or snap a notice board to ask a question!_\n\n"
         f"💡 *Got a helpful tip for your neighbours?*\n"
-        f"Share it anytime with:\n"
+        f"Snap a photo of any mall promo or notice, or type:\n"
         f"`/tip <topic> <your tip>` (e.g. `/tip mall CS Fresh sushi discounts start after 8:30pm`)\n\n"
         f"How can I assist you today?"
     )
     await update.message.reply_text(welcome_text, parse_mode="Markdown")
+
 
 
 
@@ -164,6 +166,89 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await message.reply_text(response_text)
 
 
+async def handle_photo(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Processes incoming photos from residents (tips or visual inquiries) via Gemini Vision."""
+    user = update.effective_user
+    message = update.message
+    if not user or not message or not message.photo:
+        return
+
+    # Guardrail: Encourage 1-on-1 usage
+    if update.effective_chat and update.effective_chat.type != Chat.PRIVATE:
+        await message.reply_text("Please chat with me directly in a 1-on-1 private message to protect resident privacy!")
+        return
+
+    # Register user activity
+    db_client.get_or_create_user(user_id=user.id, username=user.username, first_name=user.first_name)
+    db_client.increment_user_query(user_id=user.id)
+
+    # Indicate processing
+    await context.bot.send_chat_action(chat_id=message.chat_id, action=ChatAction.TYPING)
+
+    caption = message.caption or ""
+    highest_res_photo = message.photo[-1]
+
+    try:
+        tg_file = await highest_res_photo.get_file()
+        photo_bytes = await tg_file.download_as_bytearray()
+    except Exception as e:
+        logger.error(f"Failed to download photo from user {user.id}: {e}")
+        await message.reply_text("Sorry, I had trouble downloading your photo. Please try sending it again.")
+        return
+
+    # Multimodal image analysis using Gemini 3.8 Flash Vision
+    result = concierge_agent.analyze_resident_image(
+        image_bytes=bytes(photo_bytes),
+        caption=caption,
+        user_id=user.id,
+    )
+
+    intent = result.get("intent", "RESIDENT_QUESTION")
+    topic = result.get("topic", "general")
+    title = result.get("title", "Photo Discovery")
+    tip_content = result.get("tip", "")
+    user_reply = result.get("user_reply", "Thank you for sharing your photo!")
+
+    if intent == "TIP_SUBMISSION" and tip_content:
+        # Submit to moderation queue
+        tip_id = db_client.submit_community_tip(
+            user_id=user.id,
+            topic=topic,
+            content=tip_content,
+            has_image=True,
+            image_summary=title,
+        )
+
+        # Notify Admin with photo + interactive approve/reject buttons
+        await notify_admin_new_tip(
+            context,
+            tip_id=tip_id,
+            topic=topic,
+            content=f"📸 [{title}]\n{tip_content}",
+            photo_bytes=bytes(photo_bytes),
+        )
+
+        # Log query
+        db_client.log_query(
+            user_id=user.id,
+            user_query=f"[Photo Tip Submission] {caption}",
+            tools_called=["analyze_resident_image", "submit_tip_to_moderation"],
+            agent_response=user_reply,
+            answered_successfully=True,
+        )
+    else:
+        # Visual query / troubleshooting
+        db_client.log_query(
+            user_id=user.id,
+            user_query=f"[Photo Query] {caption}",
+            tools_called=["analyze_resident_image"],
+            agent_response=user_reply,
+            answered_successfully=True,
+        )
+
+    await message.reply_text(user_reply)
+
+
 def create_bot_app() -> Application:
     """Builds and configures the python-telegram-bot application."""
     if not TELEGRAM_BOT_TOKEN:
@@ -183,10 +268,14 @@ def create_bot_app() -> Application:
     # Callback handler for admin interactive inline moderation buttons
     app.add_handler(CallbackQueryHandler(handle_moderation_callback, pattern=r"^mod_"))
 
+    # Photo handler for resident tip submissions and visual inquiries
+    app.add_handler(MessageHandler(filters.PHOTO, handle_photo))
+
     # Default message handler for 1-on-1 resident chats
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
 
     return app
+
 
 
 def main():

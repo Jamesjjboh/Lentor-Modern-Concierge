@@ -28,11 +28,12 @@ The **Lentor Modern Digital Concierge** bridges this gap as an **autonomous AI A
 ```mermaid
 flowchart TD
     subgraph ResidentExperience["Resident Experience (1-on-1 Telegram)"]
-        User["Resident (@LMConciergeBot)"] -->|"Chat Query"| Webhook["Cloud Run Webhook<br/>(asia-southeast1)"]
+        User["Resident (@LMConciergeBot)"] -->|"Text Query or Photo"| Webhook["Cloud Run Webhook<br/>(asia-southeast1)"]
     end
 
     subgraph AgentCore["Agent Reasoning Engine (Gemini 3.8 Flash)"]
-        Webhook -->|"Context & Query"| Agent["Autonomous Tool Orchestrator<br/>(src/agent.py)"]
+        Webhook -->|"Context, Query & Photos"| Agent["Autonomous Tool Orchestrator<br/>(src/agent.py)"]
+        Agent -->|"Multimodal Vision Analysis"| Vision["analyze_resident_image"]
         Agent -->|"Bylaws Lookup"| Tool1["search_bylaws_and_handbook"]
         Agent -->|"Mall Lookup"| Tool2["search_mall_directory"]
         Agent -->|"Crowdsourced Tips"| Tool3["get_verified_community_tips"]
@@ -83,6 +84,12 @@ flowchart TD
 
 ### 3. Product Analytics & Content Gaps (`/admin_stats`)
 * Displays total registered households, total query volume, and a list of **unanswered questions** (highlighting missing estate documentation or untracked mall shops).
+
+### 4. Multimodal Vision & Photo Ingestion
+* Residents can snap photos of mall flyers, opening hours notices, or appliance error codes directly in Telegram without typing.
+* **Auto-Intent Classification:** Automatically categorizes photos into either a *Community Tip* (e.g., CS Fresh promotions) or a *Resident Query* (e.g., induction cooker error code "L").
+* **Photo Moderation Cards:** For tips, pushes the resident's photo directly to the Admin's private Telegram chat with interactive inline `[ ✅ Approve ]` / `[ ❌ Reject ]` buttons.
+* **Privacy by Design:** Strict Singapore PII scrubber ensures unit numbers, phone numbers, and resident identities are stripped before publication.
 
 ---
 

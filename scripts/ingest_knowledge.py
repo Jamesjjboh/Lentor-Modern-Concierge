@@ -312,6 +312,29 @@ def process_bylaws_and_guides(docs_dir: Path) -> List[Dict[str, Any]]:
         )
     })
 
+    # 6. Paint Specifications (Internal Walls & Balcony)
+    records.append({
+        "topic": "Official Paint Specifications (Internal Walls & Ceilings)",
+        "section": "Interior Architectural Finishes",
+        "content": (
+            "The official white paint specified and used by the developer for all interior walls and ceilings at Lentor Modern is "
+            "Intermatt BS E55 (White). If engaging painters for touch-ups, defect rectification, or renovation repainting, request "
+            "'Intermatt BS E55' to ensure an identical sheen and color match with the developer's original handover coat."
+        )
+    })
+    records.append({
+        "topic": "Official Paint Specifications (Balcony & External Façade)",
+        "section": "Exterior Façade & Balcony By-Laws",
+        "content": (
+            "The official paint specification for Lentor Modern balcony walls and exterior façade is: "
+            "Brand: Dulux (ICI)\n"
+            "Colour Name: Thick Smoke\n"
+            "Colour Code: 96YR 09/033 (Composilicon W55)\n"
+            "Under MCST building façade by-laws, any touch-ups, wall repairs, or repainting on balconies must strictly match "
+            "Dulux Thick Smoke (96YR 09/033) to preserve the uniform architectural aesthetic of the development."
+        )
+    })
+
     return records
 
 
@@ -511,6 +534,11 @@ def generate_seed_verified_tips() -> List[Dict[str, Any]]:
             "topic": "cooling",
             "title": "Aircon SWG Copper Piping Specifications",
             "content": "When engaging third-party aircon servicing or relocation, ensure contractors strictly adhere to GuocoLand's specification of SWG 22 (0.71mm thickness) copper piping to maintain building warranty."
+        },
+        {
+            "topic": "bylaws",
+            "title": "Official Unit Paint Codes (Internal Walls & Balcony)",
+            "content": "Verified developer paint specifications for Lentor Modern:\n• Internal Walls & Ceilings: Intermatt BS E55 (White).\n• Balcony & External Façade: Dulux (ICI) 'Thick Smoke' — Colour Code: 96YR 09/033 (Composilicon W55).\nProvide these exact codes to your painter/ID for touch-ups to avoid patchy walls and ensure compliance with MCST façade appearance by-laws."
         }
     ]
 

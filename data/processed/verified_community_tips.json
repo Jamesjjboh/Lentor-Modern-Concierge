@@ -1,118 +1,128 @@
 [
   {
     "topic": "defects",
-    "title": "Estimated Timeline for Defects and Renovation",
-    "content": "When planning your move-in timeline, expect defect checks and rectifications to take approximately one month. Subsequent renovation works typically require an additional 4 to 6 weeks."
+    "title": "Lodging Defects via Novade App",
+    "content": "Defects must be documented with photos and lodged item-by-item through the developer's Novade application. Many third-party defect inspection services can log these directly into the app on your behalf after conducting their walkthrough."
   },
   {
     "topic": "defects",
-    "title": "Prerequisites for Starting Defect Inspection",
-    "content": "Defect inspections should only begin after key collection and the setup of your water and electricity accounts. Note that there is a complimentary 7-day period of electricity and water provided immediately after handover."
+    "title": "Joint Inspection Scheduling Process",
+    "content": "Once all defects are submitted on the Novade app, contact the Lentor Modern customer service representative who assisted you during key collection to arrange a joint inspection date with the customer service and main contractor teams."
   },
   {
     "topic": "defects",
-    "title": "Logging Defects via the Novade App",
-    "content": "All identified defects must be itemized with photos and logged through the developer's Novade app. After logging, you should coordinate with the customer service officer assigned during your key collection to arrange a joint inspection date with the main contractor."
+    "title": "Contractor Access During Rectification",
+    "content": "Homeowners do not need to be physically present during ongoing defect rectifications. The developer's contractors will access the unit across multiple days to carry out repairs, which typically take up to 30 days depending on the volume of work required, before a final joint walkthrough."
   },
   {
     "topic": "defects",
-    "title": "Homeowner Presence During Rectification Works",
-    "content": "Homeowners do not need to be present in the unit during the rectification period. The contractor will access the unit independently to complete the repairs. Rectification works can take up to 30 days depending on the volume of touch-ups required, after which a final handover check is conducted."
+    "title": "Utilities Grace Period for Inspection",
+    "content": "Lentor Modern provides a complimentary 7-day grace period of water and electricity after key handover, allowing sufficient utility supply to test electrical points, appliances, and plumbing during initial defect inspections before setting up an SP Services account."
   },
   {
     "topic": "defects",
-    "title": "Phased Key Collection and Unit Readiness",
-    "content": "Key collection and handovers are processed in batches rather than all at once. The timing of your key collection depends on when your specific unit passes the developer's internal inspections and when the law firms are notified of unit readiness."
+    "title": "Defect Rectification and Move-In Timelines",
+    "content": "When planning handover and lease transitions, factor in approximately 1 month for comprehensive defect checking and contractor rectifications, followed by 4 to 6 weeks for interior renovation works before moving in."
+  },
+  {
+    "topic": "defects",
+    "title": "Critical Areas to Inspect Beyond Cosmetics",
+    "content": "Ensure defect checks go beyond cosmetic paint and surface blemishes to include technical testing of bedroom data/network points, hollow floor or wall tiles, and proper water drainage/ponding gradients in common and master bathrooms."
   },
   {
     "topic": "appliances",
     "title": "Developer-Provided Kitchen and Laundry Appliances",
-    "content": "Lentor Modern units come equipped with essential appliances provided by the developer, which include a refrigerator, an oven, and a washer/dryer."
+    "content": "Units come equipped with core major appliances provided by the developer, which include the refrigerator, oven, and washer/dryer."
   },
   {
     "topic": "appliances",
-    "title": "Smart Home Hub and Integration Capabilities",
-    "content": "The developer provides a smart home hub/console designed to manage intercom systems, access control, lighting, and CCTV. This system can be integrated with a mobile application for remote management."
+    "title": "Light Switch Wiring for Smart Home Integration",
+    "content": "No neutral wire is provided at the wall lighting switches. Residents planning to convert to smart switches must ensure they purchase no-neutral switch models or install bypass capacitors/relays compatible with their setup."
   },
   {
     "topic": "appliances",
-    "title": "Smart Switch Wiring Limitation (No Neutral Wire)",
-    "content": "Please note that no neutral wire is provided behind the lighting switches. If you plan to install smart home switches, you will need to source smart switches that do not require a neutral wire."
+    "title": "Smart Home Hub and Motorised Blinds Integration",
+    "content": "The developer provides a central smart home hub for unit controls. This hub can be linked to mobile applications for home access and integrated with supported motorized outdoor blinds (such as Dooya-compatible systems)."
   },
   {
     "topic": "appliances",
-    "title": "Dishwasher Space and Tabletop Alternatives",
-    "content": "As dedicated space or plumbing for a built-in dishwasher is not explicitly indicated in the standard unit provisions, residents interested in a dishwasher may need to consider compact tabletop models that fit on existing countertops."
+    "title": "Dishwasher Space and Tabletop Solutions",
+    "content": "Built-in dishwasher cabinetry and dedicated plumbing may be limited depending on the unit layout. Residents looking to add dishwashing capabilities should measure countertop dimensions and consider compact tabletop dishwashers."
+  },
+  {
+    "topic": "appliances",
+    "title": "Window Solar Film to Reduce Aircon Cooling Load",
+    "content": "For units receiving afternoon sun exposure, installing UV and heat-blocking solar film on windows helps mitigate indoor heat accumulation and reduces the daily operating load on air conditioning units."
   },
   {
     "topic": "logistics",
-    "title": "House Moving and Bulky Delivery Hours",
-    "content": "Bulky deliveries and moving activities are restricted to Mondays through Fridays from 9:00 AM to 6:00 PM, and Saturdays from 9:00 AM to 1:00 PM. Residents are required to submit Form 2.1 (Application for House Moving and Bulky Delivery) to the management prior to scheduling moving activities."
+    "title": "Delivery and Visitor Access Routing (Level 2)",
+    "content": "The Level 1 intercom is intentionally disabled by management to prevent congestion and protect the lobby. All visitors and delivery riders must drive up to the Level 2 carpark to access the tower intercom. Residents should add delivery notes instructing riders to head to Level 2. Note that vehicles over 3 meters tall cannot access Level 2, meaning residents may need to meet these drivers at Level 1."
   },
   {
     "topic": "logistics",
-    "title": "Delivery Drop-offs and Intercom Access via Level 2",
-    "content": "The Level 1 intercom is intentionally deactivated by management to avoid congestion along the mall driveway and prevent damage to unpadded lobbies. Advise delivery riders and couriers to proceed to the Level 2 car park lobby to access the intercom for entry."
+    "title": "Granting Lift Access via iPlus Living App",
+    "content": "To allow delivery riders to reach your doorstep, they must key in your unit number at the gate or lift lobby entrance. You can then grant them access using the iPlus Living app, which enables them to select your floor in the lift. If riders tail-gate others into the lift lobby without being buzzed in, they will not have the authorization to press your floor button."
   },
   {
     "topic": "logistics",
-    "title": "Height Clearance Restrictions for Heavy Lorries",
-    "content": "Vehicles exceeding 3 meters in height cannot clear the ramp to the Level 2 car park. If receiving bulky deliveries via high-clearance lorries, residents must meet delivery personnel at Level 1 to coordinate manual intake or escort."
+    "title": "Lift Access Card Tapping Workaround",
+    "content": "If your floor button fails to register or turns off after tapping your access card, introduce a brief pause. Wait 1 to 2 seconds after tapping your card before pressing the floor button to allow the lift system enough time to register the card's authorization."
   },
   {
     "topic": "logistics",
-    "title": "Granting Visitor and Courier Lift Access via iPlus App",
-    "content": "To allow couriers up to your doorstep, they must buzz your unit number at the tower lobby intercom. Releasing the entrance via the iPlus Living app automatically activates access for your specific floor in the lift. If visitors or couriers tailgate through the lobby doors without buzzing your unit, the lift will not permit them to select your residential floor."
+    "title": "Permitted House Moving and Bulky Delivery Hours",
+    "content": "House moving and bulky deliveries are restricted to specific timeframes under Form 2.1 (Application for House Moving and Bulky Delivery). Permitted hours are Mondays to Fridays from 9:00 a.m. to 6:00 p.m., and Saturdays from 9:00 a.m. to 1:00 p.m."
   },
   {
     "topic": "logistics",
-    "title": "Lift Access Card Registration Workaround",
-    "content": "The residential lift readers experience a short processing delay when scanning cards. Wait 1 to 2 seconds after tapping your card before pressing the destination floor button to ensure it registers. Tapping repeatedly or pressing the floor button twice may deselect the level."
+    "title": "Canceling Wrong Lift Floor Selections",
+    "content": "If you or a visitor accidentally presses the wrong floor button inside the lift, you can cancel the selection by pressing the same button twice."
   },
   {
     "topic": "bylaws",
-    "title": "Balcony Zip Blind Installation Guidelines",
-    "content": "Installation of zip track blinds at the balcony is permitted, subject to the requirements in the resident handbook. Homeowners can obtain the handbook and approved color specifications from the Managing Agent (MA) on or after the day of key collection."
+    "title": "Balcony Zip Blinds Approval and Guidelines",
+    "content": "Installation of zip track blinds at the balcony is permitted, subject to the guidelines in the resident handbook. Homeowners can request the handbook and the list of approved colors from the Managing Agent (MA) on or after the day of key collection."
   },
   {
     "topic": "bylaws",
-    "title": "Balcony Structural Variations for Blinds",
-    "content": "When measuring or getting quotes for balcony outdoor blinds, note that one side of the balcony features a half-height wall. This means the blind panels will not be uniform in height, which can reduce the overall cost of installation."
+    "title": "Balcony Invisible Grille Installation",
+    "content": "Residents are permitted to install invisible grilles at the balcony. These are commonly installed alongside zip blinds for safety and weather protection."
   },
   {
     "topic": "bylaws",
-    "title": "Invisible Grille Installation",
-    "content": "Invisible grilles are allowed for balcony installation. Residents planning to install them often pair them with zip blinds, with options like Teflon-coated grilles being considered. Ensure you verify the approved specifications with the Managing Agent."
+    "title": "Balcony Structure Variations for Blinds",
+    "content": "When getting quotes for balcony zip blinds, note that some units feature a half-height wall on one side of the balcony. This means the blind panels will not be of uniform height, as one side will require a shorter panel."
   },
   {
     "topic": "bylaws",
     "title": "Function Room Amenities",
-    "content": "The condominium's function room includes a pool (billiard) table available for resident booking and use."
+    "content": "The condominium's function room is equipped with a pool (billiard) table available for resident use."
   },
   {
     "topic": "mall",
-    "title": "Mall Opening Timeline and Childcare Status",
-    "content": "According to official developer correspondence, Lentor Modern Mall is projected to open to the public in early 2026. The developer is currently in discussions with various childcare providers to finalize the anchor preschool tenant."
+    "title": "Mall Opening Timeline and Childcare Provider Status",
+    "content": "According to developer updates, Lentor Modern Mall is scheduled to open to the public in early 2026. The developer is currently in discussions with various childcare providers to finalize the preschool operator."
   },
   {
     "topic": "mall",
-    "title": "Visitor Access Route from MRT and Taxi Stand",
-    "content": "For visitors arriving via MRT or taxi, the primary pedestrian access route to the residential blocks is through the concierge entrance located near Burger King. Residents may need to escort guests if they do not use this entrance."
+    "title": "Visitor Pedestrian Access from MRT and Taxi Stand",
+    "content": "Visitors arriving via MRT or taxi must enter through the concierge entrance near Burger King. Otherwise, residents must physically go down to escort visitors up, as direct access from other points is restricted."
   },
   {
     "topic": "mall",
     "title": "Vehicle Entrance and Slip Road Layout",
-    "content": "The development features a single-lane 'IN' slip road shared by both residents and the public. This lane subsequently splits, directing residential traffic to the left and mall-bound traffic to the right."
+    "content": "The development features a single-lane 'IN' slip road for both residents and the public. This lane subsequently splits, with the left lane leading to the residential area and the right lane leading to the mall carpark."
+  },
+  {
+    "topic": "mall",
+    "title": "Confirmed Retailers and Tenant Directory",
+    "content": "Confirmed tenants include CS Fresh (supermarket currently undergoing renovation) and Pinnacle Clinic. Residents can check the official Lentor Modern website under 'Opening Soon: F&B and Essentials' for the latest list of incoming shops."
   },
   {
     "topic": "mall",
     "title": "Burner Bin Location",
-    "content": "A burner bin is located outside the mall area, situated near the entrance of the carpark along the grass strip."
-  },
-  {
-    "topic": "mall",
-    "title": "Retailer Updates and Directory",
-    "content": "The official Lentor Modern website (lentormodern.com.sg) has been updated with an 'Opening Soon: F&B and Essentials' section. Confirmed upcoming tenants include CS Fresh (supermarket), Pinnacle Clinic, and Omote."
+    "content": "A burner bin is located outside the mall near the entrance of the carpark, situated along the grass patch."
   },
   {
     "topic": "appliances",
@@ -153,5 +163,10 @@
     "topic": "cooling",
     "title": "Aircon SWG Copper Piping Specifications",
     "content": "When engaging third-party aircon servicing or relocation, ensure contractors strictly adhere to GuocoLand's specification of SWG 22 (0.71mm thickness) copper piping to maintain building warranty."
+  },
+  {
+    "topic": "bylaws",
+    "title": "Official Unit Paint Codes (Internal Walls & Balcony)",
+    "content": "Verified developer paint specifications for Lentor Modern:\n• Internal Walls & Ceilings: Intermatt BS E55 (White).\n• Balcony & External Façade: Dulux (ICI) 'Thick Smoke' — Colour Code: 96YR 09/033 (Composilicon W55).\nProvide these exact codes to your painter/ID for touch-ups to avoid patchy walls and ensure compliance with MCST façade appearance by-laws."
   }
 ]

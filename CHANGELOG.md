@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.3.1] - 2026-10-03
+
+### Added
+- **Official Interior & Balcony Paint Specifications**:
+  - **Internal Unit Paint (Walls & Ceilings)**: Verified developer handover specification is **Intermatt BS E55** (White). Injected into knowledge base to ensure resident touch-ups and defect rectification achieve exact sheen and color match.
+  - **Balcony & Façade Paint**: Verified developer & MCST architectural specification is **Dulux (ICI) "Thick Smoke"**, Colour Code: **`96YR 09/033`** (System: Composilicon W55). Ingested into building by-law guidelines to maintain uniform external facade aesthetic.
+  - Added seed verified community tip for instant 1-on-1 query answering regarding unit touch-up paint.
+
+---
+
 ## [1.3.0] - 2026-10-03
 
 ### Added

@@ -1,0 +1,13 @@
+.git
+.gitignore
+.env
+.env.*
+.venv
+venv
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.DS_Store
+data/raw/*
+!data/raw/.gitkeep

@@ -1,0 +1,24 @@
+[
+  {
+    "name": "delete-old-images",
+    "action": {
+      "type": "DELETE"
+    },
+    "condition": {
+      "olderThan": "86400s",
+      "tagState": "ANY"
+    }
+  },
+  {
+    "name": "keep-latest-two-versions",
+    "action": {
+      "type": "KEEP"
+    },
+    "mostRecentVersions": {
+      "keepCount": 2,
+      "packageNamePrefixes": [
+        "lentor-concierge"
+      ]
+    }
+  }
+]

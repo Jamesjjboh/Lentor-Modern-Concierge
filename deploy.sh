@@ -1,7 +1,6 @@
 #!/bin/bash
 set -e
 
-# Configuration
 SERVICE_NAME="lentor-concierge"
 REGION="asia-southeast1" # Singapore region
 
@@ -25,16 +24,26 @@ fi
 
 gcloud config set project "$GCP_PROJECT_ID"
 
-# Build and deploy directly to Cloud Run
+SERVICE_URL="https://${SERVICE_NAME}-523250497459.${REGION}.run.app"
+echo "🌐 Cloud Run Service URL target: ${SERVICE_URL}"
+
+# Build container and deploy to Cloud Run with Webhook mode enabled
+echo "📦 Building container and deploying to Cloud Run..."
 gcloud run deploy "$SERVICE_NAME" \
     --source . \
     --region "$REGION" \
     --platform managed \
     --allow-unauthenticated \
+    --port 8080 \
     --min-instances 0 \
-    --max-instances 3 \
+    --max-instances 2 \
     --memory 512Mi \
     --cpu 1 \
-    --set-env-vars "ENVIRONMENT=production,GEMINI_MODEL=gemini-3.8-flash,GCP_PROJECT_ID=${GCP_PROJECT_ID},TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN},ADMIN_TELEGRAM_ID=${ADMIN_TELEGRAM_ID},GEMINI_API_KEY=${GEMINI_API_KEY}"
+    --set-env-vars "ENVIRONMENT=production,WEBHOOK_URL=${SERVICE_URL},GEMINI_MODEL=${GEMINI_MODEL:-gemini-3.8-flash},GCP_PROJECT_ID=${GCP_PROJECT_ID},TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN},ADMIN_TELEGRAM_ID=${ADMIN_TELEGRAM_ID},GEMINI_API_KEY=${GEMINI_API_KEY}"
 
-echo "✅ Deployment complete! Check the Cloud Run service URL in the output above."
+
+echo "✅ Cloud Run deployment complete!"
+echo "🔗 Setting Telegram Webhook directly..."
+curl -s "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/setWebhook?url=${SERVICE_URL}/${TELEGRAM_BOT_TOKEN}" | grep '"ok":true' && echo " ✓ Webhook confirmed active!" || echo " ⚠️ Check webhook status."
+
+echo "🎉 Lentor Modern Digital Concierge is live 24/7 on Google Cloud Run!"

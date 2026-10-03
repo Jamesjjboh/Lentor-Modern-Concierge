@@ -15,6 +15,8 @@ from telegram.ext import (
     MessageHandler,
     filters,
 )
+from telegram.request import HTTPXRequest
+
 
 from src.admin import (
     handle_admin_stats_command,
@@ -47,19 +49,22 @@ async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     )
 
     welcome_text = (
-        f"👋 Welcome to the *Lentor Modern AI Concierge*, {user.first_name or 'Resident'}!\n\n"
-        f"I am your 24/7 autonomous resident assistant for ~605 households at Lentor Modern.\n\n"
-        f"Here are a few things you can ask me:\n"
-        f"• 📜 *Estate By-laws:* _\"What are the renovation hours and deposit fees?\"_\n"
-        f"• 🔑 *Access & Utilities:* _\"How do I get the fiber broadband riser key for NetLink?\"_\n"
-        f"• 🏬 *Mall Directory:* _\"What time does CS Fresh close? Is there a clinic on L1?\"_\n"
-        f"• 💡 *Neighbour Tips:* _\"Where should Taobao delivery trucks enter?\"_\n"
-        f"• ✉️ *MA Drafting:* _\"Help me draft an email to the MA about corridor noise.\"_\n\n"
-        f"💡 *Have a tip for neighbours?* Submit it anytime with:\n"
-        f"`/tip <topic> <your tip>` (e.g. `/tip mall CS Fresh sushi 20% off after 8:30pm`)\n\n"
+        f"👋 Welcome to the *Lentor Modern Digital Concierge*, {user.first_name or 'Resident'}!\n\n"
+        f"I am your 24/7 digital resident companion for Lentor Modern. You can ask me anything about "
+        f"estate by-laws, facility bookings, mall directory, or crowdsourced neighbour tips.\n\n"
+        f"Here are a few common questions to get you started:\n"
+        f"• 🔨 *Renovations:* _\"What are the renovation working hours and deposit amounts?\"_\n"
+        f"• 🚚 *Deliveries & Moving:* _\"Where is the residential loading bay and what is the height limit?\"_\n"
+        f"• 🏬 *Mall Directory:* _\"What time does CS Fresh close? Is there a clinic in the mall?\"_\n"
+        f"• 🏊 *Facilities & Parking:* _\"What are the gym hours and BBQ booking rules?\"_\n"
+        f"• 🛠️ *Defects & Inquiries:* _\"How do I report common property defects or contact the Managing Agent?\"_\n\n"
+        f"💡 *Got a helpful tip for your neighbours?*\n"
+        f"Share it anytime with:\n"
+        f"`/tip <topic> <your tip>` (e.g. `/tip mall CS Fresh sushi discounts start after 8:30pm`)\n\n"
         f"How can I assist you today?"
     )
     await update.message.reply_text(welcome_text, parse_mode="Markdown")
+
 
 
 async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -164,7 +169,9 @@ def create_bot_app() -> Application:
     if not TELEGRAM_BOT_TOKEN:
         logger.warning("TELEGRAM_BOT_TOKEN is not configured in .env. Bot cannot start without token.")
 
-    app = Application.builder().token(TELEGRAM_BOT_TOKEN or "MOCK_TOKEN").build()
+    request = HTTPXRequest(connect_timeout=30.0, read_timeout=30.0)
+    app = Application.builder().token(TELEGRAM_BOT_TOKEN or "MOCK_TOKEN").request(request).build()
+
 
     # Command handlers
     app.add_handler(CommandHandler("start", start_command))
@@ -190,17 +197,27 @@ def main():
 
     app = create_bot_app()
 
-    if WEBHOOK_URL:
-        logger.info(f"Starting bot in Webhook mode on port {PORT} with URL {WEBHOOK_URL}")
-        app.run_webhook(
-            listen="0.0.0.0",
-            port=PORT,
-            url_path=TELEGRAM_BOT_TOKEN,
-            webhook_url=f"{WEBHOOK_URL}/{TELEGRAM_BOT_TOKEN}",
-        )
+    if ENVIRONMENT == "production" or WEBHOOK_URL:
+        full_webhook_url = f"{WEBHOOK_URL}/{TELEGRAM_BOT_TOKEN}" if WEBHOOK_URL else None
+        logger.info(f"🌐 Running in Webhook Mode on port {PORT}...")
+        if full_webhook_url:
+            logger.info(f"🔗 Setting Telegram Webhook to: {full_webhook_url}")
+            app.run_webhook(
+                listen="0.0.0.0",
+                port=PORT,
+                url_path=TELEGRAM_BOT_TOKEN,
+                webhook_url=full_webhook_url,
+            )
+        else:
+            app.run_webhook(
+                listen="0.0.0.0",
+                port=PORT,
+                url_path=TELEGRAM_BOT_TOKEN,
+            )
     else:
-        logger.info("Starting bot in local polling mode...")
+        logger.info("💻 Running in local polling mode...")
         app.run_polling(drop_pending_updates=True)
+
 
 
 if __name__ == "__main__":

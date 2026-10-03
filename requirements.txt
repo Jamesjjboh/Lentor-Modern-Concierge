@@ -1,5 +1,6 @@
 google-genai
-python-telegram-bot
+python-telegram-bot[webhooks]
+
 pydantic
 python-dotenv
 chromadb

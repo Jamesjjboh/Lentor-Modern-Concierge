@@ -2,7 +2,7 @@
 
 import asyncio
 import logging
-from typing import Optional
+from typing import Any, Dict, List, Optional
 
 from telegram import ForceReply, InlineKeyboardButton, InlineKeyboardMarkup, Update
 from telegram.error import BadRequest

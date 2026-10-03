@@ -7,6 +7,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.6.0] - 2026-10-03
+
+### Added
+- **Resident 1-Tap Answer Feedback (👍 Helpful / 👎 Inaccurate)**:
+  - Factual AI concierge responses in 1-on-1 private chat now include inline buttons (`[ 👍 Helpful ]` and `[ 👎 Inaccurate ]`).
+  - Positive feedback triggers an instant toast confirmation (*"👍 Thank you! Glad this was helpful."*) and collapses to `[ ✅ Marked as Helpful ]`.
+  - Negative feedback alerts the user (*"🙏 Thank you for flagging! We've notified the admin to review and correct this."*), collapses to `[ ⚠️ Flagged for Review ]`, and logs feedback directly in Firestore.
+- **Real-Time Admin Flagged Answer Alert Workflow**:
+  - Tapping `👎 Inaccurate` immediately pushes an alert card to Admin's private Telegram DM containing:
+    - Resident name, Telegram handle, and User ID.
+    - Exact query asked and bot's response.
+    - Retrieved tools and knowledge sources.
+    - Interactive `[ 💬 Reply to Resident ]` (2-way swipe/tap reply) and `[ 📁 Mark Reviewed ]` buttons.
+- **Admin Review Command (`/flagged`)**:
+  - Added dedicated `/flagged` admin command to inspect the 10 most recently reported inaccurate answers with timestamps and direct resident follow-up guidance.
+- **Automated Test Suite (`tests/test_feedback.py`)**:
+  - Full unit test coverage verifying rating keyboard generation, status transitions, Firestore logging, and callback handling.
+
+---
+
 ## [1.5.0] - 2026-10-03
 
 ### Added

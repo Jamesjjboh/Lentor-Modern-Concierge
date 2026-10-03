@@ -135,6 +135,12 @@ An instant, text-first dashboard (no chart rendering), with inline buttons `[ 7d
   * `[ 🏢 On-Site Contacts ]`: Displays estate office phone hotlines and locations.
   * `[ ◀️ Quick Menu ]`: Jumps back to main quick shortcuts.
 
+### 8. Resident 1-Tap Answer Rating & Admin Review Workflow
+* **1-Tap Answer Validation:** Every factual response sent to residents contains subtle `[ 👍 Helpful ]` and `[ 👎 Inaccurate ]` buttons.
+* **Auto-Collapse & Reassurance:** Tapping `👍` immediately confirms via toast and locks to `[ ✅ Marked as Helpful ]`. Tapping `👎` reassures the resident that the admin was alerted and locks to `[ ⚠️ Flagged for Review ]`.
+* **Instant Admin Alert Card:** When an answer is flagged `👎`, the bot pushes an interactive alert card to the Admin's private Telegram DM containing resident details, query text, bot response, retrieved tools, plus `[ 💬 Reply to Resident ]` and `[ 📁 Mark Reviewed ]` buttons.
+* **Admin Review Command (`/flagged`):** Allows admin to review the top 10 most recent flagged answers on demand anytime.
+
 ---
 
 ## 💰 Zero-Cost Serverless Architecture ($0.00 / month)

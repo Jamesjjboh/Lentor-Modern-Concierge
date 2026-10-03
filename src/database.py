@@ -135,6 +135,73 @@ class DatabaseClient:
         doc_ref.set(log_entry)
         return doc_ref.id
 
+    def update_query_feedback(
+        self,
+        log_id: str,
+        feedback: str,
+    ) -> bool:
+        """Updates resident feedback (e.g. 'helpful' or 'inaccurate') on a logged query."""
+        now = datetime.now(timezone.utc).isoformat()
+        if self._mock_mode or not self.db:
+            for entry in self._mock_logs:
+                if entry.get("log_id") == log_id:
+                    entry["feedback"] = feedback
+                    entry["feedback_at"] = now
+                    return True
+            return False
+
+        doc_ref = self.db.collection("query_logs").document(log_id)
+        doc = doc_ref.get()
+        if not doc.exists:
+            return False
+        doc_ref.update({"feedback": feedback, "feedback_at": now})
+        return True
+
+    def get_query_log(self, log_id: str) -> Optional[Dict[str, Any]]:
+        """Retrieves a logged query by log_id."""
+        if self._mock_mode or not self.db:
+            for entry in self._mock_logs:
+                if entry.get("log_id") == log_id:
+                    return entry
+            return None
+
+        doc = self.db.collection("query_logs").document(log_id).get()
+        if doc.exists:
+            data = doc.to_dict() or {}
+            data["log_id"] = doc.id
+            return data
+        return None
+
+    def get_flagged_queries(self, limit: int = 20) -> List[Dict[str, Any]]:
+        """Retrieves recent queries marked as inaccurate or flagged by residents."""
+        if self._mock_mode or not self.db:
+            flagged = [
+                entry for entry in reversed(self._mock_logs)
+                if entry.get("feedback") == "inaccurate"
+            ]
+            return flagged[:limit]
+
+        query = (
+            self.db.collection("query_logs")
+            .where("feedback", "==", "inaccurate")
+            .order_by("timestamp", direction=firestore.Query.DESCENDING)
+            .limit(limit)
+        )
+        results = []
+        try:
+            for d in query.stream():
+                item = d.to_dict()
+                item["log_id"] = d.id
+                results.append(item)
+        except Exception as e:
+            logger.warning(f"Failed query with ordering: {e}, falling back to unordered query")
+            fallback = self.db.collection("query_logs").where("feedback", "==", "inaccurate").limit(limit)
+            for d in fallback.stream():
+                item = d.to_dict()
+                item["log_id"] = d.id
+                results.append(item)
+        return results
+
     def submit_community_tip(
         self,
         user_id: int,

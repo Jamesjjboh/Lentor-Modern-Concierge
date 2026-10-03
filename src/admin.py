@@ -236,6 +236,104 @@ async def handle_feedback_callback(update: Update, context: ContextTypes.DEFAULT
         elif query.message:
             await query.edit_message_text(text=resolved_text, parse_mode="Markdown")
 
+    elif action == "flag_resolve":
+        log_id = rest
+        db_client.update_query_feedback(log_id, "resolved")
+        original_text = ""
+        if query.message:
+            original_text = query.message.caption or query.message.text or ""
+        reviewed_text = f"✅ *Flagged Answer Marked as Reviewed & Closed*\n\n{original_text}"
+        if query.message:
+            await query.edit_message_text(text=reviewed_text, parse_mode="Markdown")
+
+
+async def notify_admin_flagged_answer(
+    context: ContextTypes.DEFAULT_TYPE,
+    log_id: str,
+    user_id: int,
+    username: Optional[str],
+    first_name: Optional[str],
+    user_query: str,
+    agent_response: str,
+    tools_called: Optional[List[str]] = None,
+):
+    """Pushes an interactive flagged query alert directly to Admin's private Telegram DM."""
+    if not ADMIN_TELEGRAM_ID:
+        logger.warning("ADMIN_TELEGRAM_ID not set; skipping admin flagged answer notification.")
+        return
+
+    resident_display = first_name or "Resident"
+    if username:
+        resident_display += f" (@{username})"
+
+    # Truncate response if excessively long for Telegram message limit
+    trimmed_response = agent_response[:400] + "..." if len(agent_response) > 400 else agent_response
+    tools_str = ", ".join(tools_called) if tools_called else "Direct LLM"
+
+    alert_text = (
+        f"🚨 *Resident Flagged Inaccurate Answer*\n\n"
+        f"👤 *From:* {resident_display}\n"
+        f"🆔 *User ID:* `{user_id}`\n"
+        f"📑 *Log ID:* `{log_id}`\n\n"
+        f"❓ *Resident Question:*\n\"{user_query}\"\n\n"
+        f"🤖 *Bot's Answer:*\n\"{trimmed_response}\"\n\n"
+        f"🛠️ *Tools / Retrieval:* `{tools_str}`\n\n"
+        f"👉 *Swipe left to reply to {first_name or 'Resident'}, or tap buttons below:*"
+    )
+
+    keyboard = [
+        [
+            InlineKeyboardButton(f"💬 Reply to {first_name or 'Resident'}", callback_data=f"fb_reply:{user_id}:log_{log_id}"),
+            InlineKeyboardButton("📁 Mark Reviewed", callback_data=f"flag_resolve:{log_id}"),
+        ]
+    ]
+    reply_markup = InlineKeyboardMarkup(keyboard)
+
+    try:
+        sent_msg = await context.bot.send_message(
+            chat_id=ADMIN_TELEGRAM_ID,
+            text=alert_text,
+            reply_markup=reply_markup,
+            parse_mode="Markdown",
+        )
+        db_client.save_admin_reply_mapping(
+            admin_message_id=sent_msg.message_id,
+            user_id=user_id,
+            resident_name=first_name or "Resident",
+            feedback_id=f"log_{log_id}",
+        )
+        logger.info(f"Admin notified for flagged query {log_id} by user {user_id}")
+    except Exception as e:
+        logger.error(f"Failed to send admin alert for flagged query {log_id}: {e}")
+
+
+async def handle_flagged_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Admin command `/flagged` to inspect recently reported inaccurate answers."""
+    user = update.effective_user
+    if not user or not is_admin(user.id):
+        if update.message:
+            await update.message.reply_text("⛔ This command is restricted to estate administrators.")
+        return
+
+    flagged_items = db_client.get_flagged_queries(limit=10)
+    if not flagged_items:
+        if update.message:
+            await update.message.reply_text("🎉 No flagged inaccurate answers found! All recent queries are clear.")
+        return
+
+    lines = [f"🚨 *Recently Flagged Inaccurate Answers ({len(flagged_items)}):*\n"]
+    for i, item in enumerate(flagged_items, 1):
+        q = item.get("user_query", "Unknown question")
+        uid = item.get("user_id", "Unknown")
+        ts = item.get("timestamp", "")[:16].replace("T", " ")
+        ans_preview = item.get("agent_response", "")[:100].replace("\n", " ")
+        lines.append(f"{i}. *\"{q}\"*\n   👤 User: `{uid}` | 🕒 {ts} UTC\n   💬 _{ans_preview}..._\n")
+
+    lines.append("Use `/reply <user_id> <message>` to follow up with any resident directly.")
+    if update.message:
+        await update.message.reply_text("\n".join(lines), parse_mode="Markdown")
+
+
 
 
 async def handle_broadcast_command(update: Update, context: ContextTypes.DEFAULT_TYPE):

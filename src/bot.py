@@ -26,10 +26,12 @@ from src.admin import (
     handle_admin_stats_command,
     handle_broadcast_command,
     handle_feedback_callback,
+    handle_flagged_command,
     handle_moderation_callback,
     handle_reply_command,
     handle_stats_callback,
     is_admin,
+    notify_admin_flagged_answer,
     notify_admin_new_feedback,
     notify_admin_new_tip,
 )
@@ -80,6 +82,24 @@ def get_unanswered_fallback_keyboard() -> InlineKeyboardMarkup:
         ],
     ]
     return InlineKeyboardMarkup(keyboard)
+
+
+def get_answer_feedback_keyboard(log_id: str) -> InlineKeyboardMarkup:
+    """Returns 1-tap rating buttons for answers so residents can validate or flag answers."""
+    keyboard = [
+        [
+            InlineKeyboardButton("👍 Helpful", callback_data=f"fb_rate:pos:{log_id}"),
+            InlineKeyboardButton("👎 Inaccurate", callback_data=f"fb_rate:neg:{log_id}"),
+        ]
+    ]
+    return InlineKeyboardMarkup(keyboard)
+
+
+def get_answer_feedback_done_keyboard(feedback_type: str) -> InlineKeyboardMarkup:
+    """Returns acknowledged state after a resident has rated an answer."""
+    label = "✅ Marked as Helpful" if feedback_type == "pos" else "⚠️ Flagged for Review"
+    return InlineKeyboardMarkup([[InlineKeyboardButton(label, callback_data="noop")]])
+
 
 
 async def _keep_typing(bot, chat_id: int, stop_event: asyncio.Event):
@@ -297,6 +317,61 @@ async def handle_fallback_callback(update: Update, context: ContextTypes.DEFAULT
         )
 
 
+async def handle_answer_feedback_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Handles resident tapping [ 👍 Helpful ] or [ 👎 Inaccurate ] on an answer."""
+    query = update.callback_query
+    if not query:
+        return
+
+    data = query.data or ""
+    if data == "noop":
+        await query.answer()
+        return
+
+    # Data format: fb_rate:<pos|neg>:<log_id>
+    _, _, rest = data.partition(":")
+    rating_type, _, log_id = rest.partition(":")
+
+    user = update.effective_user
+    user_id = user.id if user else 0
+
+    if rating_type == "pos":
+        # Positive feedback
+        db_client.update_query_feedback(log_id, "helpful")
+        await query.answer("👍 Thank you! Glad this was helpful.", show_alert=False)
+        try:
+            await query.edit_message_reply_markup(reply_markup=get_answer_feedback_done_keyboard("pos"))
+        except Exception:
+            pass
+
+    elif rating_type == "neg":
+        # Negative / inaccurate feedback
+        db_client.update_query_feedback(log_id, "inaccurate")
+        await query.answer("🙏 Thank you for flagging! We've notified the admin to review and correct this.", show_alert=True)
+        try:
+            await query.edit_message_reply_markup(reply_markup=get_answer_feedback_done_keyboard("neg"))
+        except Exception:
+            pass
+
+        # Retrieve logged query info and immediately alert admin
+        log_entry = db_client.get_query_log(log_id)
+        if log_entry:
+            q_text = log_entry.get("user_query", "Unknown query")
+            ans_text = log_entry.get("agent_response", "")
+            tools = log_entry.get("tools_called", [])
+            await notify_admin_flagged_answer(
+                context=context,
+                log_id=log_id,
+                user_id=user_id,
+                username=user.username if user else None,
+                first_name=user.first_name if user else None,
+                user_query=q_text,
+                agent_response=ans_text,
+                tools_called=tools,
+            )
+
+
+
 
 async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Handles /help command."""
@@ -314,6 +389,7 @@ async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "*Admin Commands:*\n"
         "• `/reply <user_id> <message>` — Send direct message to a resident.\n"
         "• `/broadcast <message>` — Send estate broadcast to registered residents.\n"
+        "• `/flagged` — View recently reported inaccurate answers from residents.\n"
         "• `/admin_stats [7|30|all]` — Analytics dashboard (users, topics, content gaps, feedback). You can also just ask, e.g. _\"what did residents ask most this week?\"_"
     )
     await update.message.reply_text(
@@ -533,7 +609,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     # Send immediate in-chat status message directly below the resident's question
     status_msg = await message.reply_text(
-        "🔍 <i>Looking that up for you with Gemini AI...</i>",
+        "🛎️ <i>Looking that up for you...</i>",
         parse_mode="HTML",
     )
 
@@ -548,9 +624,9 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         stop_typing_event.set()
         await typing_task
 
-    # Log query into Firestore for content gap detection
+    # Log query into Firestore for content gap detection and resident feedback
     answered_successfully = analytics.is_answered(response_text, tools_called)
-    db_client.log_query(
+    log_id = db_client.log_query(
         user_id=user.id,
         user_query=user_query,
         tools_called=tools_called,
@@ -606,11 +682,13 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 reply_markup=get_unanswered_fallback_keyboard(),
             )
     else:
+        # Provide 1-tap rating buttons so residents can easily confirm accuracy or flag errors
+        reply_kb = get_answer_feedback_keyboard(log_id)
         try:
-            await status_msg.edit_text(response_text, parse_mode="Markdown")
+            await status_msg.edit_text(response_text, reply_markup=reply_kb, parse_mode="Markdown")
         except Exception:
             # Fallback to plain text if Markdown format is invalid
-            await status_msg.edit_text(response_text)
+            await status_msg.edit_text(response_text, reply_markup=reply_kb)
 
 
 async def handle_photo(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -633,7 +711,7 @@ async def handle_photo(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await context.bot.send_chat_action(chat_id=message.chat_id, action=ChatAction.TYPING)
 
     # Immediate in-chat status message directly below the photo
-    status_msg = await message.reply_text("📥 <i>Downloading image...</i>", parse_mode="HTML")
+    status_msg = await message.reply_text("📥 <i>Receiving photo...</i>", parse_mode="HTML")
 
     caption = message.caption or ""
     highest_res_photo = message.photo[-1]
@@ -641,10 +719,10 @@ async def handle_photo(update: Update, context: ContextTypes.DEFAULT_TYPE):
     try:
         tg_file = await highest_res_photo.get_file()
         photo_bytes = await tg_file.download_as_bytearray()
-        await status_msg.edit_text("🔍 <i>Analyzing with Gemini Vision AI...</i>", parse_mode="HTML")
+        await status_msg.edit_text("🔍 <i>Checking details from your photo...</i>", parse_mode="HTML")
     except Exception as e:
         logger.error(f"Failed to download photo from user {user.id}: {e}")
-        await status_msg.edit_text("❌ Sorry, I had trouble downloading your photo. Please try sending it again.")
+        await status_msg.edit_text("❌ Sorry, I had trouble receiving your photo. Please try sending it again.")
         return
 
     # Multimodal image analysis using Gemini 3.8 Flash Vision with persistent typing heartbeat
@@ -729,13 +807,22 @@ async def handle_photo(update: Update, context: ContextTypes.DEFAULT_TYPE):
         )
     else:
         # Visual query / troubleshooting
-        db_client.log_query(
+        log_id = db_client.log_query(
             user_id=user.id,
             user_query=f"[Photo Query] {caption}",
             tools_called=["analyze_resident_image"],
             agent_response=user_reply,
             answered_successfully=True,
         )
+        reply_kb = get_answer_feedback_keyboard(log_id)
+        try:
+            await status_msg.edit_text(user_reply, reply_markup=reply_kb, parse_mode="Markdown")
+        except Exception:
+            try:
+                await status_msg.edit_text(user_reply, reply_markup=reply_kb)
+            except Exception:
+                await message.reply_text(user_reply, reply_markup=reply_kb)
+        return
 
     try:
         await status_msg.edit_text(user_reply, parse_mode="Markdown")
@@ -765,15 +852,17 @@ def create_bot_app() -> Application:
     app.add_handler(CommandHandler("reply", handle_reply_command))
     app.add_handler(CommandHandler("broadcast", handle_broadcast_command))
     app.add_handler(CommandHandler("admin_stats", handle_admin_stats_command))
+    app.add_handler(CommandHandler("flagged", handle_flagged_command))
 
     # Callback handler for resident interactive 1-tap quick action menu
     app.add_handler(CallbackQueryHandler(handle_quick_menu_callback, pattern=r"^menu_"))
     app.add_handler(CallbackQueryHandler(handle_fallback_callback, pattern=r"^fallback_"))
+    app.add_handler(CallbackQueryHandler(handle_answer_feedback_callback, pattern=r"^(fb_rate|noop)"))
 
     # Callback handler for admin interactive inline moderation buttons
     app.add_handler(CallbackQueryHandler(handle_stats_callback, pattern=r"^stats_"))
     app.add_handler(CallbackQueryHandler(handle_moderation_callback, pattern=r"^mod_"))
-    app.add_handler(CallbackQueryHandler(handle_feedback_callback, pattern=r"^fb_"))
+    app.add_handler(CallbackQueryHandler(handle_feedback_callback, pattern=r"^(fb_|flag_)"))
 
     # Photo handler for resident tip submissions and visual inquiries
     app.add_handler(MessageHandler(filters.PHOTO, handle_photo))

@@ -10,9 +10,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.5.0] - 2026-10-03
 
 ### Added
-- **In-Chat Progress Status Bubble (Matching Macro Tracker UX)**:
-  - For text questions, the bot immediately posts `🔍 Looking that up for you with Gemini AI...` directly beneath the resident's message, editing into the response once ready.
-  - For photo questions, the bot immediately posts `📥 Downloading image...` and transitions to `🔍 Analyzing with Gemini Vision AI...` before delivering the final answer.
+- **In-Chat Progress Status Bubble (Concierge Persona)**:
+  - For text questions, the bot immediately posts `🛎️ Looking that up for you...` directly beneath the resident's message, editing into the response once ready.
+  - For photo questions, the bot immediately posts `📥 Receiving photo...` and transitions to `🔍 Checking details from your photo...` before delivering the final answer.
 - **Verified GuocoLand e-Voucher Merchant Directory (34 Official Stores)**:
   - Cross-referenced directly against official Lentor Modern Mall directory (`https://www.lentormodern.com.sg/shops/`), updating knowledge store with all 34 participating merchants categorized by F&B and Retail/Services.
 - **Persistent Typing Heartbeat Indicator**:

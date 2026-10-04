@@ -39,11 +39,14 @@ gcloud run deploy "$SERVICE_NAME" \
     --max-instances 2 \
     --memory 512Mi \
     --cpu 1 \
-    --set-env-vars "ENVIRONMENT=production,WEBHOOK_URL=${SERVICE_URL},GEMINI_MODEL=${GEMINI_MODEL:-gemini-3.8-flash},GCP_PROJECT_ID=${GCP_PROJECT_ID},TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN},ADMIN_TELEGRAM_ID=${ADMIN_TELEGRAM_ID},GEMINI_API_KEY=${GEMINI_API_KEY}"
-
+    --set-env-vars "ENVIRONMENT=production,WEBHOOK_URL=${SERVICE_URL},GEMINI_MODEL=${GEMINI_MODEL:-gemini-3.8-flash},GCP_PROJECT_ID=${GCP_PROJECT_ID},TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN},ADMIN_TELEGRAM_ID=${ADMIN_TELEGRAM_ID},GEMINI_API_KEY=${GEMINI_API_KEY},WEBHOOK_SECRET_TOKEN=${WEBHOOK_SECRET_TOKEN:-}"
 
 echo "✅ Cloud Run deployment complete!"
 echo "🔗 Setting Telegram Webhook directly..."
-curl -s "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/setWebhook?url=${SERVICE_URL}/${TELEGRAM_BOT_TOKEN}" | grep '"ok":true' && echo " ✓ Webhook confirmed active!" || echo " ⚠️ Check webhook status."
+WEBHOOK_SET_URL="https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/setWebhook?url=${SERVICE_URL}/${TELEGRAM_BOT_TOKEN}"
+if [ -n "$WEBHOOK_SECRET_TOKEN" ]; then
+    WEBHOOK_SET_URL="${WEBHOOK_SET_URL}&secret_token=${WEBHOOK_SECRET_TOKEN}"
+fi
+curl -s "$WEBHOOK_SET_URL" | grep '"ok":true' && echo " ✓ Webhook confirmed active!" || echo " ⚠️ Check webhook status."
 
 echo "🎉 Lentor Modern Digital Concierge is live 24/7 on Google Cloud Run!"

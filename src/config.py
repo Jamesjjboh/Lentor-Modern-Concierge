@@ -30,3 +30,4 @@ PROCESSED_DATA_DIR = DATA_DIR / "processed"
 PORT = int(os.getenv("PORT", "8080"))
 ENVIRONMENT = os.getenv("ENVIRONMENT", "development")
 WEBHOOK_URL = os.getenv("WEBHOOK_URL", "")
+WEBHOOK_SECRET_TOKEN = os.getenv("WEBHOOK_SECRET_TOKEN", "")

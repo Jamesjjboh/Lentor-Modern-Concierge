@@ -36,7 +36,7 @@ from src.admin import (
     notify_admin_new_tip,
 )
 from src.agent import concierge_agent, submit_tip_to_moderation
-from src.config import ADMIN_TELEGRAM_ID, ENVIRONMENT, PORT, TELEGRAM_BOT_TOKEN, WEBHOOK_URL
+from src.config import ADMIN_TELEGRAM_ID, ENVIRONMENT, PORT, TELEGRAM_BOT_TOKEN, WEBHOOK_SECRET_TOKEN, WEBHOOK_URL
 from src.database import db_client
 
 logging.basicConfig(
@@ -44,6 +44,32 @@ logging.basicConfig(
     level=logging.INFO,
 )
 logger = logging.getLogger(__name__)
+
+# In-memory sliding-window rate limiter per user
+# Max 10 queries per 60 seconds (admins exempt)
+_user_query_timestamps: dict[int, list[float]] = {}
+RATE_LIMIT_WINDOW_SECONDS = 60.0
+RATE_LIMIT_MAX_QUERIES = 10
+
+
+def check_rate_limit(user_id: int) -> bool:
+    """Returns True if the request is permitted, False if rate limit is exceeded."""
+    if is_admin(user_id):
+        return True
+
+    import time
+    now = time.time()
+    timestamps = _user_query_timestamps.get(user_id, [])
+
+    # Filter timestamps within current window
+    valid_timestamps = [t for t in timestamps if now - t < RATE_LIMIT_WINDOW_SECONDS]
+    if len(valid_timestamps) >= RATE_LIMIT_MAX_QUERIES:
+        _user_query_timestamps[user_id] = valid_timestamps
+        return False
+
+    valid_timestamps.append(now)
+    _user_query_timestamps[user_id] = valid_timestamps
+    return True
 
 
 def get_quick_menu_keyboard() -> InlineKeyboardMarkup:
@@ -603,6 +629,14 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await message.reply_text(answer, reply_markup=analytics.stats_keyboard(window))
         return
 
+    # Rate limiting: max 10 requests per minute
+    if not check_rate_limit(user.id):
+        await message.reply_text(
+            "⏳ *Slow down a moment!* You are sending questions a bit too fast. Please wait a minute before asking again.",
+            parse_mode="Markdown",
+        )
+        return
+
     # Register / update user activity
     db_client.get_or_create_user(user_id=user.id, username=user.username, first_name=user.first_name)
     db_client.increment_user_query(user_id=user.id)
@@ -701,6 +735,12 @@ async def handle_photo(update: Update, context: ContextTypes.DEFAULT_TYPE):
     # Guardrail: Encourage 1-on-1 usage
     if update.effective_chat and update.effective_chat.type != Chat.PRIVATE:
         await message.reply_text("Please chat with me directly in a 1-on-1 private message to protect resident privacy!")
+    # Rate limiting: max 10 requests per minute
+    if not check_rate_limit(user.id):
+        await message.reply_text(
+            "⏳ *Slow down a moment!* You are sending photos a bit too fast. Please wait a minute before sending another.",
+            parse_mode="Markdown",
+        )
         return
 
     # Register user activity
@@ -887,18 +927,24 @@ def main():
         logger.info(f"🌐 Running in Webhook Mode on port {PORT}...")
         if full_webhook_url:
             logger.info(f"🔗 Setting Telegram Webhook to: {full_webhook_url}")
-            app.run_webhook(
-                listen="0.0.0.0",
-                port=PORT,
-                url_path=TELEGRAM_BOT_TOKEN,
-                webhook_url=full_webhook_url,
-            )
+            webhook_kwargs = {
+                "listen": "0.0.0.0",
+                "port": PORT,
+                "url_path": TELEGRAM_BOT_TOKEN,
+                "webhook_url": full_webhook_url,
+            }
+            if WEBHOOK_SECRET_TOKEN:
+                webhook_kwargs["secret_token"] = WEBHOOK_SECRET_TOKEN
+            app.run_webhook(**webhook_kwargs)
         else:
-            app.run_webhook(
-                listen="0.0.0.0",
-                port=PORT,
-                url_path=TELEGRAM_BOT_TOKEN,
-            )
+            webhook_kwargs = {
+                "listen": "0.0.0.0",
+                "port": PORT,
+                "url_path": TELEGRAM_BOT_TOKEN,
+            }
+            if WEBHOOK_SECRET_TOKEN:
+                webhook_kwargs["secret_token"] = WEBHOOK_SECRET_TOKEN
+            app.run_webhook(**webhook_kwargs)
     else:
         logger.info("💻 Running in local polling mode...")
         app.run_polling(drop_pending_updates=True)

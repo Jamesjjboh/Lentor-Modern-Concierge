@@ -122,7 +122,69 @@
         "percentage": "10.4%",
         "layout_features": "Only 4-bedroom layout in Lentor Modern. Features two ensuite bedrooms (Master + Junior Master), common bath, flex room, generous balcony, enclosed kitchen, utility room, yard, and WC."
       }
-    ]
+    ],
+    "maintenance_fees": {
+      "framework": "Lentor Modern is an integrated mixed-use development comprising residential towers, retail mall, and MRT connection. Maintenance contributions consist of two components billed per Share Value (SV): (1) Residential Sub-MC (Sub-MCMF) at $39.00/SV/month, and (2) Main MC (Common Property/Main MCMF) at $5.80/SV/month. Total base contribution is $44.80 per SV/month (before GST), or $48.832 per SV/month (inclusive of 9% GST).",
+      "rates_per_share_value": {
+        "residential_sub_mc_per_sv": "$39.00 / month",
+        "main_mc_common_per_sv": "$5.80 / month",
+        "total_base_per_sv_excl_gst": "$44.80 / month",
+        "total_per_sv_incl_9pct_gst": "$48.832 / month"
+      },
+      "breakdown_by_unit_type": [
+        {
+          "unit_type": "1-Bedroom + Flex",
+          "size_sqft": "527 sq ft",
+          "share_value": 8,
+          "residential_sub_mc": "$312.00 / month",
+          "main_mc_common": "$46.40 / month",
+          "monthly_fee_excl_gst": "$358.40",
+          "monthly_fee_incl_9pct_gst": "$390.66",
+          "first_6_months_lump_sum": "$2,343.94"
+        },
+        {
+          "unit_type": "2-Bedroom + Flex",
+          "size_sqft": "678 - 732 sq ft",
+          "share_value": 9,
+          "residential_sub_mc": "$351.00 / month",
+          "main_mc_common": "$52.20 / month",
+          "monthly_fee_excl_gst": "$403.20",
+          "monthly_fee_incl_9pct_gst": "$439.49",
+          "first_6_months_lump_sum": "$2,636.93"
+        },
+        {
+          "unit_type": "3-Bedroom + Flex (Compact)",
+          "size_sqft": "969 - 990 sq ft",
+          "share_value": 10,
+          "residential_sub_mc": "$390.00 / month",
+          "main_mc_common": "$58.00 / month",
+          "monthly_fee_excl_gst": "$448.00",
+          "monthly_fee_incl_9pct_gst": "$488.32",
+          "first_6_months_lump_sum": "$2,929.92"
+        },
+        {
+          "unit_type": "3-Bedroom + Flex (Premium)",
+          "size_sqft": "1,109 - 1,130 sq ft",
+          "share_value": 11,
+          "residential_sub_mc": "$429.00 / month",
+          "main_mc_common": "$63.80 / month",
+          "monthly_fee_excl_gst": "$492.80",
+          "monthly_fee_incl_9pct_gst": "$537.15",
+          "first_6_months_lump_sum": "$3,222.91"
+        },
+        {
+          "unit_type": "4-Bedroom + Flex",
+          "size_sqft": "1,528 sq ft",
+          "share_value": 11,
+          "residential_sub_mc": "$429.00 / month",
+          "main_mc_common": "$63.80 / month",
+          "monthly_fee_excl_gst": "$492.80",
+          "monthly_fee_incl_9pct_gst": "$537.15",
+          "first_6_months_lump_sum": "$3,222.91"
+        }
+      ],
+      "billing_notes": "First 6 months collected in advance upon key handover / vacant possession as required by the S&P agreement. Subsequent maintenance fund bills are issued by Managing Agent CBRE (typically on a quarterly/pro-rated schedule). Waste removal (CORA Environment) is billed separately through individual SP Services utilities accounts, not included in MCST fees."
+    }
   },
   "schools_proximity": {
     "moe_primary_registration_rule": "Under the Ministry of Education (MOE) Primary 1 Registration Framework, home-school distance is officially calculated as the shortest straight-line distance from the specific residential block/tower to the school reference point via Singapore Land Authority (SLA) OneMap SchoolQuery. Priority tiers are: (1) Within 1km, (2) 1km to 2km, and (3) Outside 2km.",

@@ -141,6 +141,18 @@ An instant, text-first dashboard (no chart rendering), with inline buttons `[ 7d
 * **Instant Admin Alert Card:** When an answer is flagged `👎`, the bot pushes an interactive alert card to the Admin's private Telegram DM containing resident details, query text, bot response, retrieved tools, plus `[ 💬 Reply to Resident ]` and `[ 📁 Mark Reviewed ]` buttons.
 * **Admin Review Command (`/flagged`):** Allows admin to review the top 10 most recent flagged answers on demand anytime.
 
+### 9. Anti-Abuse Rate Limiting, Admin Spam Alerts & Webhook Security
+* **Sliding-Window Rate Limiter:** Protects Gemini API quotas and serverless compute by capping requests at 10 queries per 60 seconds per user.
+* **Instant Admin Spam Alert:** If a user hammers the limit, their requests are throttled and an alert card (`🚨 Rate Limit Alert`) is immediately pushed to the Admin's private Telegram DM.
+* **Webhook Secret Verification:** Cloud Run webhook supports `WEBHOOK_SECRET_TOKEN` to ensure updates are verified against Telegram's `X-Telegram-Bot-Api-Secret-Token`.
+* **Prompt Hardening:** Strict anti-jailbreak guidelines protect system prompts, API keys, and internal configs.
+
+### 10. Comprehensive Estate Data: MCST Maintenance Fees & Supplier Hotlines
+* **MCST Maintenance Fees & Share Values:** Full schedule ingested for all unit types (Sub-MC $39/SV + Main MC $5.80/SV = $44.80/SV base, or $48.832/SV incl. 9% GST; 1BR 8 SV / $390.66; 2BR 9 SV / $439.49; 3BR Compact 10 SV / $488.32; 3BR Premium & 4BR 11 SV / $537.15).
+* **Official Supplier Hotlines:** Direct contacts for Mitsubishi Aircon (6473 2308), SMEG (6950 0910), Rheem Water Heater (6872 2043), Assa Abloy Yale Lock (6591 8868), and Fermax Intercom (6259 0700).
+* **Shopee / SPX Parcel Hubs:** Documented 24/7 Shopee lockers at Carpark Level 2 and Twigly's Convenience Store (#01-10) collection point.
+* **Dynamic Telegram Command Menu:** Automatically syncs native Telegram `[Menu]` buttons tailored for residents vs. administrators.
+
 ---
 
 ## 💰 Zero-Cost Serverless Architecture ($0.00 / month)

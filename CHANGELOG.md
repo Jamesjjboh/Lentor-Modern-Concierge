@@ -7,6 +7,43 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.7.0] - 2026-10-04
+
+### Added
+- **MCST Maintenance Fees by Unit Type & Share Value**:
+  - Ingested verified estate maintenance fee schedule across all unit types into `estate_profile.json` and `bylaws_handbook.json`:
+    - Base contribution: Sub-MC (Residential) at $39.00/SV + Main MC (Common Property) at $5.80/SV = $44.80/SV base ($48.832/SV incl. 9% GST).
+    - 1-Bed + Flex (527 sf, 8 SV): $358.40/mo ($390.66 incl. GST).
+    - 2-Bed + Flex (678 & 732 sf, 9 SV): $403.20/mo ($439.49 incl. GST).
+    - 3-Bed + Flex Compact (969–990 sf, 10 SV): $448.00/mo ($488.32 incl. GST).
+    - 3-Bed + Flex Premium (1,109–1,130 sf, 11 SV): $492.80/mo ($537.15 incl. GST).
+    - 4-Bed + Flex (1,528 sf, 11 SV): $492.80/mo ($537.15 incl. GST).
+  - Updated `search_estate_profile` and `search_bylaws_and_handbook` to answer fee breakdowns and share value questions immediately.
+- **Supplier Hotlines & Appliance Servicing Contacts**:
+  - Filtered conversational stopwords and weighted equipment terms in `search_bylaws_and_handbook`.
+  - Inquiries about air conditioning, water heaters, hobs, or locks directly surface official supplier contacts:
+    - Mitsubishi Electric (ACMV): `6473 2308`
+    - SMEG Singapore: `6950 0910`
+    - Rheem Water Heater: `6872 2043`
+    - Ferroli Gas Heater: `9747 8743` (WhatsApp)
+    - Assa Abloy Yale Lock: `6591 8868`
+    - Fermax (Intercom/Smart Home): `6259 0700`
+- **Parcel Lockers & Shopee Collection Points**:
+  - Added Shopee / SPX automated parcel lockers at Carpark Level 2 (near Tower 5 and letterboxes) to `verified_community_tips.json`.
+  - Added Twigly's Convenience Store (#01-10) official Shopee collection point to both `mall_directory.json` and `verified_community_tips.json`.
+- **Anti-Spam Sliding Window Rate Limiting & Admin Alerts**:
+  - Enforced a 10 requests / 60 seconds rate limit per user across text questions and photo uploads.
+  - Throttled users receive a polite wait message; admin receives an immediate private alert card in Telegram (`🚨 Rate Limit Alert`).
+- **Dynamic Telegram Command Menu (`set_my_commands`)**:
+  - Implemented `post_init` hook registering the native Telegram blue `[Menu]` button:
+    - Residents see: `/start`, `/menu`, `/help`, `/tip`, `/feedback`, `/bug`.
+    - Admin additionally sees: `/admin_stats`, `/flagged`, `/reply`, `/broadcast`.
+- **Webhook Security & Secret Token**:
+  - Added optional `WEBHOOK_SECRET_TOKEN` support across `config.py`, `.env.example`, `bot.py`, and `deploy.sh` to verify `X-Telegram-Bot-Api-Secret-Token`.
+  - Hardened system prompt with explicit anti-jailbreak instructions.
+
+---
+
 ## [1.6.0] - 2026-10-03
 
 ### Added

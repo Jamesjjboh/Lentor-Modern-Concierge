@@ -307,6 +307,39 @@ async def notify_admin_flagged_answer(
         logger.error(f"Failed to send admin alert for flagged query {log_id}: {e}")
 
 
+async def notify_admin_rate_limit_alert(
+    context: ContextTypes.DEFAULT_TYPE,
+    user_id: int,
+    username: Optional[str],
+    first_name: Optional[str],
+    request_count: int,
+):
+    """Pushes a rate-limit alert to Admin when a user hammers the bot excessively."""
+    if not ADMIN_TELEGRAM_ID:
+        return
+
+    resident_display = first_name or "User"
+    if username:
+        resident_display += f" (@{username})"
+
+    alert_text = (
+        f"🚨 *Rate Limit Alert / Rapid Activity*\n\n"
+        f"👤 *From:* {resident_display}\n"
+        f"🆔 *User ID:* `{user_id}`\n"
+        f"⚡ *Spam Count:* Exceeded {request_count} requests in 60s.\n\n"
+        f"The user has received the rate limit warning message. Gemini API calls are temporarily blocked for them."
+    )
+
+    try:
+        await context.bot.send_message(
+            chat_id=ADMIN_TELEGRAM_ID,
+            text=alert_text,
+            parse_mode="Markdown",
+        )
+    except Exception as e:
+        logger.error(f"Failed to send admin rate limit alert: {e}")
+
+
 async def handle_flagged_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Admin command `/flagged` to inspect recently reported inaccurate answers."""
     user = update.effective_user

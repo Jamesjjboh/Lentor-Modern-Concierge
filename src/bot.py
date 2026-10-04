@@ -6,7 +6,7 @@ Runs via long-polling in local development, and supports webhook for Cloud Run d
 import asyncio
 import logging
 import os
-from telegram import Chat, InlineKeyboardButton, InlineKeyboardMarkup, Update
+from telegram import BotCommand, BotCommandScopeChat, BotCommandScopeDefault, Chat, InlineKeyboardButton, InlineKeyboardMarkup, Update
 from telegram.constants import ChatAction
 from telegram.ext import (
     Application,
@@ -34,6 +34,7 @@ from src.admin import (
     notify_admin_flagged_answer,
     notify_admin_new_feedback,
     notify_admin_new_tip,
+    notify_admin_rate_limit_alert,
 )
 from src.agent import concierge_agent, submit_tip_to_moderation
 from src.config import ADMIN_TELEGRAM_ID, ENVIRONMENT, PORT, TELEGRAM_BOT_TOKEN, WEBHOOK_SECRET_TOKEN, WEBHOOK_URL
@@ -48,14 +49,15 @@ logger = logging.getLogger(__name__)
 # In-memory sliding-window rate limiter per user
 # Max 10 queries per 60 seconds (admins exempt)
 _user_query_timestamps: dict[int, list[float]] = {}
+_user_warned_recently: dict[int, float] = {}
 RATE_LIMIT_WINDOW_SECONDS = 60.0
 RATE_LIMIT_MAX_QUERIES = 10
 
 
-def check_rate_limit(user_id: int) -> bool:
-    """Returns True if the request is permitted, False if rate limit is exceeded."""
+def check_rate_limit(user_id: int) -> tuple[bool, bool, int]:
+    """Returns (is_allowed, should_alert_admin, request_count)."""
     if is_admin(user_id):
-        return True
+        return True, False, 0
 
     import time
     now = time.time()
@@ -63,13 +65,20 @@ def check_rate_limit(user_id: int) -> bool:
 
     # Filter timestamps within current window
     valid_timestamps = [t for t in timestamps if now - t < RATE_LIMIT_WINDOW_SECONDS]
-    if len(valid_timestamps) >= RATE_LIMIT_MAX_QUERIES:
-        _user_query_timestamps[user_id] = valid_timestamps
-        return False
-
     valid_timestamps.append(now)
     _user_query_timestamps[user_id] = valid_timestamps
-    return True
+
+    count = len(valid_timestamps)
+    if count > RATE_LIMIT_MAX_QUERIES:
+        last_warned = _user_warned_recently.get(user_id, 0)
+        should_alert = False
+        # Alert admin at most once per 60 seconds per user
+        if now - last_warned > RATE_LIMIT_WINDOW_SECONDS:
+            _user_warned_recently[user_id] = now
+            should_alert = True
+        return False, should_alert, count
+
+    return True, False, count
 
 
 def get_quick_menu_keyboard() -> InlineKeyboardMarkup:
@@ -630,7 +639,18 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
 
     # Rate limiting: max 10 requests per minute
-    if not check_rate_limit(user.id):
+    allowed, should_alert, req_count = check_rate_limit(user.id)
+    if not allowed:
+        if should_alert:
+            asyncio.create_task(
+                notify_admin_rate_limit_alert(
+                    context=context,
+                    user_id=user.id,
+                    username=user.username,
+                    first_name=user.first_name,
+                    request_count=req_count,
+                )
+            )
         await message.reply_text(
             "⏳ *Slow down a moment!* You are sending questions a bit too fast. Please wait a minute before asking again.",
             parse_mode="Markdown",
@@ -736,7 +756,18 @@ async def handle_photo(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if update.effective_chat and update.effective_chat.type != Chat.PRIVATE:
         await message.reply_text("Please chat with me directly in a 1-on-1 private message to protect resident privacy!")
     # Rate limiting: max 10 requests per minute
-    if not check_rate_limit(user.id):
+    allowed, should_alert, req_count = check_rate_limit(user.id)
+    if not allowed:
+        if should_alert:
+            asyncio.create_task(
+                notify_admin_rate_limit_alert(
+                    context=context,
+                    user_id=user.id,
+                    username=user.username,
+                    first_name=user.first_name,
+                    request_count=req_count,
+                )
+            )
         await message.reply_text(
             "⏳ *Slow down a moment!* You are sending photos a bit too fast. Please wait a minute before sending another.",
             parse_mode="Markdown",
@@ -878,8 +909,46 @@ def create_bot_app() -> Application:
     if not TELEGRAM_BOT_TOKEN:
         logger.warning("TELEGRAM_BOT_TOKEN is not configured in .env. Bot cannot start without token.")
 
+    async def post_init(application: Application):
+        """Sets the Telegram native command menu list for users and administrator."""
+        # 1. Resident default menu
+        resident_commands = [
+            BotCommand("start", "Welcome message & introduction"),
+            BotCommand("menu", "1-Tap Quick Actions Menu"),
+            BotCommand("help", "How to use the concierge & command list"),
+            BotCommand("tip", "Submit a neighbour tip or deal"),
+            BotCommand("feedback", "Suggest an idea or improvement"),
+            BotCommand("bug", "Report an inaccurate answer or issue"),
+        ]
+        try:
+            await application.bot.set_my_commands(resident_commands, scope=BotCommandScopeDefault())
+        except Exception as e:
+            logger.warning(f"Could not set default commands: {e}")
+
+        # 2. Admin private chat menu (includes management commands)
+        if ADMIN_TELEGRAM_ID:
+            admin_commands = resident_commands + [
+                BotCommand("admin_stats", "View usage analytics dashboard"),
+                BotCommand("flagged", "View flagged inaccurate answers"),
+                BotCommand("reply", "Reply directly to a resident: /reply <uid> <msg>"),
+                BotCommand("broadcast", "Send announcement: /broadcast <msg>"),
+            ]
+            try:
+                await application.bot.set_my_commands(
+                    admin_commands,
+                    scope=BotCommandScopeChat(chat_id=ADMIN_TELEGRAM_ID),
+                )
+            except Exception as e:
+                logger.warning(f"Could not set admin commands: {e}")
+
     request = HTTPXRequest(connect_timeout=30.0, read_timeout=30.0)
-    app = Application.builder().token(TELEGRAM_BOT_TOKEN or "MOCK_TOKEN").request(request).build()
+    app = (
+        Application.builder()
+        .token(TELEGRAM_BOT_TOKEN or "MOCK_TOKEN")
+        .request(request)
+        .post_init(post_init)
+        .build()
+    )
 
 
     # Command handlers

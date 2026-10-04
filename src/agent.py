@@ -19,9 +19,9 @@ SYSTEM_INSTRUCTION = """
 You are the Lentor Modern Digital Concierge, a helpful, polite, and accurate virtual concierge for the ~605 households of Lentor Modern (a premier integrated mixed-use development by GuocoLand in Singapore, atop Lentor Modern Mall and Lentor MRT).
 
 You have access to 7 specialized tools:
-1. `search_bylaws_and_handbook`: Use to look up official MCST by-laws, renovation hours & deposits, facility booking rules, aircon ledge rules, moving & delivery bay procedures, and handover defect procedures.
-2. `search_mall_directory`: Use to look up shops, supermarkets (CS Fresh), clinics, childcare, and eateries in Lentor Modern Mall, including floor levels (B1, L1, L2), unit numbers, operating hours, direct online ordering/queuing links (from ResiQ, e.g. QB Premium queue, Ajumma's, Yuen Kee Dumpling), and verified resident discounts.
-3. `get_verified_community_tips`: Use to retrieve crowdsourced neighbour advice (e.g. delivery bay access, induction cooker lock quirks, aircon piping SWG requirements, evening grocery discounts).
+1. `search_bylaws_and_handbook`: Use to look up official MCST by-laws, renovation hours & deposits, facility booking rules, aircon ledge rules, moving & delivery bay procedures, handover defect procedures, and developer supplier contact hotlines for appliances & fittings (e.g. Mitsubishi air conditioning 6473 2308, SMEG appliances 6950 0910, Rheem water heater 6872 2043, Yale digital lock 6591 8868, Fermax intercom/smart home 6259 0700).
+2. `search_mall_directory`: Use to look up shops, supermarkets (CS Fresh), clinics, childcare, and eateries in Lentor Modern Mall, including floor levels (B1, L1, L2), unit numbers, operating hours, direct online ordering/queuing links (from ResiQ, e.g. QB Premium queue, Ajumma's, Yuen Kee Dumpling), verified resident discounts, and mall collection points (e.g. Twigly's #01-10 Shopee collection point).
+3. `get_verified_community_tips`: Use to retrieve crowdsourced neighbour advice (e.g. delivery bay access, parcel lockers like Shopee/SPX lockers at Carpark Level 2 near Tower 5 letterbox, induction cooker lock quirks, aircon piping SWG requirements, evening grocery discounts).
 4. `generate_mcst_email_draft`: Use when a resident needs to formally email the Managing Agent (MA) to report a defect, common property issue, or submit a request.
 5. `submit_tip_to_moderation`: Use when a resident shares a new helpful tip, discovery, or advice that should be added to the community knowledge base.
 6. `submit_developer_feedback`: Use when a resident provides feedback about the bot itself, reports a bug, mentions an error or inaccuracy in an answer, or suggests a new feature for the concierge creator & admin (@jamesjjboh).
@@ -50,12 +50,44 @@ def search_bylaws_and_handbook(query: str) -> str:
     except Exception as e:
         return f"Error loading handbook records: {e}"
 
-    query_tokens = set(re.findall(r"\w+", query.lower()))
+    # Strip conversational stopwords so equipment/appliance and policy terms get priority
+    STOPWORDS = {
+        "i", "me", "my", "myself", "we", "our", "ours", "ourselves", "you", "your",
+        "yours", "yourself", "yourselves", "he", "him", "his", "himself", "she",
+        "her", "hers", "herself", "it", "its", "itself", "they", "them", "their",
+        "theirs", "themselves", "what", "which", "who", "whom", "this", "that",
+        "these", "those", "am", "is", "are", "was", "were", "be", "been", "being",
+        "have", "has", "had", "having", "do", "does", "did", "doing", "a", "an",
+        "the", "and", "but", "if", "or", "because", "as", "until", "while", "of",
+        "at", "by", "for", "with", "about", "against", "between", "into", "through",
+        "during", "before", "after", "above", "below", "to", "from", "up", "down",
+        "in", "out", "on", "off", "over", "under", "again", "further", "then",
+        "once", "here", "there", "when", "where", "why", "how", "all", "any",
+        "both", "each", "few", "more", "most", "other", "some", "such", "no",
+        "nor", "not", "only", "own", "same", "so", "than", "too", "very", "s",
+        "t", "can", "will", "just", "don", "should", "now", "issues", "issue", "help", "call"
+    }
+    raw_tokens = re.findall(r"\w+", query.lower())
+    query_tokens = [t for t in raw_tokens if t not in STOPWORDS]
+    if not query_tokens:
+        query_tokens = raw_tokens
+
     scored_matches: List[Tuple[int, Dict[str, Any]]] = []
 
     for r in records:
-        content_text = f"{r.get('topic', '')} {r.get('section', '')} {r.get('content', '')} {r.get('text', '')}".lower()
-        score = sum(1 for token in query_tokens if token in content_text)
+        topic_text = r.get("topic", "").lower()
+        section_text = r.get("section", "").lower()
+        body_text = f"{r.get('content', '')} {r.get('text', '')}".lower()
+
+        score = 0
+        for token in query_tokens:
+            if token in topic_text:
+                score += 5
+            if token in section_text:
+                score += 3
+            if token in body_text:
+                score += 1
+
         if score > 0:
             scored_matches.append((score, r))
 
@@ -203,9 +235,32 @@ def get_verified_community_tips(topic: str = "") -> str:
             with open(tips_file, "r", encoding="utf-8") as f:
                 seed_tips = json.load(f)
                 t_lower = topic.strip().lower()
+                query_tokens = [w for w in re.findall(r"\w+", t_lower) if len(w) > 2]
+
+                scored_seed: List[Tuple[int, Dict[str, Any]]] = []
                 for st in seed_tips:
-                    if not t_lower or t_lower in st.get("topic", "").lower() or t_lower in st.get("content", "").lower():
-                        tips.append(f"• [{st.get('topic', 'general').capitalize()}] {st.get('content')}")
+                    topic_text = st.get("topic", "").lower()
+                    title_text = st.get("title", "").lower()
+                    content_text = st.get("content", "").lower()
+                    full_text = f"{topic_text} {title_text} {content_text}"
+
+                    if not query_tokens:
+                        scored_seed.append((1, st))
+                    else:
+                        score = 0
+                        for token in query_tokens:
+                            if token in title_text:
+                                score += 5
+                            elif token in topic_text:
+                                score += 3
+                            elif token in content_text:
+                                score += 1
+                        if score > 0:
+                            scored_seed.append((score, st))
+
+                scored_seed.sort(key=lambda x: x[0], reverse=True)
+                for _, st in scored_seed:
+                    tips.append(f"• [{st.get('topic', 'general').capitalize()}] {st.get('title')}: {st.get('content')}")
         except Exception as e:
             logger.error(f"Error reading seed tips: {e}")
 

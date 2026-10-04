@@ -740,14 +740,14 @@
     "floor": "L1",
     "unit": "#01-10",
     "opening_hours": "10:00 - 21:30 daily",
-    "description": "At Twigly’s Convenience Store, convenience is reimagined. We blend thoughtful design, effortless speed, and warm hospitality to create a retail experience that feels as good as it functions. Every store is a carefully curated space — clean, modern, and intuitively laid out. Our team greets each customer with genuine warmth, making even the quickest visit a pleasant pause in the day.",
+    "description": "At Twigly’s Convenience Store, convenience is reimagined. We blend thoughtful design, effortless speed, and warm hospitality to create a retail experience that feels as good as it functions. Twigly's also serves as an official Shopee collection point for convenient parcel pickup downstairs.",
     "accepts_guocoland_voucher": true,
     "resident_discount": "Enjoy 5% off total bill with minimum spending of $10.",
     "discount_terms": "Flash Lentor Modern Resident Access Card prior to payment. Valid until 31 Dec 2026. Not valid with other promotions.",
     "order_url": null,
     "order_type": null,
     "resiq_link": "https://resiq-lm.vercel.app/",
-    "tips": "Flash your Lentor Modern Resident Access Card to enjoy: Enjoy 5% off total bill with minimum spending of $10."
+    "tips": "Official Shopee collection point! Flash your Lentor Modern Resident Access Card to enjoy: Enjoy 5% off total bill with minimum spending of $10."
   },
   {
     "name": "UMAI",

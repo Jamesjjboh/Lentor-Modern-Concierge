@@ -16,7 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Added customized walking cues for Tower 5 (cross small bridge, turn right) and generalized directional signage guidance for Towers 3 and 7.
 - **1-Tap Quick Menu & Shortcut Command (`/directions`)**:
   - Added `📍 Guest Directions (MRT & Car)` button to `/menu` for instant 1-tap template access.
-  - Added dedicated `/directions [tower] [unit]` command (e.g. `/directions 5 25-15`) producing pre-filled, ready-to-forward WhatsApp/Telegram messages in <1ms without token latency.
+  - Added dedicated `/directions` command producing a formatted, ready-to-forward WhatsApp/Telegram navigation message with tower options.
   - Integrated into admin analytics tracking under `Guest Directions`.
 - **Public Privacy Policy (`PRIVACY.md`)**:
   - Published comprehensive Singapore PDPA-compliant privacy policy outlining data collection, zero third-party tracking, and transient session retention.

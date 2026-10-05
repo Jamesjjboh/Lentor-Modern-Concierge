@@ -108,6 +108,21 @@ def get_back_to_menu_keyboard() -> InlineKeyboardMarkup:
     return InlineKeyboardMarkup([[InlineKeyboardButton("◀️ Back to Quick Menu", callback_data="menu_main")]])
 
 
+def get_directions_keyboard() -> InlineKeyboardMarkup:
+    """Returns 1-tap tower selection buttons for instant guest directions."""
+    keyboard = [
+        [
+            InlineKeyboardButton("🏢 Tower 3", callback_data="dir_tower:3"),
+            InlineKeyboardButton("🏢 Tower 5", callback_data="dir_tower:5"),
+            InlineKeyboardButton("🏢 Tower 7", callback_data="dir_tower:7"),
+        ],
+        [
+            InlineKeyboardButton("◀️ Back to Quick Menu", callback_data="menu_main"),
+        ],
+    ]
+    return InlineKeyboardMarkup(keyboard)
+
+
 def get_unanswered_fallback_keyboard() -> InlineKeyboardMarkup:
     """Returns interactive 1-tap options when a question cannot be factually answered."""
     keyboard = [
@@ -279,7 +294,7 @@ async def handle_quick_menu_callback(update: Update, context: ContextTypes.DEFAU
             "• *Bus 855:* Direct to Upper Thomson cafe stretch & HarbourFront\n"
             "• *Bus 852:* Direct to SIM / Ngee Ann Poly & Bukit Batok\n\n"
             "📍 *Inviting Guests Over?*\n"
-            "Use `/directions [tower] [unit]` (e.g. `/directions 5 25-15`) to generate an instant, copy-paste visitor guide for friends arriving by MRT or Car!"
+            "Tap `📍 Guest Directions` in `/menu` or type `/directions` to get an instant, copy-paste visitor guide for friends arriving by MRT or Car!"
         )
     elif action == "menu_mall":
         text = (
@@ -334,14 +349,15 @@ async def handle_quick_menu_callback(update: Update, context: ContextTypes.DEFAU
             "3. Park or drop off at **Level 2 or 3**, walk to the lift lobby, and intercom [#XX-YY].\n\n"
             "❤️ *If you get lost or need help, just call me and I'll come down to meet you!*\n\n"
             "━━━━━━━━━━━━━━━━━━━\n"
-            "💡 *Tip:* To get this template pre-filled with your unit, just type: `/directions <tower> <unit>` (e.g. `/directions 5 25-15`) or ask me directly in chat!"
+            "💡 *Tip:* You can also tap the tower buttons below or ask me directly in chat (e.g. _\"how to get to Tower 5\"_)!"
         )
     else:
         text = "Please select an option from the menu."
 
+    chosen_markup = get_directions_keyboard() if action == "menu_directions" else back_markup
     await query.edit_message_text(
         text=text,
-        reply_markup=back_markup,
+        reply_markup=chosen_markup,
         parse_mode="Markdown",
     )
 
@@ -380,6 +396,51 @@ async def handle_fallback_callback(update: Update, context: ContextTypes.DEFAULT
             parse_mode="Markdown",
             reply_markup=get_back_to_menu_keyboard(),
         )
+
+
+async def handle_directions_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Handles 1-tap tower selection buttons (dir_tower:3, dir_tower:5, dir_tower:7)."""
+    query = update.callback_query
+    if not query:
+        return
+    await query.answer()
+
+    data = query.data or ""
+    _, _, tower_num = data.partition(":")
+    tower_str = f"Tower {tower_num}" if tower_num in ["3", "5", "7"] else "[Tower 3 / 5 / 7]"
+
+    walk_cues = ""
+    if tower_str == "Tower 5":
+        walk_cues = "Turn left, cross the small bridge (no need to walk along the pool), and turn right to reach Tower 5."
+    else:
+        walk_cues = f"Follow the directional signage across the landscape deck to reach {tower_str}."
+
+    text = (
+        f"📍 *Visitor Navigation Guide — {tower_str}*\n\n"
+        f"Copy & forward the message below to your friends, family, or delivery drivers:\n\n"
+        f"━━━━━━━━━━━━━━━━━━━\n"
+        f"📍 *Coming to my place — Lentor Modern ({tower_str}, [#XX-YY])*\n\n"
+        f"🚇 *If you're taking the MRT:*\n"
+        f"1. Alight at Lentor MRT (TEL TE5) and head out from **Exit 1**.\n"
+        f"2. At the top of the escalator, turn right, go down the short stairs, and turn left.\n"
+        f"3. Walk past Burger King along the sheltered mall corridor — the **Clubhouse entrance is right beside Ma Kuang TCM & Fresh and Clean**.\n"
+        f"4. Ring the Concierge at the glass door; they will open it for you to take the lift up to **Level 4**.\n"
+        f"5. At the Level 4 Concierge desk, let them know you're visiting [#XX-YY].\n"
+        f"6. Walk straight out of the concierge lobby onto the deck. {walk_cues}\n"
+        f"7. Go to the {tower_str} lift lobby and intercom [#XX-YY] so I can buzz you up! 🎉\n\n"
+        f"🚗 *If you're driving / taking Grab / Taxi:*\n"
+        f"1. Set GPS destination to: **Lentor Modern {tower_str}**.\n"
+        f"⚠️ *Important Driver Note:* Google Maps frequently directs drivers into the Lentor Modern Mall commercial drop-off by mistake! Before turning into the mall drop-off, make sure to **keep left to enter the Residents' Carpark ramp** just before the mall entrance.\n"
+        f"2. Tell the security guard at the barrier that you are dropping off / visiting {tower_str} ([#XX-YY]).\n"
+        f"3. Park or drop off at **Level 2 or 3**, walk to the {tower_str} lift lobby, and intercom [#XX-YY].\n\n"
+        f"❤️ *If you get lost or need help, just call me and I'll come down to meet you!*"
+    )
+
+    await query.edit_message_text(
+        text=text,
+        reply_markup=get_directions_keyboard(),
+        parse_mode="Markdown",
+    )
 
 
 async def handle_answer_feedback_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -446,7 +507,7 @@ async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     help_text = (
         "🤖 *Lentor Modern Concierge Commands:*\n\n"
         "• Just message me directly with any question about estate rules, facilities, or mall shops.\n"
-        "• `/directions [tower] [unit]` — Generate a copy-paste navigation guide for guests (MRT & Car).\n"
+        "• `/directions` — Visitor navigation guide for guests (MRT & Car).\n"
         "• `/menu` — Open 1-tap interactive resident quick actions.\n"
         "• `/tip <topic> <advice>` — Submit a community tip for admin review.\n"
         "• `/feedback <suggestion>` — Send feature ideas or feedback directly to project creator & admin @jamesjjboh.\n"
@@ -540,7 +601,7 @@ async def directions_command(update: Update, context: ContextTypes.DEFAULT_TYPE)
         f"❤️ *If you get lost or need help, just call me and I'll come down to meet you!*"
     )
 
-    await message.reply_text(template, parse_mode="Markdown")
+    await message.reply_text(template, reply_markup=get_directions_keyboard(), parse_mode="Markdown")
 
 
 async def feedback_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -1049,6 +1110,7 @@ def create_bot_app() -> Application:
 
     # Callback handler for resident interactive 1-tap quick action menu
     app.add_handler(CallbackQueryHandler(handle_quick_menu_callback, pattern=r"^menu_"))
+    app.add_handler(CallbackQueryHandler(handle_directions_callback, pattern=r"^dir_tower:"))
     app.add_handler(CallbackQueryHandler(handle_fallback_callback, pattern=r"^fallback_"))
     app.add_handler(CallbackQueryHandler(handle_answer_feedback_callback, pattern=r"^(fb_rate|noop)"))
 

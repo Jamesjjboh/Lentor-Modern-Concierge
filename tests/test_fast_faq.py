@@ -79,6 +79,14 @@ class TestFastFAQ(unittest.TestCase):
         self.assertIn("605 units", text)
         self.assertIn("search_estate_profile", tools)
 
+    def test_physical_concierge_desk_hours_match(self):
+        res = match_fast_faq("What time is the physical concierge opened until")
+        self.assertIsNotNone(res)
+        text, tools = res
+        self.assertIn("9:00 AM – 8:00 PM daily", text)
+        self.assertIn("Security Control", text)
+        self.assertIn("search_bylaws_and_handbook", tools)
+
     def test_unmatched_query_falls_back(self):
         res = match_fast_faq("Can I keep an exotic lizard in my unit?")
         self.assertIsNone(res)

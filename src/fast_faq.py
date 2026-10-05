@@ -156,7 +156,22 @@ FAQ_RULES = [
         ),
         ["search_estate_profile"],
     ),
-    # 11. QB Premium Resident Discount & Queue
+    # 11. Physical Concierge Desk Operating Hours
+    (
+        re.compile(r"\b(physical concierge|concierge desk|concierge counter|concierge)\b.*\b(hours?|open|opened|timing|close|closing|until|schedule)\b|\b(what time|when).*\b(concierge)\b", re.IGNORECASE),
+        (
+            "🛎️ *Lentor Modern Physical Concierge Desk (Level 4 Clubhouse)*\n\n"
+            "• *Physical Counter Hours:* *9:00 AM – 8:00 PM daily*\n"
+            "  _(For in-person inquiries, car decal collection, visitor reception, parcel assistance)_\n"
+            "• *Telephone:* +65 6054 3375\n"
+            "• *Email:* concierge@LT-MODERN.COM\n\n"
+            "🌙 *After 8:00 PM / Late Night Assistance:*\n"
+            "• The physical desk counter is unstaffed after 8:00 PM.\n"
+            "• For urgent estate issues or night entry assistance, please contact *24/7 Security Control at +65 6054 3379*."
+        ),
+        ["search_bylaws_and_handbook", "search_estate_profile"],
+    ),
+    # 12. QB Premium Resident Discount & Queue
     (
         re.compile(r"\b(qb\s*premium|qb\s*house|qb)\b.*\b(discount|promo|perk|resident|offer|deal|cut|hair|queue)\b|\b(discount|promo|perk|resident|offer|deal)\b.*\b(qb\s*premium|qb\s*house|qb)\b", re.IGNORECASE),
         (

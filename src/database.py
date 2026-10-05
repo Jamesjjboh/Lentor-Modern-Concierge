@@ -3,6 +3,7 @@ Handles users, query logs, and community tips moderation queue.
 Supports graceful fallback to an in-memory/mock store when GCP credentials are not yet configured.
 """
 
+import asyncio
 import logging
 from datetime import datetime, timedelta, timezone
 from typing import Any, Dict, List, Optional
@@ -102,7 +103,11 @@ class DatabaseClient:
             return
 
         user_ref = self.db.collection("users").document(user_key)
-        user_ref.update({"total_queries": firestore.Increment(1)})
+        try:
+            loop = asyncio.get_running_loop()
+            loop.create_task(asyncio.to_thread(user_ref.update, {"total_queries": firestore.Increment(1)}))
+        except RuntimeError:
+            user_ref.update({"total_queries": firestore.Increment(1)})
 
     # --- Query Logging (Content Gap Detection) ---
     def log_query(
@@ -132,7 +137,11 @@ class DatabaseClient:
             return log_id
 
         doc_ref = self.db.collection("query_logs").document()
-        doc_ref.set(log_entry)
+        try:
+            loop = asyncio.get_running_loop()
+            loop.create_task(asyncio.to_thread(doc_ref.set, log_entry))
+        except RuntimeError:
+            doc_ref.set(log_entry)
         return doc_ref.id
 
     def update_query_feedback(

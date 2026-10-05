@@ -36,7 +36,7 @@ from src.admin import (
     notify_admin_new_tip,
     notify_admin_rate_limit_alert,
 )
-from src.agent import concierge_agent, submit_tip_to_moderation
+from src.agent import concierge_agent, get_cached_json, submit_tip_to_moderation
 from src.config import (
     ADMIN_TELEGRAM_ID,
     ENVIRONMENT,
@@ -248,11 +248,14 @@ async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if not user or not update.message:
         return
 
-    # Register user in Firestore
-    db_client.get_or_create_user(
-        user_id=user.id,
-        username=user.username,
-        first_name=user.first_name,
+    # Register user in Firestore asynchronously without delaying the welcome message
+    asyncio.create_task(
+        asyncio.to_thread(
+            db_client.get_or_create_user,
+            user_id=user.id,
+            username=user.username,
+            first_name=user.first_name,
+        )
     )
 
     welcome_text = (
@@ -290,7 +293,6 @@ async def handle_quick_menu_callback(update: Update, context: ContextTypes.DEFAU
     query = update.callback_query
     if not query:
         return
-    await query.answer()
 
     action = query.data
     user = query.from_user
@@ -300,25 +302,28 @@ async def handle_quick_menu_callback(update: Update, context: ContextTypes.DEFAU
             f"👋 *Lentor Modern Quick Actions Menu:*\n\n"
             f"Select any topic below for instant information, or type your question below:"
         )
-        await query.edit_message_text(
-            text=main_text,
-            reply_markup=get_quick_menu_keyboard(),
-            parse_mode="Markdown",
+        await asyncio.gather(
+            query.answer(),
+            query.edit_message_text(
+                text=main_text,
+                reply_markup=get_quick_menu_keyboard(),
+                parse_mode="Markdown",
+            ),
         )
         return
 
-    # Track quick-menu usage (kept separate from typed questions in analytics)
+    # Track quick-menu usage asynchronously (kept separate from typed questions in analytics)
     if action in analytics.MENU_LABELS:
-        try:
-            db_client.log_query(
+        asyncio.create_task(
+            asyncio.to_thread(
+                db_client.log_query,
                 user_id=user.id,
                 user_query=f"{analytics.MENU_PREFIX}{action}",
                 tools_called=[action],
                 agent_response="",
                 answered_successfully=True,
             )
-        except Exception as e:
-            logger.warning(f"Failed to log menu tap: {e}")
+        )
 
     back_markup = get_back_to_menu_keyboard()
 
@@ -435,10 +440,13 @@ async def handle_quick_menu_callback(update: Update, context: ContextTypes.DEFAU
     else:
         chosen_markup = back_markup
 
-    await query.edit_message_text(
-        text=text,
-        reply_markup=chosen_markup,
-        parse_mode="Markdown",
+    await asyncio.gather(
+        query.answer(),
+        query.edit_message_text(
+            text=text,
+            reply_markup=chosen_markup,
+            parse_mode="Markdown",
+        ),
     )
 
 
@@ -447,7 +455,6 @@ async def handle_fallback_callback(update: Update, context: ContextTypes.DEFAULT
     query = update.callback_query
     if not query:
         return
-    await query.answer()
 
     action = query.data
     user = query.from_user
@@ -471,10 +478,13 @@ async def handle_fallback_callback(update: Update, context: ContextTypes.DEFAULT
             "```\n\n"
             "💡 *Tips:* You can also call the Estate Office directly at `+65 6054 3370` (Mon–Fri 9am–6pm, Sat 9am–1pm) or visit Level 3 at 9 Lentor Central."
         )
-        await query.message.reply_text(
-            text=draft,
-            parse_mode="Markdown",
-            reply_markup=get_back_to_menu_keyboard(),
+        await asyncio.gather(
+            query.answer(),
+            query.message.reply_text(
+                text=draft,
+                parse_mode="Markdown",
+                reply_markup=get_back_to_menu_keyboard(),
+            ),
         )
 
 
@@ -483,7 +493,6 @@ async def handle_directions_callback(update: Update, context: ContextTypes.DEFAU
     query = update.callback_query
     if not query:
         return
-    await query.answer()
 
     data = query.data or ""
     _, _, tower_num = data.partition(":")
@@ -516,10 +525,13 @@ async def handle_directions_callback(update: Update, context: ContextTypes.DEFAU
         f"❤️ *If you get lost or need help, just call me and I'll come down to meet you!*"
     )
 
-    await query.edit_message_text(
-        text=text,
-        reply_markup=get_directions_keyboard(),
-        parse_mode="Markdown",
+    await asyncio.gather(
+        query.answer(),
+        query.edit_message_text(
+            text=text,
+            reply_markup=get_directions_keyboard(),
+            parse_mode="Markdown",
+        ),
     )
 
 
@@ -528,18 +540,9 @@ async def handle_mall_hub_callback(update: Update, context: ContextTypes.DEFAULT
     query = update.callback_query
     if not query:
         return
-    await query.answer()
 
     action = query.data
-    mall_file = PROCESSED_DATA_DIR / "mall_directory.json"
-    shops = []
-    if mall_file.exists():
-        try:
-            with open(mall_file, "r", encoding="utf-8") as f:
-                shops = json.load(f)
-        except Exception as e:
-            logger.warning(f"Could not load mall_directory.json: {e}")
-
+    shops = get_cached_json("mall_directory.json") or []
     back_kb = get_back_to_mall_keyboard()
 
     if action == "mall_dir":
@@ -561,7 +564,10 @@ async def handle_mall_hub_callback(update: Update, context: ContextTypes.DEFAULT
         for s in sorted(l2, key=lambda x: x.get("unit", "")):
             lines.append(f"• *{s['name']}* ({s.get('unit')}) — _{s.get('category')}_")
 
-        await query.edit_message_text(text="\n".join(lines), reply_markup=back_kb, parse_mode="Markdown")
+        await asyncio.gather(
+            query.answer(),
+            query.edit_message_text(text="\n".join(lines), reply_markup=back_kb, parse_mode="Markdown"),
+        )
 
     elif action == "mall_vouchers":
         # 2. GuocoLand e-Voucher Merchants
@@ -581,7 +587,10 @@ async def handle_mall_hub_callback(update: Update, context: ContextTypes.DEFAULT
         lines.append("\n⚠️ *Note:* CS Fresh Supermarket (#B1-11 to 16) does *not* accept GuocoLand vouchers (uses Cold Storage / yuu).")
         lines.append("💡 *How to use:* Flash your digital voucher on the GuocoLand app at the cashier prior to ordering/billing.")
 
-        await query.edit_message_text(text="\n".join(lines), reply_markup=back_kb, parse_mode="Markdown")
+        await asyncio.gather(
+            query.answer(),
+            query.edit_message_text(text="\n".join(lines), reply_markup=back_kb, parse_mode="Markdown"),
+        )
 
     elif action == "mall_discounts":
         # 3. Resident Card Discounts
@@ -599,7 +608,10 @@ async def handle_mall_hub_callback(update: Update, context: ContextTypes.DEFAULT
         for s in sorted(d_services, key=lambda x: x["name"]):
             lines.append(f"• *{s['name']}* ({s.get('unit')}): {s.get('resident_discount')}")
 
-        await query.edit_message_text(text="\n".join(lines), reply_markup=back_kb, parse_mode="Markdown")
+        await asyncio.gather(
+            query.answer(),
+            query.edit_message_text(text="\n".join(lines), reply_markup=back_kb, parse_mode="Markdown"),
+        )
 
 
 async def handle_contacts_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -607,7 +619,6 @@ async def handle_contacts_callback(update: Update, context: ContextTypes.DEFAULT
     query = update.callback_query
     if not query:
         return
-    await query.answer()
 
     action = query.data
     back_kb = get_back_to_contacts_keyboard()
@@ -650,7 +661,10 @@ async def handle_contacts_callback(update: Update, context: ContextTypes.DEFAULT
             "  _24/7 lift emergency rescue & maintenance_\n\n"
             "💡 *Resident Tip:* When contacting suppliers for warranty claims, have your unit number, handover date, and serial number (on appliance sticker) ready."
         )
-        await query.edit_message_text(text=text, reply_markup=back_kb, parse_mode="Markdown")
+        await asyncio.gather(
+            query.answer(),
+            query.edit_message_text(text=text, reply_markup=back_kb, parse_mode="Markdown"),
+        )
 
     elif action == "contacts_fittings":
         text = (
@@ -683,7 +697,10 @@ async def handle_contacts_callback(update: Update, context: ContextTypes.DEFAULT
             "  *Lian Beng Construction (1988) Pte Ltd*\n"
             "  _Log defect rectifications via the Novade app or report to the BSC / Managing Agent office._"
         )
-        await query.edit_message_text(text=text, reply_markup=back_kb, parse_mode="Markdown")
+        await asyncio.gather(
+            query.answer(),
+            query.edit_message_text(text=text, reply_markup=back_kb, parse_mode="Markdown"),
+        )
 
     elif action == "contacts_utilities":
         text = (
@@ -701,7 +718,10 @@ async def handle_contacts_callback(update: Update, context: ContextTypes.DEFAULT
             "  _Town gas supply turn-on appointment & gas cooker connection_\n\n"
             "💡 *Move-In Sequence:* Open your SP Services utilities account via the SP app first, then schedule your City Energy appointment for gas turn-on before your kitchen hob is used."
         )
-        await query.edit_message_text(text=text, reply_markup=back_kb, parse_mode="Markdown")
+        await asyncio.gather(
+            query.answer(),
+            query.edit_message_text(text=text, reply_markup=back_kb, parse_mode="Markdown"),
+        )
 
     elif action == "contacts_draft_ma":
         user_name = user.first_name if user and user.first_name else "Resident"
@@ -723,7 +743,10 @@ async def handle_contacts_callback(update: Update, context: ContextTypes.DEFAULT
             "```\n\n"
             "💡 *Tips:* Tap inside the code box above to copy the template instantly. You can also call the Estate Office directly at `+65 6054 3370` (Mon–Fri 9am–6pm, Sat 9am–1pm) or visit Level 3 at 9 Lentor Central."
         )
-        await query.edit_message_text(text=draft, reply_markup=back_kb, parse_mode="Markdown")
+        await asyncio.gather(
+            query.answer(),
+            query.edit_message_text(text=draft, reply_markup=back_kb, parse_mode="Markdown"),
+        )
 
 
 async def handle_answer_feedback_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -1091,14 +1114,26 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         )
         return
 
-    # Register / update user activity
-    db_client.get_or_create_user(user_id=user.id, username=user.username, first_name=user.first_name)
-    db_client.increment_user_query(user_id=user.id)
-
-    # Send immediate in-chat status message directly below the resident's question
+    # Send immediate in-chat status message directly below the resident's question (<100ms acknowledgment)
     status_msg = await message.reply_text(
         "🛎️ <i>Looking that up for you...</i>",
         parse_mode="HTML",
+    )
+
+    # Register / update user activity asynchronously in background
+    asyncio.create_task(
+        asyncio.to_thread(
+            db_client.get_or_create_user,
+            user_id=user.id,
+            username=user.username,
+            first_name=user.first_name,
+        )
+    )
+    asyncio.create_task(
+        asyncio.to_thread(
+            db_client.increment_user_query,
+            user_id=user.id,
+        )
     )
 
     # Execute autonomous agent query non-blockingly with persistent typing heartbeat

@@ -23,30 +23,37 @@ The **Lentor Modern Digital Concierge** bridges this gap as an **autonomous AI A
 
 ---
 
-## 🏗️ System Architecture
+## 🏗️ System Architecture & Ultra-Fast Response Pipeline
 
 ```mermaid
 flowchart TD
     subgraph ResidentExperience["Resident Experience (1-on-1 Telegram)"]
-        User["Resident (@LMConciergeBot)"] -->|"Text Query or Photo"| Webhook["Cloud Run Webhook<br/>(asia-southeast1)"]
+        User["Resident (@LMConciergeBot)"] -->|"Tap Menu or Ask Question"| Webhook["Cloud Run Webhook<br/>(asia-southeast1)"]
     end
 
-    subgraph AgentCore["Agent Reasoning Engine (Gemini 3.8 Flash)"]
-        Webhook -->|"Context, Query & Photos"| Agent["Autonomous Tool Orchestrator<br/>(src/agent.py)"]
+    subgraph FastPath["Zero-Shot Fast FAQ (<5ms, Zero LLM Cost)"]
+        Webhook -->|"Top 10 High-Frequency Queries"| FastFAQ["Pre-Compiled Regex Index<br/>(src/fast_faq.py)"]
+        FastFAQ -->|"Instant Match (Gym, Pool, Reno, MRT, Paint)"| QuickReturn["Instant Verified Response (<5ms)"]
+    end
+
+    subgraph AgentCore["Autonomous Agent Core (Gemini 3.8 Flash)"]
+        FastFAQ -->|"Nuanced, Novel or Complex Queries"| Agent["Autonomous Tool Orchestrator<br/>(src/agent.py)"]
         Agent -->|"Multimodal Vision Analysis"| Vision["analyze_resident_image"]
-        Agent -->|"Bylaws Lookup"| Tool1["search_bylaws_and_handbook"]
-        Agent -->|"Mall Lookup"| Tool2["search_mall_directory"]
-        Agent -->|"Crowdsourced Tips"| Tool3["get_verified_community_tips"]
+        Agent -->|"Bylaws & Defect Hotlines"| Tool1["search_bylaws_and_handbook"]
+        Agent -->|"Mall Directory & ResiQ"| Tool2["search_mall_directory"]
+        Agent -->|"Crowdsourced Neighbour Tips"| Tool3["get_verified_community_tips"]
         Agent -->|"MA Ticket Draft"| Tool4["generate_mcst_email_draft"]
         Agent -->|"New Tip Submission"| Tool5["submit_tip_to_moderation"]
+        Agent -->|"Estate & School Catchment"| Tool7["search_estate_profile"]
     end
 
-    subgraph KnowledgeData["Clean Knowledge Layer (data/processed/)"]
+    subgraph KnowledgeData["In-Memory Knowledge Cache (_DATA_CACHE)"]
         Tool1 --- K1[("bylaws_handbook.json<br/>(Bylaws, Paint Specs & Contacts)")]
         Tool1 --- K4[("appliance_manuals.json<br/>(SMEG, Yale, Rheem, Aircon)")]
         Tool1 --- K5[("estate_contacts.json<br/>(21 Supplier Hotlines)")]
         Tool2 --- K2[("mall_directory.json")]
         Tool3 --- K3[("verified_community_tips.json<br/>(34 Verified Resident Tips)")]
+        Tool7 --- K6[("estate_profile.json<br/>(Transit, Fees & Schools)")]
     end
 
     subgraph DatabaseLayer["Cloud Persistence & Moderation"]

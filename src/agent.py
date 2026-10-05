@@ -10,9 +10,29 @@ from google.genai import types
 
 from src.config import GEMINI_API_KEY, GEMINI_MODEL, PROCESSED_DATA_DIR
 from src.database import db_client
+from src.fast_faq import match_fast_faq
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+
+# In-memory JSON cache to avoid repeated disk I/O on every tool invocation
+_DATA_CACHE: Dict[str, Any] = {}
+
+
+def get_cached_json(filename: str) -> Optional[Any]:
+    """Returns in-memory cached JSON data, reading from disk only on first load."""
+    if filename not in _DATA_CACHE:
+        filepath = PROCESSED_DATA_DIR / filename
+        if not filepath.exists():
+            return None
+        try:
+            with open(filepath, "r", encoding="utf-8") as f:
+                _DATA_CACHE[filename] = json.load(f)
+        except Exception as e:
+            logger.error(f"Error loading {filename}: {e}")
+            return None
+    return _DATA_CACHE.get(filename)
+
 
 # System instructions setting identity, guardrails, and tone
 SYSTEM_INSTRUCTION = """
@@ -42,15 +62,10 @@ Guidelines:
 # --- Tool 1: Bylaws & Handbook Search ---
 def search_bylaws_and_handbook(query: str) -> str:
     """Searches official Lentor Modern MCST by-laws, renovation guidelines, facility policies, and estate rules."""
-    handbook_file = PROCESSED_DATA_DIR / "bylaws_handbook.json"
-    if not handbook_file.exists():
+    records: Optional[List[Dict[str, Any]]] = get_cached_json("bylaws_handbook.json")
+    if records is None:
         return "No handbook or bylaws data is currently available in the estate database."
 
-    try:
-        with open(handbook_file, "r", encoding="utf-8") as f:
-            records: List[Dict[str, Any]] = json.load(f)
-    except Exception as e:
-        return f"Error loading handbook records: {e}"
 
     # Strip conversational stopwords so equipment/appliance and policy terms get priority
     STOPWORDS = {
@@ -111,15 +126,10 @@ def search_bylaws_and_handbook(query: str) -> str:
 # --- Tool 2: Mall Directory Search ---
 def search_mall_directory(category: str = "", shop_name: str = "") -> str:
     """Looks up Lentor Modern Mall tenant directory, floor levels (B1, L1, L2), unit numbers, operating hours, direct online ordering/queuing links (via ResiQ), and verified resident discounts."""
-    mall_file = PROCESSED_DATA_DIR / "mall_directory.json"
-    if not mall_file.exists():
+    tenants: Optional[List[Dict[str, Any]]] = get_cached_json("mall_directory.json")
+    if tenants is None:
         return "Mall directory is currently being updated."
 
-    try:
-        with open(mall_file, "r", encoding="utf-8") as f:
-            tenants: List[Dict[str, Any]] = json.load(f)
-    except Exception as e:
-        return f"Error loading mall directory: {e}"
 
     search_term = f"{category} {shop_name}".strip().lower()
     words = search_term.split()
@@ -231,38 +241,36 @@ def get_verified_community_tips(topic: str = "") -> str:
     """Retrieves verified tribal knowledge and practical tips crowdsourced from Lentor Modern residents."""
     tips = []
     # 1. Check local seed file
-    tips_file = PROCESSED_DATA_DIR / "verified_community_tips.json"
-    if tips_file.exists():
+    seed_tips = get_cached_json("verified_community_tips.json")
+    if seed_tips:
         try:
-            with open(tips_file, "r", encoding="utf-8") as f:
-                seed_tips = json.load(f)
-                t_lower = topic.strip().lower()
-                query_tokens = [w for w in re.findall(r"\w+", t_lower) if len(w) > 2]
+            t_lower = topic.strip().lower()
+            query_tokens = [w for w in re.findall(r"\w+", t_lower) if len(w) > 2]
 
-                scored_seed: List[Tuple[int, Dict[str, Any]]] = []
-                for st in seed_tips:
-                    topic_text = st.get("topic", "").lower()
-                    title_text = st.get("title", "").lower()
-                    content_text = st.get("content", "").lower()
-                    full_text = f"{topic_text} {title_text} {content_text}"
+            scored_seed: List[Tuple[int, Dict[str, Any]]] = []
+            for st in seed_tips:
+                topic_text = st.get("topic", "").lower()
+                title_text = st.get("title", "").lower()
+                content_text = st.get("content", "").lower()
+                full_text = f"{topic_text} {title_text} {content_text}"
 
-                    if not query_tokens:
-                        scored_seed.append((1, st))
-                    else:
-                        score = 0
-                        for token in query_tokens:
-                            if token in title_text:
-                                score += 5
-                            elif token in topic_text:
-                                score += 3
-                            elif token in content_text:
-                                score += 1
-                        if score > 0:
-                            scored_seed.append((score, st))
+                if not query_tokens:
+                    scored_seed.append((1, st))
+                else:
+                    score = 0
+                    for token in query_tokens:
+                        if token in title_text:
+                            score += 5
+                        elif token in topic_text:
+                            score += 3
+                        elif token in content_text:
+                            score += 1
+                    if score > 0:
+                        scored_seed.append((score, st))
 
-                scored_seed.sort(key=lambda x: x[0], reverse=True)
-                for _, st in scored_seed:
-                    tips.append(f"• [{st.get('topic', 'general').capitalize()}] {st.get('title')}: {st.get('content')}")
+            scored_seed.sort(key=lambda x: x[0], reverse=True)
+            for _, st in scored_seed:
+                tips.append(f"• [{st.get('topic', 'general').capitalize()}] {st.get('title')}: {st.get('content')}")
         except Exception as e:
             logger.error(f"Error reading seed tips: {e}")
 
@@ -348,15 +356,10 @@ def submit_developer_feedback(category: str, details: str, user_id: int = 0) -> 
 # --- Tool 7: Estate Profile, Transit & School Catchment Search ---
 def search_estate_profile(query: str = "") -> str:
     """Looks up Lentor Modern project facts, developer (GuocoLand), tenure, completion dates, towers & postal codes, unit types and sizes, Lentor MRT (TE5) first/last train timings, surrounding bus routes (825, 855, 852, 851, 652), and official MOE primary school proximity tiers (e.g. Anderson Primary is strictly the ONLY school <1km; CHIJ St. Nicholas is 1–2km)."""
-    profile_file = PROCESSED_DATA_DIR / "estate_profile.json"
-    if not profile_file.exists():
+    profile: Optional[Dict[str, Any]] = get_cached_json("estate_profile.json")
+    if profile is None:
         return "Estate profile data is currently being updated."
 
-    try:
-        with open(profile_file, "r", encoding="utf-8") as f:
-            profile: Dict[str, Any] = json.load(f)
-    except Exception as e:
-        return f"Error loading estate profile: {e}"
 
     q_lower = query.lower()
 
@@ -553,6 +556,13 @@ class LentorAgent:
 
     def run_query(self, user_query: str, user_id: int = 0) -> Tuple[str, List[str]]:
         """Processes a resident query, calls tools as needed, and returns (response_text, tools_called)."""
+        # 1. High-speed zero-shot FAQ cache (<5ms response time, zero LLM cost)
+        fast_match = match_fast_faq(user_query)
+        if fast_match:
+            response_text, tools_called = fast_match
+            logger.info(f"Zero-shot Fast FAQ matched query: '{user_query}' -> tools: {tools_called}")
+            return response_text, tools_called
+
         tools_called: List[str] = []
 
         if not self.client:
@@ -704,6 +714,10 @@ Return a JSON object with this exact structure:
 
     def _simulated_response(self, user_query: str, user_id: int) -> Tuple[str, List[str]]:
         """Rule-based simulation mode for testing when Gemini API key is not yet set."""
+        fast_match = match_fast_faq(user_query)
+        if fast_match:
+            return fast_match
+
         q_lower = user_query.lower()
         tools_called = []
 

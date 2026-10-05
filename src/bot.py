@@ -10,6 +10,7 @@ import os
 import re
 from telegram import BotCommand, BotCommandScopeChat, BotCommandScopeDefault, Chat, InlineKeyboardButton, InlineKeyboardMarkup, Update
 from telegram.constants import ChatAction
+from telegram.error import BadRequest
 from telegram.ext import (
     Application,
     CallbackQueryHandler,
@@ -1337,6 +1338,18 @@ async def handle_photo(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await message.reply_text(user_reply)
 
 
+async def global_error_handler(update: object, context: ContextTypes.DEFAULT_TYPE) -> None:
+    """Catches and handles uncaught exceptions from handlers.
+    Specifically silences Telegram's 'Message is not modified' error when users double-tap buttons.
+    """
+    error = context.error
+    if isinstance(error, BadRequest) and "message is not modified" in str(error).lower():
+        logger.debug("Silenced BadRequest: message is not modified (user double-tapped).")
+        return
+
+    logger.error("Exception while handling an update:", exc_info=context.error)
+
+
 def create_bot_app() -> Application:
     """Builds and configures the python-telegram-bot application."""
     if not TELEGRAM_BOT_TOKEN:
@@ -1416,6 +1429,9 @@ def create_bot_app() -> Application:
 
     # Default message handler for 1-on-1 resident chats
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
+
+    # Global error handler for uncaught exceptions and double-tap BadRequest suppression
+    app.add_error_handler(global_error_handler)
 
     return app
 

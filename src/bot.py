@@ -47,6 +47,7 @@ from src.config import (
     WEBHOOK_URL,
 )
 from src.database import db_client
+from src.formatting import clean_markdown_for_telegram
 
 logging.basicConfig(
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
@@ -1184,6 +1185,9 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
             message=user_query,
         )
 
+    # Normalise LLM Markdown (**bold**, "* bullets") into Telegram-safe Markdown
+    response_text = clean_markdown_for_telegram(response_text)
+
     # If the query could not be factually answered, polish reply and provide 1-tap fallback buttons
     if not answered_successfully:
         fallback_prompt = (
@@ -1355,6 +1359,7 @@ async def handle_photo(update: Update, context: ContextTypes.DEFAULT_TYPE):
             answered_successfully=True,
         )
         reply_kb = get_answer_feedback_keyboard(log_id)
+        user_reply = clean_markdown_for_telegram(user_reply)
         try:
             await status_msg.edit_text(user_reply, reply_markup=reply_kb, parse_mode="Markdown")
         except Exception:

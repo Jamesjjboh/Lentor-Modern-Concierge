@@ -153,6 +153,12 @@ An instant, text-first dashboard (no chart rendering), with inline buttons `[ 7d
 * **Shopee / SPX Parcel Hubs:** Documented 24/7 Shopee lockers at Carpark Level 2 and Twigly's Convenience Store (#01-10) collection point.
 * **Dynamic Telegram Command Menu:** Automatically syncs native Telegram `[Menu]` buttons tailored for residents vs. administrators.
 
+### 11. Visitor Navigation Engine & Resident Directions Generator
+* **MRT & Car Directions Templates:** Ingested navigation knowledge covering Lentor MRT Exit 1 $\rightarrow$ Clubhouse Lobby $\rightarrow$ Level 4 Concierge $\rightarrow$ Sky deck / bridge transfer, plus the crucial Google Maps warning (preventing drivers from mistakenly turning into the commercial mall drop-off).
+* **1-Tap Menu & Dedicated Command (`/directions`):** Residents can tap `📍 Guest Directions (MRT & Car)` in `/menu` or run `/directions [tower] [unit]` to get an instant, copy-paste WhatsApp/Telegram message formatted with clear emojis.
+* **Zero PII Storage:** Purely parameterized templates without hardcoded resident unit numbers or levels.
+* **Published Privacy Policy:** Full Singapore PDPA-compliant [PRIVACY.md](PRIVACY.md) linked directly to the bot profile via Telegram's `/setprivacy`.
+
 ---
 
 ## 💰 Zero-Cost Serverless Architecture ($0.00 / month)

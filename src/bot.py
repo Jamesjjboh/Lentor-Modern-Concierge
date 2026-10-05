@@ -82,7 +82,7 @@ def check_rate_limit(user_id: int) -> tuple[bool, bool, int]:
 
 
 def get_quick_menu_keyboard() -> InlineKeyboardMarkup:
-    """Returns the 6-button interactive 1-tap quick action keyboard for residents."""
+    """Returns the 7-button interactive 1-tap quick action keyboard for residents."""
     keyboard = [
         [
             InlineKeyboardButton("🏢 Estate Contacts", callback_data="menu_contacts"),
@@ -95,6 +95,9 @@ def get_quick_menu_keyboard() -> InlineKeyboardMarkup:
         [
             InlineKeyboardButton("🔨 Moving & Reno", callback_data="menu_reno"),
             InlineKeyboardButton("📱 iPlus Living Guide", callback_data="menu_iplus"),
+        ],
+        [
+            InlineKeyboardButton("📍 Guest Directions (MRT & Car)", callback_data="menu_directions"),
         ],
     ]
     return InlineKeyboardMarkup(keyboard)
@@ -274,7 +277,9 @@ async def handle_quick_menu_callback(update: Update, context: ContextTypes.DEFAU
             "🚌 *Buses at Exit 1 (Bus Stop 55341):*\n"
             "• *Bus 825:* Feeder loop to Yio Chu Kang MRT & AMK 628 Market\n"
             "• *Bus 855:* Direct to Upper Thomson cafe stretch & HarbourFront\n"
-            "• *Bus 852:* Direct to SIM / Ngee Ann Poly & Bukit Batok"
+            "• *Bus 852:* Direct to SIM / Ngee Ann Poly & Bukit Batok\n\n"
+            "📍 *Inviting Guests Over?*\n"
+            "Use `/directions [tower] [unit]` (e.g. `/directions 5 25-15`) to generate an instant, copy-paste visitor guide for friends arriving by MRT or Car!"
         )
     elif action == "menu_mall":
         text = (
@@ -305,6 +310,31 @@ async def handle_quick_menu_callback(update: Update, context: ContextTypes.DEFAU
             "3. *Smart Intercom Buzzer:* Link your mobile under 'Visitor Access'. When guests or delivery riders dial your unit at lobby intercoms, your phone video rings — tap 'Unlock' to open the lobby glass door remotely!\n"
             "4. *Facility Bookings:* Book BBQ, Tennis, Function Room 14–30 days in advance (1 peak session/week per unit, $100–$200 deposit).\n"
             "5. *Support:* Email `managementoffice@LT-MODERN.COM` or call `+65 6054 3370`."
+        )
+    elif action == "menu_directions":
+        text = (
+            "📍 *Guest Navigation Template (MRT & Car)*\n\n"
+            "Copy & forward the message below to your friends, family, or delivery drivers:\n\n"
+            "━━━━━━━━━━━━━━━━━━━\n"
+            "📍 *Coming to my place — Lentor Modern ([Tower 3 / 5 / 7], [#XX-YY])*\n\n"
+            "🚇 *If you're taking the MRT:*\n"
+            "1. Alight at Lentor MRT (TEL TE5) and head out from **Exit 1**.\n"
+            "2. At the top of the escalator, turn right, go down the short stairs, and turn left.\n"
+            "3. Walk past Burger King along the sheltered mall corridor — the **Clubhouse entrance is right beside Ma Kuang TCM & Fresh and Clean**.\n"
+            "4. Ring the Concierge at the glass door; they will open it for you to take the lift up to **Level 4**.\n"
+            "5. At the Level 4 Concierge desk, let them know you're visiting [#XX-YY].\n"
+            "6. Walk straight out of the concierge lobby onto the deck:\n"
+            "   • *Tower 5:* Turn left, cross the small bridge (no need to walk along pool), and turn right.\n"
+            "   • *Tower 3 & 7:* Follow directional signs across the landscape deck.\n"
+            "7. Go to the lift lobby and intercom [#XX-YY] so I can buzz you up! 🎉\n\n"
+            "🚗 *If you're driving / taking Grab / Taxi:*\n"
+            "1. Set GPS destination to: **Lentor Modern Tower [3 / 5 / 7]**.\n"
+            "⚠️ *Important Driver Note:* Google Maps frequently directs drivers into the Lentor Modern Mall commercial drop-off by mistake! Before turning into the mall drop-off, make sure to **keep left to enter the Residents' Carpark ramp** just before the mall entrance.\n"
+            "2. Tell the security guard at the barrier that you are dropping off / visiting Tower [3 / 5 / 7] ([#XX-YY]).\n"
+            "3. Park or drop off at **Level 2 or 3**, walk to the lift lobby, and intercom [#XX-YY].\n\n"
+            "❤️ *If you get lost or need help, just call me and I'll come down to meet you!*\n\n"
+            "━━━━━━━━━━━━━━━━━━━\n"
+            "💡 *Tip:* To get this template pre-filled with your unit, just type: `/directions <tower> <unit>` (e.g. `/directions 5 25-15`) or ask me directly in chat!"
         )
     else:
         text = "Please select an option from the menu."
@@ -416,6 +446,7 @@ async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     help_text = (
         "🤖 *Lentor Modern Concierge Commands:*\n\n"
         "• Just message me directly with any question about estate rules, facilities, or mall shops.\n"
+        "• `/directions [tower] [unit]` — Generate a copy-paste navigation guide for guests (MRT & Car).\n"
         "• `/menu` — Open 1-tap interactive resident quick actions.\n"
         "• `/tip <topic> <advice>` — Submit a community tip for admin review.\n"
         "• `/feedback <suggestion>` — Send feature ideas or feedback directly to project creator & admin @jamesjjboh.\n"
@@ -459,6 +490,57 @@ async def tip_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
         f"✅ Thank you! Your tip about *{topic}* has been submitted for review. Once verified, it will be added to the resident knowledge base.",
         parse_mode="Markdown",
     )
+
+
+async def directions_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Generates an instant, copy-paste visitor navigation guide for guests coming by MRT or Car."""
+    message = update.message
+    if not message:
+        return
+
+    tower_arg = None
+    unit_arg = None
+
+    if context.args:
+        # Check first argument for tower or unit
+        for arg in context.args:
+            clean = arg.strip().replace("#", "")
+            if clean in ["3", "5", "7"] and not tower_arg:
+                tower_arg = f"Tower {clean}"
+            elif "-" in clean and not unit_arg:
+                unit_arg = f"#{clean}"
+
+    tower_str = tower_arg or "[Tower 3 / 5 / 7]"
+    unit_str = unit_arg or "[#XX-YY]"
+
+    walk_cues = ""
+    if tower_str == "Tower 5":
+        walk_cues = "Turn left, cross the small bridge (no need to walk along the pool), and turn right to reach Tower 5."
+    else:
+        walk_cues = f"Follow the directional signage across the landscape deck to reach {tower_str}."
+
+    template = (
+        f"📍 *Visitor Navigation Guide — {tower_str}, Unit {unit_str}*\n\n"
+        f"Copy and forward the message below to your friends, family, or delivery drivers:\n\n"
+        f"━━━━━━━━━━━━━━━━━━━\n"
+        f"📍 *Coming to my place — Lentor Modern ({tower_str}, {unit_str})*\n\n"
+        f"🚇 *If you're taking the MRT:*\n"
+        f"1. Alight at Lentor MRT (Thomson-East Coast Line TE5) and head out from **Exit 1**.\n"
+        f"2. At the top of the escalator, turn right, go down the short stairs, and turn left.\n"
+        f"3. Walk past Burger King along the sheltered mall corridor — the **Clubhouse entrance is right beside Ma Kuang TCM & Fresh and Clean**.\n"
+        f"4. Ring the Concierge at the glass door; they will open it for you to take the lift up to **Level 4**.\n"
+        f"5. At the Level 4 Concierge desk, let them know you're visiting {unit_str}.\n"
+        f"6. Walk straight out of the concierge lobby onto the deck. {walk_cues}\n"
+        f"7. Go to the {tower_str} lift lobby and intercom {unit_str} so I can buzz you up! 🎉\n\n"
+        f"🚗 *If you're driving / taking Grab / Taxi:*\n"
+        f"1. Set your GPS destination to: **Lentor Modern {tower_str}**.\n"
+        f"⚠️ *Important Driver Note:* Google Maps frequently directs drivers into the Lentor Modern Mall commercial drop-off by mistake! Before turning into the mall drop-off, make sure to **keep left to enter the Residents' Carpark ramp** just before the mall entrance.\n"
+        f"2. Tell the security guard at the barrier that you are dropping off / visiting {tower_str} ({unit_str}).\n"
+        f"3. Park or drop off at **Level 2 or 3**, walk to the {tower_str} lift lobby, and intercom {unit_str}.\n\n"
+        f"❤️ *If you get lost or need help, just call me and I'll come down to meet you!*"
+    )
+
+    await message.reply_text(template, parse_mode="Markdown")
 
 
 async def feedback_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -915,6 +997,7 @@ def create_bot_app() -> Application:
         resident_commands = [
             BotCommand("start", "Welcome message & introduction"),
             BotCommand("menu", "1-Tap Quick Actions Menu"),
+            BotCommand("directions", "Visitor directions (MRT & Car)"),
             BotCommand("help", "How to use the concierge & command list"),
             BotCommand("tip", "Submit a neighbour tip or deal"),
             BotCommand("feedback", "Suggest an idea or improvement"),
@@ -954,6 +1037,7 @@ def create_bot_app() -> Application:
     # Command handlers
     app.add_handler(CommandHandler("start", start_command))
     app.add_handler(CommandHandler("menu", menu_command))
+    app.add_handler(CommandHandler("directions", directions_command))
     app.add_handler(CommandHandler("help", help_command))
     app.add_handler(CommandHandler("tip", tip_command))
     app.add_handler(CommandHandler("feedback", feedback_command))

@@ -37,6 +37,7 @@ MENU_LABELS = {
     "menu_mall": "Mall & Deals",
     "menu_reno": "Moving & Reno",
     "menu_iplus": "iPlus Living Guide",
+    "menu_directions": "Guest Directions",
 }
 
 # Phrases in a final reply that indicate the bot could not actually answer.

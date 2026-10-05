@@ -7,6 +7,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.8.0] - 2026-10-05
+
+### Added
+- **Visitor Directions & Navigation Template Generator**:
+  - Implemented dynamic visitor routing for both **MRT** (Exit 1 $\rightarrow$ past Burger King $\rightarrow$ Clubhouse entrance beside Ma Kuang & Fresh and Clean $\rightarrow$ Level 4 Concierge $\rightarrow$ Sky deck / bridge $\rightarrow$ Intercom) and **Car / Grab / Taxi** navigation.
+  - Included critical driver warning: Alerts visitors that Google Maps often misdirects drivers to the commercial Mall drop-off by mistake, instructing them to keep left into the Residents' Carpark ramp to Level 2/3 visitor parking.
+  - Added customized walking cues for Tower 5 (cross small bridge, turn right) and generalized directional signage guidance for Towers 3 and 7.
+- **1-Tap Quick Menu & Shortcut Command (`/directions`)**:
+  - Added `📍 Guest Directions (MRT & Car)` button to `/menu` for instant 1-tap template access.
+  - Added dedicated `/directions [tower] [unit]` command (e.g. `/directions 5 25-15`) producing pre-filled, ready-to-forward WhatsApp/Telegram messages in <1ms without token latency.
+  - Integrated into admin analytics tracking under `Guest Directions`.
+- **Public Privacy Policy (`PRIVACY.md`)**:
+  - Published comprehensive Singapore PDPA-compliant privacy policy outlining data collection, zero third-party tracking, and transient session retention.
+  - Linked to Telegram `@LMConciergeBot` via `@BotFather` `/setprivacy`.
+- **High-Definition Mascot Avatars**:
+  - Added custom 3D Pixar character mascot avatars in `assets/avatars/`, including Shiba Inu, Corgi, and Samoyed concierge editions.
+
+---
+
 ## [1.7.0] - 2026-10-04
 
 ### Added

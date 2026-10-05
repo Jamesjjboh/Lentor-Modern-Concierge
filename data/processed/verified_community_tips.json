@@ -168,5 +168,15 @@
     "topic": "logistics",
     "title": "Shopee Collection Point at Twigly's Convenience Store (#01-10)",
     "content": "Twigly's Convenience Store (#01-10) at Lentor Modern Mall serves as an official Shopee collection point. Residents can choose Twigly's as their pickup location during Shopee checkout for parcel collection downstairs."
+  },
+  {
+    "topic": "visitor_directions",
+    "title": "Visitor Directions via MRT (Lentor TE5 Exit 1 -> Level 4 Clubhouse -> Residential Towers)",
+    "content": "For guests visiting Lentor Modern by train: (1) Alight at Lentor MRT Station (Thomson-East Coast Line TE5) and proceed out via Exit 1. (2) At the top of the escalator, turn right, go down the short flight of stairs, and turn left. (3) Walk past Burger King (#01-14/15) along the sheltered walkway—the Residential Clubhouse entrance is located right beside Ma Kuang TCM (#01-12) and Fresh & Clean. (4) Ring the Concierge buzzer at the entrance door for the concierge to grant access to the Clubhouse lift. (5) Take the lift up to Level 4. (6) At Level 4, inform the Concierge desk which unit and tower you are visiting. (7) Walk straight out of the concierge lobby onto the sky deck: for Tower 5, turn left, cross the small bridge (no need to walk along the pool), and turn right to reach the Tower 5 lift lobby; for Towers 3 and 7, follow the directional signage across the landscape deck. (8) At the tower lift lobby intercom, dial the resident's unit number (#XX-YY) so the resident can buzz you into the lift and activate your floor button."
+  },
+  {
+    "topic": "visitor_directions",
+    "title": "Visitor Driving & Private Hire (Grab / Gojek / Taxi) Navigation & Mall Drop-off Pitfall",
+    "content": "For guests or private hire drivers visiting Lentor Modern by car: (1) Set GPS destination directly to the specific residential tower (e.g., 'Lentor Modern Tower 3', 'Tower 5', or 'Tower 7'). (2) CRITICAL DRIVER WARNING: Google Maps and GPS apps frequently direct drivers into the Lentor Modern Mall commercial retail drop-off lane by mistake. Before the vehicle turns into the mall drop-off, ensure the driver stays to the left lane to enter the Residents' Carpark ramp entrance located immediately before the mall drop-off. (3) Inform the security guard at the barrier that you are visiting a resident at Tower 3, 5, or 7. (4) Proceed up the carpark ramp to Level 2 or Level 3 visitor parking / tower drop-off. (5) Walk directly to the respective tower lift lobby and dial the host's unit number (#XX-YY) on the intercom panel to be granted lift access to their floor."
   }
 ]

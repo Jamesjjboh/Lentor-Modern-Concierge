@@ -171,7 +171,25 @@ FAQ_RULES = [
         ),
         ["search_bylaws_and_handbook", "search_estate_profile"],
     ),
-    # 12. QB Premium Resident Discount & Queue
+    # 12. Defect Liability Period (DLP) & Handover Defects
+    (
+        re.compile(
+            r"\b(dlp|defect liability|defects? liability period)\b|\b(when|what time|until when|last day|deadline)\b.*\b(defect|defects|dlp)\b|\b(defect|defects|dlp)\b.*\b(end|ends|expiry|expire|expires|over|deadline)\b",
+            re.IGNORECASE,
+        ),
+        (
+            "🛠️ *Lentor Modern Defect Liability Period (DLP)*\n\n"
+            "• *Official DLP End Date:* *31 October 2026* _(Confirmed by Block Management)_\n"
+            "• *Developer Obligation:* Under the BCA Standard Sale & Purchase Agreement, the developer (GuocoLand) and main contractor (Lian Beng Construction) are legally required to rectify defects in materials and workmanship at their cost within 30 days of notification.\n\n"
+            "📱 *How to Report Defects:*\n"
+            "1. Lodge defect items with clear photos via the *Novade Quality* mobile app.\n"
+            "2. Your assigned Customer Service Officer (CSO) will schedule a joint inspection walkthrough.\n"
+            "3. Sign off on the app once rectifications are satisfactorily verified.\n\n"
+            "⚠️ *Important Notice:* Ensure all unit defects are submitted on Novade before *31 October 2026*. For common property defects (e.g. corridors, swimming pool, lifts), report immediately to the Management Office (CBRE: `+65 6054 3370`) so repairs are charged to the developer before DLP expires."
+        ),
+        ["search_bylaws_and_handbook", "search_estate_profile"],
+    ),
+    # 13. QB Premium Resident Discount & Queue
     (
         re.compile(r"\b(qb\s*premium|qb\s*house|qb)\b.*\b(discount|promo|perk|resident|offer|deal|cut|hair|queue)\b|\b(discount|promo|perk|resident|offer|deal)\b.*\b(qb\s*premium|qb\s*house|qb)\b", re.IGNORECASE),
         (

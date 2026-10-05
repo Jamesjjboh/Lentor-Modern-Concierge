@@ -18,6 +18,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Added `📍 Guest Directions (MRT & Car)` button to `/menu` for instant 1-tap template access.
   - Added dedicated `/directions` command producing a formatted, ready-to-forward WhatsApp/Telegram navigation message with tower options.
   - Integrated into admin analytics tracking under `Guest Directions`.
+- **Per-User Question Tracking & Engagement Breakdown (`/admin_stats`)**:
+  - Enhanced the analytics engine to compute questions asked and quick-menu taps on a per-user basis across all time windows (`7d`, `30d`, `all`).
+  - Added key community health metrics to the main dashboard: Active Askers ratio & percentage, Menu-Only / Lurkers count, and average questions per active asker.
+  - Added dedicated interactive sub-screen `[ 👥 User Activity ]` displaying a ranked resident leaderboard with names, `@usernames`, queries in window, lifetime questions, menu interactions, and humanized relative active timestamps (`10m ago`, `2h ago`).
+  - Enriched conversational LLM context (`summary_for_llm`) so the admin can query resident engagement in plain English.
 - **Interactive Estate Contacts Hub (`menu_contacts`)**:
   - Upgraded the primary Estate Contacts menu into an interactive directory hub covering 22 verified service providers and contractors.
   - Retained essential on-site management (CBRE Managing Agent, 24/7 Residential Concierge, 24/7 Security Control, GuocoLand CST / Lian Beng) on the primary screen.

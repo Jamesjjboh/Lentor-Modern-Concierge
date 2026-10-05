@@ -13,20 +13,20 @@ def ts(days_ago: float) -> str:
 
 
 USERS = [
-    {"user_id": "1", "first_seen": ts(40), "last_active": ts(1)},
-    {"user_id": "2", "first_seen": ts(20), "last_active": ts(10)},
-    {"user_id": "3", "first_seen": ts(2), "last_active": ts(0.5)},
-    {"user_id": "4", "first_seen": ts(60), "last_active": ts(45)},
+    {"user_id": "1", "first_seen": ts(40), "last_active": ts(1), "first_name": "James", "username": "jamesjjboh", "total_queries": 10},
+    {"user_id": "2", "first_seen": ts(20), "last_active": ts(10), "first_name": "Partner", "username": "partner_handle", "total_queries": 0},
+    {"user_id": "3", "first_seen": ts(2), "last_active": ts(0.5), "first_name": "ResidentC", "username": None, "total_queries": 2},
+    {"user_id": "4", "first_seen": ts(60), "last_active": ts(45), "first_name": "LurkerD", "username": None, "total_queries": 0},
 ]
 
 LOGS = [
-    {"timestamp": ts(0.2), "user_query": "Where is the gym?", "tools_called": ["search_bylaws_and_handbook"], "answered_successfully": True},
-    {"timestamp": ts(1), "user_query": "Last train to bayshore?", "tools_called": ["search_estate_profile"], "answered_successfully": True},
-    {"timestamp": ts(1), "user_query": "Is there a pet salon?", "tools_called": ["search_mall_directory"], "answered_successfully": False},
-    {"timestamp": ts(2), "user_query": "is there a pet salon", "tools_called": ["search_mall_directory"], "answered_successfully": False},
-    {"timestamp": ts(12), "user_query": "Old unanswered", "tools_called": [], "answered_successfully": False},
-    {"timestamp": ts(0.1), "user_query": "[Menu] menu_transit", "tools_called": ["menu_transit"], "answered_successfully": True},
-    {"timestamp": ts(0.1), "user_query": "[Menu] menu_transit", "tools_called": ["menu_transit"], "answered_successfully": True},
+    {"timestamp": ts(0.2), "user_id": "1", "user_query": "Where is the gym?", "tools_called": ["search_bylaws_and_handbook"], "answered_successfully": True},
+    {"timestamp": ts(1), "user_id": "1", "user_query": "Last train to bayshore?", "tools_called": ["search_estate_profile"], "answered_successfully": True},
+    {"timestamp": ts(1), "user_id": "1", "user_query": "Is there a pet salon?", "tools_called": ["search_mall_directory"], "answered_successfully": False},
+    {"timestamp": ts(2), "user_id": "3", "user_query": "is there a pet salon", "tools_called": ["search_mall_directory"], "answered_successfully": False},
+    {"timestamp": ts(12), "user_id": "1", "user_query": "Old unanswered", "tools_called": [], "answered_successfully": False},
+    {"timestamp": ts(0.1), "user_id": "2", "user_query": "[Menu] menu_transit", "tools_called": ["menu_transit"], "answered_successfully": True},
+    {"timestamp": ts(0.1), "user_id": "2", "user_query": "[Menu] menu_transit", "tools_called": ["menu_transit"], "answered_successfully": True},
 ]
 
 FEEDBACK = [
@@ -97,6 +97,9 @@ class TestAnalytics(unittest.TestCase):
         self.assertEqual(analytics.parse_stats_callback("stats_all"), ("dash", None))
         self.assertEqual(analytics.parse_stats_callback("stats_gaps_30"), ("gaps", 30))
         self.assertEqual(analytics.parse_stats_callback("stats_gaps_all"), ("gaps", None))
+        self.assertEqual(analytics.parse_stats_callback("stats_users_7"), ("users", 7))
+        self.assertEqual(analytics.parse_stats_callback("stats_users_all"), ("users", None))
+        self.assertEqual(analytics.parse_stats_callback("stats_dash_30"), ("dash", 30))
 
     def test_admin_question_intent(self):
         self.assertTrue(analytics.is_analytics_question("What did residents ask most this week?"))
@@ -118,6 +121,52 @@ class TestAnalytics(unittest.TestCase):
         self.assertEqual(analytics.sparkline([0, 0, 0]), "▁▁▁")
         self.assertEqual(len(analytics.sparkline([1, 2, 3, 4, 5, 6, 7])), 7)
         self.assertEqual(analytics.progress_bar(0.5), "█████░░░░░")
+
+    def test_user_activity_breakdown(self):
+        s = analytics.compute_analytics(USERS, LOGS, FEEDBACK, days=7, now=NOW)
+        self.assertEqual(s["active_askers"], 2)  # User 1 (3 queries) and User 3 (1 query)
+        self.assertEqual(s["lurkers"], 2)        # User 2 (0 queries) and User 4 (0 queries)
+        self.assertAlmostEqual(s["avg_queries_per_asker"], 2.0)  # 4 queries / 2 askers
+
+        # Check ranking order
+        user_ranking = s["user_activity"]
+        self.assertEqual(len(user_ranking), 4)
+        self.assertEqual(user_ranking[0]["user_id"], "1")
+        self.assertEqual(user_ranking[0]["queries_window"], 3)
+        self.assertEqual(user_ranking[0]["display_name"], "James")
+        self.assertEqual(user_ranking[0]["username"], "@jamesjjboh")
+
+        self.assertEqual(user_ranking[1]["user_id"], "3")
+        self.assertEqual(user_ranking[1]["queries_window"], 1)
+
+        self.assertEqual(user_ranking[2]["user_id"], "2")
+        self.assertEqual(user_ranking[2]["queries_window"], 0)
+        self.assertEqual(user_ranking[2]["menu_taps_window"], 2)
+
+    def test_format_user_activity(self):
+        s = analytics.compute_analytics(USERS, LOGS, FEEDBACK, days=7, now=NOW)
+        text = analytics.format_user_activity(s, now=NOW)
+        self.assertIn("Resident Activity Breakdown", text)
+        self.assertIn("Active Askers:* 2 of 4 (50%)", text)
+        self.assertIn("Menu-Only / Lurkers:* 2 of 4", text)
+        self.assertIn("James", text)
+        self.assertIn("@jamesjjboh", text)
+        self.assertIn("Partner", text)
+        self.assertIn("Menu taps: *2*", text)
+
+    def test_format_dashboard_includes_asker_summary(self):
+        s = analytics.compute_analytics(USERS, LOGS, FEEDBACK, days=7, now=NOW)
+        dash = analytics.format_dashboard(s)
+        self.assertIn("Asked: *4* by *2* of *4* users", dash)
+        self.assertIn("2* lurkers", dash)
+
+    def test_relative_time_formatter(self):
+        self.assertEqual(analytics.format_relative_time(NOW - timedelta(seconds=20), now=NOW), "just now")
+        self.assertEqual(analytics.format_relative_time(NOW - timedelta(minutes=15), now=NOW), "15m ago")
+        self.assertEqual(analytics.format_relative_time(NOW - timedelta(hours=3), now=NOW), "3h ago")
+        self.assertEqual(analytics.format_relative_time(NOW - timedelta(days=1), now=NOW), "yesterday")
+        self.assertEqual(analytics.format_relative_time(NOW - timedelta(days=4), now=NOW), "4d ago")
+        self.assertEqual(analytics.format_relative_time(None, now=NOW), "unknown")
 
 
 if __name__ == "__main__":

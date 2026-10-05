@@ -481,13 +481,13 @@ async def handle_admin_stats_command(update: Update, context: ContextTypes.DEFAU
     if update.message:
         await update.message.reply_text(
             analytics.format_dashboard(stats),
-            reply_markup=analytics.stats_keyboard(days),
+            reply_markup=analytics.stats_keyboard(days, current_view="dash"),
             parse_mode="Markdown",
         )
 
 
 async def handle_stats_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """Handles the admin dashboard inline buttons (7d / 30d / All / Full gap list / Refresh)."""
+    """Handles the admin dashboard inline buttons (7d / 30d / All / User Activity / Full gap list / Refresh)."""
     query = update.callback_query
     if not query:
         return
@@ -500,11 +500,17 @@ async def handle_stats_callback(update: Update, context: ContextTypes.DEFAULT_TY
 
     view, days = analytics.parse_stats_callback(query.data or "stats_7")
     stats = db_client.get_analytics_summary(days=days)
-    text = analytics.format_gaps(stats) if view == "gaps" else analytics.format_dashboard(stats)
+    if view == "gaps":
+        text = analytics.format_gaps(stats)
+    elif view == "users":
+        text = analytics.format_user_activity(stats)
+    else:
+        text = analytics.format_dashboard(stats)
+
     try:
         await query.edit_message_text(
             text,
-            reply_markup=analytics.stats_keyboard(days),
+            reply_markup=analytics.stats_keyboard(days, current_view=view),
             parse_mode="Markdown",
         )
     except BadRequest as e:

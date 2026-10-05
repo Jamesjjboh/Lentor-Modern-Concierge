@@ -87,14 +87,15 @@ flowchart TD
 * Iterates through all registered users in Firestore with safety rate-limiting (25 msgs/sec).
 
 ### 3. Product Analytics & Content Gaps (`/admin_stats [7|30|all]`)
-An instant, text-first dashboard (no chart rendering), with inline buttons `[ 7d ] [ 30d ] [ All ] [ 📋 Full gap list ] [ 🔄 Refresh ]`.
+An instant, text-first dashboard (no chart rendering), with inline buttons `[ 7d ] [ 30d ] [ All ] [ 👥 User Activity ] [ 📋 Full gap list ] [ 🔄 Refresh ]`.
 
 | Metric | Definition |
 | :--- | :--- |
 | **Registered users** | Unique Telegram accounts that have started or messaged the bot. This is **not** a household count: one home may have several users, and no unit numbers are collected (privacy by design). |
 | **New / Active 7d / Active 30d** | Users first seen in the window, and users active in the last 7 / 30 days. |
 | **Adoption ≈** | Registered users ÷ 605 units. An approximation only (users, not households). |
-| **Questions asked** | Typed and photo questions in the window. Quick-menu taps are tracked separately and are *not* counted as questions. |
+| **Questions asked** | Typed and photo questions in the window, showing total questions, active askers count & percentage, average questions per active user, and lurker count. |
+| **User Activity Breakdown** | 1-Tap sub-screen ranking residents by activity (questions asked in window, lifetime queries, quick-menu taps, and humanized relative active timestamps). |
 | **Answer rate** | Share of questions the bot could answer, detected from the reply wording (e.g. "I don't have…", "No shops found…", "couldn't find…"), not just two fixed phrases. |
 | **Top topics** | Questions grouped by the tool used (handbook, mall, transit/estate profile, tips, etc.). |
 | **Quick-menu taps** | How often each `/menu` button is used. |
@@ -102,7 +103,7 @@ An instant, text-first dashboard (no chart rendering), with inline buttons `[ 7d
 | **Feedback** | Totals, new/unresolved count, breakdown by type (bug / data correction / feature request) and age of the oldest unresolved item. |
 
 * **Daily sparkline:** a 7-day question trend, e.g. `▁▃▅▂▇▄▂`.
-* **Conversational analytics (admin only):** just ask in chat, e.g. *"What did residents ask most this week?"* or *"How many users do we have?"*. Gemini answers using only the verified aggregates (never raw resident messages) and cites exact numbers.
+* **Conversational analytics (admin only):** just ask in chat, e.g. *"What did residents ask most this week?"*, *"Who are the most active users?"*, or *"How many questions did each user ask?"*. Gemini answers using only the verified aggregates (never raw resident messages) and cites exact numbers.
 
 ### 4. Multimodal Vision & Photo Ingestion
 * Residents can snap photos of mall flyers, opening hours notices, or appliance error codes directly in Telegram without typing.

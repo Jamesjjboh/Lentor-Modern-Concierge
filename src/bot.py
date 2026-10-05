@@ -559,17 +559,25 @@ async def directions_command(update: Update, context: ContextTypes.DEFAULT_TYPE)
     if not message:
         return
 
+    # If called with no arguments, present a clean 1-tap tower picker
+    if not context.args:
+        prompt_text = (
+            "📍 *Visitor Navigation Guide (MRT & Car)*\n\n"
+            "Which residential tower are your guests visiting?\n"
+            "Tap your tower below to get an instant, copy-paste guide for your friends, family, or delivery drivers:"
+        )
+        await message.reply_text(prompt_text, reply_markup=get_directions_keyboard(), parse_mode="Markdown")
+        return
+
     tower_arg = None
     unit_arg = None
 
-    if context.args:
-        # Check first argument for tower or unit
-        for arg in context.args:
-            clean = arg.strip().replace("#", "")
-            if clean in ["3", "5", "7"] and not tower_arg:
-                tower_arg = f"Tower {clean}"
-            elif "-" in clean and not unit_arg:
-                unit_arg = f"#{clean}"
+    for arg in context.args:
+        clean = arg.strip().replace("#", "")
+        if clean in ["3", "5", "7"] and not tower_arg:
+            tower_arg = f"Tower {clean}"
+        elif "-" in clean and not unit_arg:
+            unit_arg = f"#{clean}"
 
     tower_str = tower_arg or "[Tower 3 / 5 / 7]"
     unit_str = unit_arg or "[#XX-YY]"

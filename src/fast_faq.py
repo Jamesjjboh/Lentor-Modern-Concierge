@@ -4,8 +4,25 @@ Bypasses LLM token generation for repetitive queries (<5ms response time, zero A
 while falling back to Gemini 3.8 Flash for nuanced or novel questions.
 """
 
+import json
+import logging
 import re
-from typing import List, Optional, Tuple
+import unicodedata
+from typing import Any, Dict, List, Optional, Tuple
+
+from src.config import PROCESSED_DATA_DIR
+
+logger = logging.getLogger(__name__)
+
+# Preload mall directory stores for instant discount lookup
+_MALL_STORES: List[Dict[str, Any]] = []
+try:
+    mall_path = PROCESSED_DATA_DIR / "mall_directory.json"
+    if mall_path.exists():
+        with open(mall_path, "r", encoding="utf-8") as f:
+            _MALL_STORES = json.load(f)
+except Exception as e:
+    logger.warning(f"Could not preload mall_directory.json in fast_faq: {e}")
 
 # Pre-compiled regex patterns for instant matching
 FAQ_RULES = [
@@ -139,7 +156,21 @@ FAQ_RULES = [
         ),
         ["search_estate_profile"],
     ),
-    # 11. Jew Kit Hainanese Chicken Rice Resident Discount
+    # 11. QB Premium Resident Discount & Queue
+    (
+        re.compile(r"\b(qb\s*premium|qb\s*house|qb)\b.*\b(discount|promo|perk|resident|offer|deal|cut|hair|queue)\b|\b(discount|promo|perk|resident|offer|deal)\b.*\b(qb\s*premium|qb\s*house|qb)\b", re.IGNORECASE),
+        (
+            "✂️ *QB PREMIUM (#01-45)*\n\n"
+            "• *Resident Discount:* *$3 off all haircuts*\n"
+            "• *How to Redeem:* Flash your physical *Lentor Modern Resident Access Card* prior to payment.\n"
+            "• *Validity:* Till 31 December 2026 (not valid with other promotions).\n"
+            "• *Operating Hours:* 10:00 – 21:30 daily\n"
+            "• 💡 *Live Queue:* Check live queue and get digital queue ticket online before walking down:\n"
+            "  https://qbhouse.relsystems.net:443/RELGetQueueLM.aspx?brCode=QDCOJEFZ"
+        ),
+        ["search_mall_directory"],
+    ),
+    # 12. Jew Kit Hainanese Chicken Rice Resident Discount
     (
         re.compile(r"\b(jew kit|chicken rice)\b.*\b(discount|promo|perk|resident|offer|deal|have)\b|\b(discount|promo|perk|resident|offer|deal)\b.*\b(jew kit|chicken rice)\b", re.IGNORECASE),
         (
@@ -151,40 +182,167 @@ FAQ_RULES = [
         ),
         ["search_mall_directory"],
     ),
-    # 12. KFC Resident Discount
+    # 13. KFC Resident Discount
     (
         re.compile(r"\b(kfc)\b.*\b(discount|promo|perk|resident|offer|deal)\b|\b(discount|promo|perk|resident|offer|deal)\b.*\b(kfc)\b", re.IGNORECASE),
         (
-            "🍗 *KFC (#B1-08 / 09)*\n\n"
-            "• *Resident Discount:* *10% off with min. $15 spend* (dine-in & takeaway).\n"
-            "• *How to Redeem:* Flash your Lentor Modern Resident Access Card at the counter before payment.\n"
-            "• *Operating Hours:* 10:00 – 22:00 daily"
+            "🍗 *KFC (#01-21/22)*\n\n"
+            "• *Resident Discount:* *15% off with minimum spending of $15* (dine-in & takeaway).\n"
+            "• *How to Redeem:* Flash your physical *Lentor Modern Resident Access Card* at the counter before payment.\n"
+            "• *Operating Hours:* 10:00 – 21:30 daily"
         ),
         ["search_mall_directory"],
     ),
-    # 13. Tim Hortons Resident Discount
+    # 14. Tim Hortons Resident Discount
     (
         re.compile(r"\b(tim hortons?|tims?)\b.*\b(discount|promo|perk|resident|offer|deal)\b|\b(discount|promo|perk|resident|offer|deal)\b.*\b(tim hortons?|tims?)\b", re.IGNORECASE),
         (
-            "☕ *Tim Hortons (#01-14)*\n\n"
-            "• *Resident Discount:* *10% off total bill*\n"
-            "• *How to Redeem:* Flash your Lentor Modern Resident Access Card prior to ordering.\n"
-            "• *Operating Hours:* 08:00 – 22:00 daily"
+            "☕ *Tim Hortons (#01-37)*\n\n"
+            "• *Resident Discount:* *15% off with minimum spending of $15*\n"
+            "• *How to Redeem:* Flash your physical *Lentor Modern Resident Access Card* prior to ordering.\n"
+            "• *Operating Hours:* 10:00 – 21:30 daily"
         ),
         ["search_mall_directory"],
     ),
-    # 14. Burger King Resident Discount
+    # 15. Burger King Resident Discount
     (
         re.compile(r"\b(burger king|bk)\b.*\b(discount|promo|perk|resident|offer|deal)\b|\b(discount|promo|perk|resident|offer|deal)\b.*\b(burger king|bk)\b", re.IGNORECASE),
         (
-            "🍔 *Burger King (#01-08)*\n\n"
-            "• *Resident Discount:* *10% off ala carte items and regular combo meals*\n"
-            "• *How to Redeem:* Flash your Lentor Modern Resident Access Card prior to ordering.\n"
-            "• *Operating Hours:* 08:00 – 22:00 daily"
+            "🍔 *Burger King (#01-14/15)*\n\n"
+            "• *Resident Discount:* *10% off total bill*\n"
+            "• *How to Redeem:* Flash your physical *Lentor Modern Resident Access Card* prior to ordering.\n"
+            "• *Operating Hours:* 10:00 – 21:30 daily"
+        ),
+        ["search_mall_directory"],
+    ),
+    # 16. General Resident Discounts & Perks Overview
+    (
+        re.compile(r"\b(what|which|list|all)\b.*\b(resident discounts?|mall discounts?|resident perks?)\b|\bresident perks\b|\ball discounts\b|\blist of discounts\b", re.IGNORECASE),
+        (
+            "🏷️ *Lentor Modern Resident Discounts & Perks Overview*\n\n"
+            "Flash your physical *Lentor Modern Resident Access Card* prior to payment to enjoy:\n\n"
+            "🍽️ *F&B & Dining:*\n"
+            "• *Jew Kit Chicken Rice (#B1-04):* 15% off total bill\n"
+            "• *KFC (#01-21/22):* 15% off with min. $15 spend\n"
+            "• *Tim Hortons (#01-37):* 15% off with min. $15 spend\n"
+            "• *Burger King (#01-14/15):* 10% off total bill\n"
+            "• *Tongue Tip Lanzhou Beef Noodles (#01-38):* 15% off à la carte\n"
+            "• *Toast & Roll by Swee Heng (#01-23):* 5% off total bill\n"
+            "• *Joylion Buffet Hotpot (#B1-08):* 10% off dine-in\n"
+            "• *Ajumma's (#01-30):* Free hotteok with min. $45 spend\n\n"
+            "✂️ *Hair & Services:*\n"
+            "• *QB PREMIUM (#01-45):* $3 off all haircuts\n"
+            "• *NK Hairworks (#01-28):* 20% off selected services\n"
+            "• *The Nail Arcadia (#01-47):* 10% off all services\n\n"
+            "🩺 *Health & Clinic:*\n"
+            "• *Pinnacle Family Clinic (#01-46):* Screenings from $99, Flu vaccine $33\n"
+            "• *Luminous Dental (#01-49):* Basic dental care at $98\n"
+            "• *Ma Kuang TCM (#01-12):* 5% off services\n\n"
+            "🛒 *Supermarket:*\n"
+            "• *CS Fresh (#B1-11 to 16):* 20%–30% markdown on sushi/bento after 8:30 PM\n\n"
+            "_You can also ask about any specific store (e.g. 'discount for QB Premium')!_"
         ),
         ["search_mall_directory"],
     ),
 ]
+
+DISCOUNT_KEYWORDS = re.compile(
+    r"\b(discount|discounts|promo|promos|promotion|promotions|perk|perks|offer|offers|deal|deals|cheaper|voucher|vouchers|privilege|privileges)\b",
+    re.IGNORECASE,
+)
+
+
+def _normalize_text(text: str) -> str:
+    return unicodedata.normalize("NFKD", text).encode("ASCII", "ignore").decode("utf-8").lower()
+
+
+def _format_store_discount(store: Dict[str, Any]) -> str:
+    name = store.get("name", "Store")
+    unit = store.get("unit", "")
+    disc = store.get("resident_discount")
+    terms = store.get("discount_terms") or "Flash Lentor Modern Resident Access Card prior to payment. Valid until 31 Dec 2026. Not valid with other promotions."
+    hours = store.get("opening_hours", "Daily")
+    order_url = store.get("order_url")
+
+    cat = (store.get("category") or "").lower()
+    emoji = "🛍️"
+    if "hair" in cat or "hair" in name.lower() or "nail" in cat:
+        emoji = "✂️"
+    elif any(k in cat for k in ["f&b", "food", "restaurant", "dining", "cafe"]):
+        emoji = "🍽️"
+    elif any(k in cat for k in ["clinic", "medical", "dental", "health", "tcm"]):
+        emoji = "🩺"
+    elif any(k in cat for k in ["enrichment", "school", "music", "education"]):
+        emoji = "📚"
+    elif "supermarket" in cat:
+        emoji = "🛒"
+
+    if disc:
+        lines = [
+            f"{emoji} *{name} ({unit})*\n",
+            f"• *Resident Discount:* {disc}",
+            f"• *How to Redeem:* Flash your physical *Lentor Modern Resident Access Card* prior to making payment.",
+            f"• *Terms:* {terms}",
+            f"• *Operating Hours:* {hours}",
+        ]
+        if order_url:
+            if "qb" in name.lower():
+                lines.append(f"• 💡 *Live Queue:* Check live queue and get digital queue ticket online before walking down:\n  {order_url}")
+            else:
+                lines.append(f"• 💡 *Order / Queue Online:* {order_url}")
+        return "\n".join(lines)
+    else:
+        lines = [
+            f"{emoji} *{name} ({unit})*\n",
+            f"• *Resident Discount:* Does not currently offer a specific resident discount.",
+            f"• *Operating Hours:* {hours}",
+            f"• *Floor:* {store.get('floor', '')}",
+            f"• _Tip:_ You can check mall customer service or the Lentor Modern directory for seasonal atrium promotions!",
+        ]
+        return "\n".join(lines)
+
+
+def match_store_discount(clean_q: str) -> Optional[Tuple[str, List[str]]]:
+    """Dynamically matches any store resident discount question across all stores in mall_directory.json."""
+    if not _MALL_STORES:
+        return None
+
+    norm_q = _normalize_text(clean_q)
+    if not DISCOUNT_KEYWORDS.search(norm_q):
+        return None
+
+    for store in _MALL_STORES:
+        name = store.get("name", "")
+        norm_name = _normalize_text(name)
+
+        aliases = [norm_name]
+        simplified = re.sub(r"\s*\([^)]*\)", "", norm_name)
+        simplified = re.sub(r":.*$", "", simplified)
+        simplified = re.sub(r"\s+by\s+.*$", "", simplified)
+        if simplified != norm_name and len(simplified) >= 3:
+            aliases.append(simplified)
+
+        if "chicken rice" in norm_name:
+            aliases.append("jew kit")
+        if "tcm" in norm_name:
+            aliases.append("ma kuang")
+        if "qb premium" in norm_name:
+            aliases.extend(["qb", "qb house", "qb premium"])
+        if "tim hortons" in norm_name:
+            aliases.extend(["tim horton", "tims", "tim hortons"])
+        if "burger king" in norm_name:
+            aliases.extend(["bk", "burger king"])
+        if "cs fresh" in norm_name or "cold storage" in norm_name:
+            aliases.extend(["cs fresh", "cold storage"])
+
+        for alias in sorted(set(aliases), key=len, reverse=True):
+            if len(alias) < 3:
+                continue
+            pattern = r"\b" + re.escape(alias) + r"\b"
+            if re.search(pattern, norm_q):
+                return _format_store_discount(store), ["search_mall_directory"]
+
+    return None
 
 
 def match_fast_faq(user_query: str) -> Optional[Tuple[str, List[str]]]:
@@ -195,8 +353,14 @@ def match_fast_faq(user_query: str) -> Optional[Tuple[str, List[str]]]:
     if len(clean_q) < 3 or len(clean_q) > 150:
         return None
 
+    # 1. Check explicit FAQ rules first
     for pattern, response_text, tools_called in FAQ_RULES:
         if pattern.search(clean_q):
             return response_text, tools_called
+
+    # 2. Check dynamic mall store discount matcher across all stores
+    store_match = match_store_discount(clean_q)
+    if store_match:
+        return store_match
 
     return None

@@ -39,6 +39,8 @@ gcloud run deploy "$SERVICE_NAME" \
     --max-instances 2 \
     --memory 512Mi \
     --cpu 1 \
+    --no-cpu-throttling \
+    --cpu-boost \
     --set-env-vars "ENVIRONMENT=production,WEBHOOK_URL=${SERVICE_URL},GEMINI_MODEL=${GEMINI_MODEL:-gemini-3.5-flash-lite},GCP_PROJECT_ID=${GCP_PROJECT_ID},TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN},ADMIN_TELEGRAM_ID=${ADMIN_TELEGRAM_ID},GEMINI_API_KEY=${GEMINI_API_KEY},WEBHOOK_SECRET_TOKEN=${WEBHOOK_SECRET_TOKEN:-}"
 
 echo "✅ Cloud Run deployment complete!"

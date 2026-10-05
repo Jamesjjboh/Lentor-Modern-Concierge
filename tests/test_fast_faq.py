@@ -94,6 +94,14 @@ class TestFastFAQ(unittest.TestCase):
         self.assertIn("6:00 AM – 10:00 PM daily", text)
         self.assertIn("search_bylaws_and_handbook", tools)
 
+    def test_qb_premium_discount_match(self):
+        res = match_fast_faq("Is there resident discount for qb premium")
+        self.assertIsNotNone(res)
+        text, tools = res
+        self.assertIn("QB PREMIUM", text)
+        self.assertIn("$3 off all haircuts", text)
+        self.assertIn("search_mall_directory", tools)
+
     def test_jew_kit_discount_match(self):
         res = match_fast_faq("Does Jew kit chicken rice have resident discount")
         self.assertIsNotNone(res)
@@ -107,7 +115,7 @@ class TestFastFAQ(unittest.TestCase):
         self.assertIsNotNone(res)
         text, tools = res
         self.assertIn("KFC", text)
-        self.assertIn("10% off with min. $15 spend", text)
+        self.assertIn("15% off with minimum spending of $15", text)
         self.assertIn("search_mall_directory", tools)
 
     def test_tim_hortons_discount_match(self):
@@ -115,7 +123,7 @@ class TestFastFAQ(unittest.TestCase):
         self.assertIsNotNone(res)
         text, tools = res
         self.assertIn("Tim Hortons", text)
-        self.assertIn("10% off total bill", text)
+        self.assertIn("15% off with minimum spending of $15", text)
         self.assertIn("search_mall_directory", tools)
 
     def test_burger_king_discount_match(self):
@@ -123,7 +131,32 @@ class TestFastFAQ(unittest.TestCase):
         self.assertIsNotNone(res)
         text, tools = res
         self.assertIn("Burger King", text)
-        self.assertIn("10% off ala carte items", text)
+        self.assertIn("10% off total bill", text)
+        self.assertIn("search_mall_directory", tools)
+
+    def test_dynamic_store_discount_toast_and_roll(self):
+        res = match_fast_faq("any discount for toast & roll?")
+        self.assertIsNotNone(res)
+        text, tools = res
+        self.assertIn("Toast & Roll", text)
+        self.assertIn("5% off total bill", text)
+        self.assertIn("search_mall_directory", tools)
+
+    def test_dynamic_store_discount_non_discount_store(self):
+        res = match_fast_faq("does chagee have resident discount?")
+        self.assertIsNotNone(res)
+        text, tools = res
+        self.assertIn("CHAGEE", text)
+        self.assertIn("Does not currently offer a specific resident discount", text)
+        self.assertIn("search_mall_directory", tools)
+
+    def test_general_discounts_overview(self):
+        res = match_fast_faq("what are the resident discounts?")
+        self.assertIsNotNone(res)
+        text, tools = res
+        self.assertIn("Lentor Modern Resident Discounts & Perks Overview", text)
+        self.assertIn("Jew Kit Chicken Rice", text)
+        self.assertIn("QB PREMIUM", text)
         self.assertIn("search_mall_directory", tools)
 
     def test_build_injected_context_mall(self):

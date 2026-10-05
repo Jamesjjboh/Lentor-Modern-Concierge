@@ -132,7 +132,15 @@ def search_mall_directory(category: str = "", shop_name: str = "") -> str:
 
 
     search_term = f"{category} {shop_name}".strip().lower()
-    words = search_term.split()
+    MALL_STOPWORDS = {
+        "where", "is", "the", "a", "an", "in", "at", "to", "for", "of", "and", "or",
+        "does", "do", "have", "has", "can", "what", "which", "there", "any", "how",
+        "i", "you", "we", "they", "it", "my", "your"
+    }
+    raw_words = re.findall(r"\w+", search_term)
+    words = [w for w in raw_words if w not in MALL_STOPWORDS]
+    if not words:
+        words = raw_words
 
     def score_match(t: Dict[str, Any]) -> int:
         name_lower = t.get("name", "").lower()
@@ -538,8 +546,68 @@ TOOL_FUNCTIONS: List[Callable[..., Any]] = [
 ]
 
 
+def build_injected_context(user_query: str) -> Tuple[str, List[str]]:
+    """Performs an ultra-fast (<1ms) local memory lookup against cached estate data
+    to pre-inject relevant records into the prompt.
+    Eliminates remote function-calling roundtrips, allowing Gemini to answer in a single turn (<1.5s).
+    """
+    context_chunks: List[str] = []
+    tools_hint: List[str] = []
+    q_lower = user_query.lower()
+
+    # 1. Mall Directory & Deals
+    mall_keywords = [
+        "mall", "shop", "store", "discount", "voucher", "deal", "promo", "perk",
+        "eat", "food", "clinic", "dentist", "doctor", "preschool", "supermarket",
+        "grocery", "resiq", "queue", "order", "b1", "level 1", "level 2"
+    ]
+    tenants = get_cached_json("mall_directory.json") or []
+    has_mall_intent = any(k in q_lower for k in mall_keywords)
+    if not has_mall_intent:
+        MALL_STOPWORDS = {"where", "is", "the", "a", "an", "in", "at", "to", "for", "of", "and", "or", "does", "do", "have", "has", "can", "what", "which", "there", "any", "how"}
+        words = [w for w in re.findall(r"\w+", q_lower) if w not in MALL_STOPWORDS and len(w) > 2]
+        for t in tenants:
+            t_name = t.get("name", "").lower()
+            if words and any(w in t_name for w in words):
+                has_mall_intent = True
+                break
+
+    if has_mall_intent:
+        mall_res = search_mall_directory(category="", shop_name=user_query)
+        if mall_res and "No shops found" not in mall_res:
+            context_chunks.append(f"--- Relevant Lentor Modern Mall Records ---\n{mall_res}")
+            tools_hint.append("search_mall_directory")
+
+    # 2. Bylaws, Renovation & Appliance Warranties
+    bylaw_keywords = [
+        "bylaw", "rule", "reno", "renovation", "deposit", "hack", "drill", "bbq",
+        "gym", "pool", "tennis", "moving", "delivery", "bay", "clearance", "aircon",
+        "grille", "balcony", "curtain", "intercom", "lock", "water heater", "smeg",
+        "mitsubishi", "yale", "defect", "contractor", "padding", "lift"
+    ]
+    if any(k in q_lower for k in bylaw_keywords):
+        bylaw_res = search_bylaws_and_handbook(user_query)
+        if bylaw_res and "No official by-laws found" not in bylaw_res and "No handbook" not in bylaw_res:
+            context_chunks.append(f"--- Relevant MCST By-laws & Handbook Records ---\n{bylaw_res}")
+            tools_hint.append("search_bylaws_and_handbook")
+
+    # 3. Estate Profile, Transit & School Proximity
+    profile_keywords = [
+        "school", "primary", "secondary", "anderson", "chij", "nicholas", "mrt",
+        "train", "timing", "bus", "postal", "tower", "maintenance fee", "share value",
+        "tenure", "developer", "guocoland", "unit mix"
+    ]
+    if any(k in q_lower for k in profile_keywords):
+        profile_res = search_estate_profile(user_query)
+        if profile_res and "data is currently being updated" not in profile_res:
+            context_chunks.append(f"--- Relevant Estate Profile & Transit Records ---\n{profile_res}")
+            tools_hint.append("search_estate_profile")
+
+    return "\n\n".join(context_chunks), tools_hint
+
+
 class LentorAgent:
-    """Autonomous agent wrapping Gemini 3.8 Flash and the Lentor Modern tool catalog."""
+    """Autonomous agent wrapping Gemini 3.5 Flash Lite and the Lentor Modern tool catalog."""
 
     def __init__(self, api_key: Optional[str] = None, model: Optional[str] = None):
         self.api_key = api_key or GEMINI_API_KEY
@@ -569,8 +637,23 @@ class LentorAgent:
             # Fallback simulator for local testing before API key is provided
             return self._simulated_response(user_query, user_id)
 
+        # 2. Smart Context Pre-Injection (<1ms local memory search to enable 1-turn response)
+        pre_context, pre_tools = build_injected_context(user_query)
+        effective_query = user_query
+        if pre_context:
+            effective_query = (
+                f"{user_query}\n\n"
+                f"[Verified Official Knowledge Base Excerpts]:\n"
+                f"{pre_context}\n\n"
+                f"(Instructions: Synthesize a polite, friendly, and factual response directly using the verified excerpts above. "
+                f"You only need to invoke a tool if the excerpts above do not contain the answer)."
+            )
+            for t in pre_tools:
+                if t not in tools_called:
+                    tools_called.append(t)
+
         candidate_models = [self.model]
-        for fallback in ["gemini-3.5-flash", "gemini-3.1-flash-lite"]:
+        for fallback in ["gemini-3.5-flash-lite", "gemini-3.1-flash-lite", "gemini-3.8-flash"]:
             if fallback not in candidate_models:
                 candidate_models.append(fallback)
 
@@ -588,7 +671,7 @@ class LentorAgent:
                     config=config,
                 )
 
-                response = chat.send_message(user_query)
+                response = chat.send_message(effective_query)
                 final_text = response.text or ""
 
                 # Check history for tool calls executed by the agent
@@ -596,18 +679,19 @@ class LentorAgent:
                     for part in getattr(msg, "parts", []):
                         fn_call = getattr(part, "function_call", None)
                         if fn_call and fn_call.name:
-                            tools_called.append(fn_call.name)
+                            if fn_call.name not in tools_called:
+                                tools_called.append(fn_call.name)
 
                 return final_text, tools_called
 
             except Exception as e:
+                last_error = e
                 if any(code in str(e) for code in ["503", "UNAVAILABLE", "402", "RESOURCE_EXHAUSTED", "429"]):
                     logger.warning(f"Model {current_model} error ({e}). Cascading to next fallback model...")
                     continue
                 else:
                     logger.error(f"Error in Gemini agent query execution with {current_model}: {e}")
                     break
-
 
         return f"I encountered an unexpected issue processing your query: {last_error}. Please try again shortly.", tools_called
 
@@ -674,7 +758,7 @@ Return a JSON object with this exact structure:
 """
 
         candidate_models = [self.model]
-        for fallback in ["gemini-3.5-flash", "gemini-3.1-flash-lite"]:
+        for fallback in ["gemini-3.5-flash-lite", "gemini-3.1-flash-lite", "gemini-3.8-flash"]:
             if fallback not in candidate_models:
                 candidate_models.append(fallback)
 

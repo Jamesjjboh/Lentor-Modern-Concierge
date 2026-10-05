@@ -94,6 +94,50 @@ class TestFastFAQ(unittest.TestCase):
         self.assertIn("6:00 AM – 10:00 PM daily", text)
         self.assertIn("search_bylaws_and_handbook", tools)
 
+    def test_jew_kit_discount_match(self):
+        res = match_fast_faq("Does Jew kit chicken rice have resident discount")
+        self.assertIsNotNone(res)
+        text, tools = res
+        self.assertIn("Jew Kit Hainanese Chicken Rice", text)
+        self.assertIn("15% off total bill", text)
+        self.assertIn("search_mall_directory", tools)
+
+    def test_kfc_discount_match(self):
+        res = match_fast_faq("is there a resident discount for KFC?")
+        self.assertIsNotNone(res)
+        text, tools = res
+        self.assertIn("KFC", text)
+        self.assertIn("10% off with min. $15 spend", text)
+        self.assertIn("search_mall_directory", tools)
+
+    def test_tim_hortons_discount_match(self):
+        res = match_fast_faq("tim hortons resident promo")
+        self.assertIsNotNone(res)
+        text, tools = res
+        self.assertIn("Tim Hortons", text)
+        self.assertIn("10% off total bill", text)
+        self.assertIn("search_mall_directory", tools)
+
+    def test_burger_king_discount_match(self):
+        res = match_fast_faq("does burger king have resident discount?")
+        self.assertIsNotNone(res)
+        text, tools = res
+        self.assertIn("Burger King", text)
+        self.assertIn("10% off ala carte items", text)
+        self.assertIn("search_mall_directory", tools)
+
+    def test_build_injected_context_mall(self):
+        from src.agent import build_injected_context
+        context, tools = build_injected_context("Where is Toast & Roll?")
+        self.assertIn("Toast & Roll", context)
+        self.assertIn("search_mall_directory", tools)
+
+    def test_build_injected_context_bylaws(self):
+        from src.agent import build_injected_context
+        context, tools = build_injected_context("what are the rules for aircon ledge?")
+        self.assertIn("Aircon", context)
+        self.assertIn("search_bylaws_and_handbook", tools)
+
     def test_cached_json_in_memory(self):
         data = get_cached_json("mall_directory.json")
         self.assertIsNotNone(data)

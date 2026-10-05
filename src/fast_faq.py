@@ -139,6 +139,51 @@ FAQ_RULES = [
         ),
         ["search_estate_profile"],
     ),
+    # 11. Jew Kit Hainanese Chicken Rice Resident Discount
+    (
+        re.compile(r"\b(jew kit|chicken rice)\b.*\b(discount|promo|perk|resident|offer|deal|have)\b|\b(discount|promo|perk|resident|offer|deal)\b.*\b(jew kit|chicken rice)\b", re.IGNORECASE),
+        (
+            "🍗 *Jew Kit Hainanese Chicken Rice (#B1-04)*\n\n"
+            "• *Resident Discount:* *15% off total bill*\n"
+            "• *How to Redeem:* Flash your physical *Lentor Modern Resident Access Card* prior to making payment.\n"
+            "• *Validity:* Till 31 December 2026 (not combinable with other ongoing promotions).\n"
+            "• *Operating Hours:* 10:00 – 21:30 daily"
+        ),
+        ["search_mall_directory"],
+    ),
+    # 12. KFC Resident Discount
+    (
+        re.compile(r"\b(kfc)\b.*\b(discount|promo|perk|resident|offer|deal)\b|\b(discount|promo|perk|resident|offer|deal)\b.*\b(kfc)\b", re.IGNORECASE),
+        (
+            "🍗 *KFC (#B1-08 / 09)*\n\n"
+            "• *Resident Discount:* *10% off with min. $15 spend* (dine-in & takeaway).\n"
+            "• *How to Redeem:* Flash your Lentor Modern Resident Access Card at the counter before payment.\n"
+            "• *Operating Hours:* 10:00 – 22:00 daily"
+        ),
+        ["search_mall_directory"],
+    ),
+    # 13. Tim Hortons Resident Discount
+    (
+        re.compile(r"\b(tim hortons?|tims?)\b.*\b(discount|promo|perk|resident|offer|deal)\b|\b(discount|promo|perk|resident|offer|deal)\b.*\b(tim hortons?|tims?)\b", re.IGNORECASE),
+        (
+            "☕ *Tim Hortons (#01-14)*\n\n"
+            "• *Resident Discount:* *10% off total bill*\n"
+            "• *How to Redeem:* Flash your Lentor Modern Resident Access Card prior to ordering.\n"
+            "• *Operating Hours:* 08:00 – 22:00 daily"
+        ),
+        ["search_mall_directory"],
+    ),
+    # 14. Burger King Resident Discount
+    (
+        re.compile(r"\b(burger king|bk)\b.*\b(discount|promo|perk|resident|offer|deal)\b|\b(discount|promo|perk|resident|offer|deal)\b.*\b(burger king|bk)\b", re.IGNORECASE),
+        (
+            "🍔 *Burger King (#01-08)*\n\n"
+            "• *Resident Discount:* *10% off ala carte items and regular combo meals*\n"
+            "• *How to Redeem:* Flash your Lentor Modern Resident Access Card prior to ordering.\n"
+            "• *Operating Hours:* 08:00 – 22:00 daily"
+        ),
+        ["search_mall_directory"],
+    ),
 ]
 
 

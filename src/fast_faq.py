@@ -213,7 +213,43 @@ FAQ_RULES = [
         ),
         ["search_bylaws_and_handbook", "search_estate_profile"],
     ),
-    # 14. QB Premium Resident Discount & Queue
+    # 14. High-Rise Littering & Smoking Regulations
+    (
+        re.compile(
+            r"\b(cig|cigarette|smoking|smoke|cigs|ash|butts?)\b.*\b(window|balcony|throw|litter|toss|outside)\b|\b(throw|drop|litter|toss)\b.*\b(window|balcony|corridor)\b|\bhigh\s*rise littering\b",
+            re.IGNORECASE,
+        ),
+        (
+            "🚭 *Smoking & High-Rise Littering By-Laws*\n\n"
+            "• *Strictly Prohibited:* Discarding cigarette butts, ash, or any rubbish from windows, balconies, or service yards is *strictly illegal* under the Environmental Public Health Act (EPHA) and estate by-laws.\n\n"
+            "• *Severe Legal Penalties (NEA):*\n"
+            "  • Under NEA laws, a *statutory presumption* applies to the registered unit owner/tenant if litter originates from their unit.\n"
+            "  • Fines: Up to *$2,000* for the first court conviction, *$4,000* for the second, and up to *$10,000* for subsequent convictions, alongside Corrective Work Orders (CWO).\n"
+            "  • Discarding burning butts also creates severe fire hazards for lower-floor balconies.\n\n"
+            "• *Common Area Smoking:* Smoking is prohibited in all estate common property (corridors, lobbies, stairwells, pool deck, gym, BBQ pavilions).\n\n"
+            "• *Reporting Incidents:* To report offenders, note the tower, approximate floor/unit, and timestamp, and contact the Management Office (CBRE: `+65 6054 3370`) or file via the *NEA myENV* app."
+        ),
+        ["search_bylaws_and_handbook"],
+    ),
+    # 15. Minor Drilling & DIY Works vs Renovation Permit
+    (
+        re.compile(
+            r"\b(can i drill|drill wall|drilling|hang.*painting|mount.*tv|drill.*hole|minor works?)\b",
+            re.IGNORECASE,
+        ),
+        (
+            "🔨 *Minor Drilling & DIY Works Guidelines*\n\n"
+            "• *Do I need a Renovation Permit for simple drilling?*\n"
+            "  • *No formal permit/deposit needed:* Minor DIY drilling inside your unit (e.g. drilling a few holes to hang paintings, mirrors, curtain tracks, or mount a TV) does *not* require an MCST Renovation Permit (Form 2.0) or renovation deposit.\n\n"
+            "• *Strict Working Hours for Drilling & Noisy Works:*\n"
+            "  • *Monday to Friday:* 9:00 AM – 5:00 PM\n"
+            "  • *Saturday:* 9:00 AM – 1:00 PM\n"
+            "  • *Sundays & Public Holidays:* *STRICTLY PROHIBITED*\n\n"
+            "⚠️ *Safety Caution:* Use a stud/pipe detector or check architectural plans before drilling to avoid concealed electrical conduits, aircon refrigerant trunking, or water pipes embedded inside the walls!"
+        ),
+        ["search_bylaws_and_handbook"],
+    ),
+    # 16. QB Premium Resident Discount & Queue
     (
         re.compile(r"\b(qb\s*premium|qb\s*house|qb)\b.*\b(discount|promo|perk|resident|offer|deal|cut|hair|queue)\b|\b(discount|promo|perk|resident|offer|deal)\b.*\b(qb\s*premium|qb\s*house|qb)\b", re.IGNORECASE),
         (

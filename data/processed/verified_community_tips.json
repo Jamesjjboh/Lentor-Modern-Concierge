@@ -30,6 +30,11 @@
     "content": "In addition to cosmetic paint or joint sealant checks, test technical items: (1) RJ45 data/ethernet wall ports in all bedrooms, (2) hollow tiles across living and bedroom floors using a tapping rod, and (3) floor gradient test in both master and common bathrooms (water should drain smoothly without ponding)."
   },
   {
+    "topic": "defects",
+    "title": "Common Handover Defects Checklist & Inspection Points",
+    "content": "Top defects to check during your 12-month Defect Liability Period (DLP):\n• Engineered Timber & Tiles: Check for hollow or drummy tiles, loose skirting, hairline grout cracks, and scratches or water marks on bedroom timber.\n• Aluminium Windows & Doors: Test sliding doors and lock latches for smooth movement; check rubber weatherstripping and silicone perimeter seals to ensure water-tightness during heavy rains.\n• Bathrooms & Plumbing: Run taps and showers to inspect water pressure and check that water drains freely without pooling around floor traps. Inspect silicone seals behind vanity basins and around toilet bowls.\n• Aircon & Electrical: Check all Mitsubishi fan coil blowers for cool air and check for water condensation or pipe drainage leaks. Test every 13A socket and USB wall outlet.\n• Appliances: Test SMEG induction hob heating zones (note: code 'L' is child lock), oven operation, and Rheem water heater. Log all issues promptly via the Novade app."
+  },
+  {
     "topic": "appliances",
     "title": "No-Neutral Smart Light Switch Wiring",
     "content": "The lighting switches in Lentor Modern units are wired WITHOUT a neutral wire. If converting to smart switches (Aqara, Tuya, etc.), ensure you purchase 'No-Neutral' switch models or install compatible bypass capacitors at the ceiling light fittings."

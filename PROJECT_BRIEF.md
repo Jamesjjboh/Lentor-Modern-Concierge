@@ -27,7 +27,7 @@ Instead of a rigid single-prompt RAG workflow, the agent autonomously selects an
 
 | Component | Technology | Implementation Detail |
 | :--- | :--- | :--- |
-| **Agent Core** | Google Gemini 2.5 Flash | Fast, low latency, large context, native tool/function calling via `google-genai` SDK. |
+| **Agent Core** | Google Gemini 3.8 Flash | Fast, low latency, large context, native tool/function calling via `google-genai` SDK (upgraded from 2.5 Flash for multimodal vision & reasoning). |
 | **Database** | Google Cloud Firestore | NoSQL document database storing users, logs, moderation queue, and verified knowledge. |
 | **Hosting** | Google Cloud Run | Serverless Docker container. Scales to 0 when idle (\$0 cost), auto-scales with traffic spikes. |
 | **User Interface** | Telegram Bot API | 1-on-1 DM bot (`python-telegram-bot` async). Webhook on Cloud Run, polling for local dev. |

@@ -4,8 +4,10 @@ Runs via long-polling in local development, and supports webhook for Cloud Run d
 """
 
 import asyncio
+import json
 import logging
 import os
+import re
 from telegram import BotCommand, BotCommandScopeChat, BotCommandScopeDefault, Chat, InlineKeyboardButton, InlineKeyboardMarkup, Update
 from telegram.constants import ChatAction
 from telegram.ext import (
@@ -17,9 +19,6 @@ from telegram.ext import (
     filters,
 )
 from telegram.request import HTTPXRequest
-
-
-import re
 
 from src import analytics
 from src.admin import (
@@ -37,7 +36,15 @@ from src.admin import (
     notify_admin_rate_limit_alert,
 )
 from src.agent import concierge_agent, submit_tip_to_moderation
-from src.config import ADMIN_TELEGRAM_ID, ENVIRONMENT, PORT, TELEGRAM_BOT_TOKEN, WEBHOOK_SECRET_TOKEN, WEBHOOK_URL
+from src.config import (
+    ADMIN_TELEGRAM_ID,
+    ENVIRONMENT,
+    PORT,
+    PROCESSED_DATA_DIR,
+    TELEGRAM_BOT_TOKEN,
+    WEBHOOK_SECRET_TOKEN,
+    WEBHOOK_URL,
+)
 from src.database import db_client
 
 logging.basicConfig(
@@ -118,6 +125,37 @@ def get_directions_keyboard() -> InlineKeyboardMarkup:
         ],
         [
             InlineKeyboardButton("◀️ Back to Quick Menu", callback_data="menu_main"),
+        ],
+    ]
+    return InlineKeyboardMarkup(keyboard)
+
+
+def get_mall_hub_keyboard() -> InlineKeyboardMarkup:
+    """Returns 1-tap category exploration buttons for the Mall & Deals hub."""
+    keyboard = [
+        [
+            InlineKeyboardButton("🏢 Full Directory (54 Stores)", callback_data="mall_dir"),
+        ],
+        [
+            InlineKeyboardButton("🎟️ GuocoLand Vouchers (34)", callback_data="mall_vouchers"),
+            InlineKeyboardButton("🏷️ Resident Perks (31)", callback_data="mall_discounts"),
+        ],
+        [
+            InlineKeyboardButton("📲 Open ResiQ (Order & Queue)", url="https://resiq-lm.vercel.app/"),
+        ],
+        [
+            InlineKeyboardButton("◀️ Back to Quick Menu", callback_data="menu_main"),
+        ],
+    ]
+    return InlineKeyboardMarkup(keyboard)
+
+
+def get_back_to_mall_keyboard() -> InlineKeyboardMarkup:
+    """Returns Back to Mall Hub and Back to Quick Menu buttons."""
+    keyboard = [
+        [
+            InlineKeyboardButton("◀️ Back to Mall & Deals", callback_data="menu_mall"),
+            InlineKeyboardButton("🏠 Quick Menu", callback_data="menu_main"),
         ],
     ]
     return InlineKeyboardMarkup(keyboard)
@@ -298,13 +336,14 @@ async def handle_quick_menu_callback(update: Update, context: ContextTypes.DEFAU
         )
     elif action == "menu_mall":
         text = (
-            "🏬 *Lentor Modern Mall Highlights:*\n\n"
+            "🏬 *Lentor Modern Mall & Deals Hub*\n\n"
             "• 🛒 *CS Fresh Supermarket:* Basement 1 (#B1-11 to 16) | 08:00 – 22:00 daily\n"
-            "• 👶 *Mulberry Learning @ Lentor (preschool & childcare):* Level 2 (#02-01)\n"
-            "• 🏷️ *Resident Discounts (31 Merchants):* Flash your Resident Access Card for 5%–15% off at Burger King, KFC, Ajumma's, QB Premium, Tim Hortons, etc.\n"
-            "• 🎟️ *GuocoLand e-Vouchers:* Accepted at 11 participating outlets\n"
-            "• 📲 *ResiQ Digital Portal:* Queue for QB Premium or order food online at [resiq-lm.vercel.app](https://resiq-lm.vercel.app/)\n"
-            "• 🅿️ *Mall Carpark:* 10-min grace period; EV charging at B1 Lots 39–42"
+            "  💡 *Pro-Tip:* Sushi, bento & bakery items are marked down 20%–30% daily after 8:30 PM!\n"
+            "• 👶 *Mulberry Learning:* Level 2 (#02-01) preschool & childcare\n"
+            "• 💳 *Resident Card Perks:* 31 merchants offer 5%–15% off (KFC, Tim Hortons, BK, Lanzhou Beef, Hanok, QB)\n"
+            "• 🎟️ *GuocoLand e-Vouchers:* Accepted at 34 stores across F&B, clinics & services\n"
+            "• 🅿️ *Mall Carpark:* 10-min free grace period | EV charging at B1 Lots 39–42\n\n"
+            "Tap any option below to view the full directory or browse deals:"
         )
     elif action == "menu_reno":
         text = (
@@ -354,7 +393,13 @@ async def handle_quick_menu_callback(update: Update, context: ContextTypes.DEFAU
     else:
         text = "Please select an option from the menu."
 
-    chosen_markup = get_directions_keyboard() if action == "menu_directions" else back_markup
+    if action == "menu_directions":
+        chosen_markup = get_directions_keyboard()
+    elif action == "menu_mall":
+        chosen_markup = get_mall_hub_keyboard()
+    else:
+        chosen_markup = back_markup
+
     await query.edit_message_text(
         text=text,
         reply_markup=chosen_markup,
@@ -441,6 +486,85 @@ async def handle_directions_callback(update: Update, context: ContextTypes.DEFAU
         reply_markup=get_directions_keyboard(),
         parse_mode="Markdown",
     )
+
+
+async def handle_mall_hub_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Handles 1-tap exploration sub-screens for the Mall & Deals hub."""
+    query = update.callback_query
+    if not query:
+        return
+    await query.answer()
+
+    action = query.data
+    mall_file = PROCESSED_DATA_DIR / "mall_directory.json"
+    shops = []
+    if mall_file.exists():
+        try:
+            with open(mall_file, "r", encoding="utf-8") as f:
+                shops = json.load(f)
+        except Exception as e:
+            logger.warning(f"Could not load mall_directory.json: {e}")
+
+    back_kb = get_back_to_mall_keyboard()
+
+    if action == "mall_dir":
+        # 1. Full Directory organized by floor
+        b1 = [s for s in shops if s.get("floor") == "B1"]
+        l1 = [s for s in shops if s.get("floor") == "L1"]
+        l2 = [s for s in shops if s.get("floor") == "L2"]
+
+        lines = [f"🏢 *Lentor Modern Mall — Full Directory ({len(shops)} Stores)*\n"]
+        lines.append("📍 *Basement 1 (MRT Linkway & Daily Essentials):*")
+        for s in sorted(b1, key=lambda x: x.get("unit", "")):
+            lines.append(f"• *{s['name']}* ({s.get('unit')}) — _{s.get('category')}_")
+
+        lines.append("\n📍 *Level 1 (F&B, Retail, Clinics & Lifestyle):*")
+        for s in sorted(l1, key=lambda x: x.get("unit", "")):
+            lines.append(f"• *{s['name']}* ({s.get('unit')}) — _{s.get('category')}_")
+
+        lines.append("\n📍 *Level 2 (Preschool & Childcare):*")
+        for s in sorted(l2, key=lambda x: x.get("unit", "")):
+            lines.append(f"• *{s['name']}* ({s.get('unit')}) — _{s.get('category')}_")
+
+        await query.edit_message_text(text="\n".join(lines), reply_markup=back_kb, parse_mode="Markdown")
+
+    elif action == "mall_vouchers":
+        # 2. GuocoLand e-Voucher Merchants
+        v_shops = [s for s in shops if s.get("accepts_guocoland_voucher")]
+        v_fnb = [s for s in v_shops if "food" in s.get("category", "").lower() or "beverage" in s.get("category", "").lower()]
+        v_ret = [s for s in v_shops if s not in v_fnb]
+
+        lines = [f"🎟️ *GuocoLand e-Voucher Participating Merchants ({len(v_shops)} Stores)*\n"]
+        lines.append(f"🍽️ *Food & Beverages ({len(v_fnb)} Stores):*")
+        for s in sorted(v_fnb, key=lambda x: x["name"]):
+            lines.append(f"• {s['name']} ({s.get('unit')})")
+
+        lines.append(f"\n🛍️ *Services, Clinics & Retail ({len(v_ret)} Stores):*")
+        for s in sorted(v_ret, key=lambda x: x["name"]):
+            lines.append(f"• {s['name']} ({s.get('unit')}) — _{s.get('category')}_")
+
+        lines.append("\n⚠️ *Note:* CS Fresh Supermarket (#B1-11 to 16) does *not* accept GuocoLand vouchers (uses Cold Storage / yuu).")
+        lines.append("💡 *How to use:* Flash your digital voucher on the GuocoLand app at the cashier prior to ordering/billing.")
+
+        await query.edit_message_text(text="\n".join(lines), reply_markup=back_kb, parse_mode="Markdown")
+
+    elif action == "mall_discounts":
+        # 3. Resident Card Discounts
+        d_shops = [s for s in shops if s.get("resident_discount")]
+        d_fnb = [s for s in d_shops if "food" in s.get("category", "").lower() or "beverage" in s.get("category", "").lower()]
+        d_services = [s for s in d_shops if s not in d_fnb]
+
+        lines = [f"🏷️ *Official Resident Card Discounts ({len(d_shops)} Merchants)*\n"]
+        lines.append("💳 _Flash your physical Lentor Modern Resident Access Card before payment (valid till 31 Dec 2026)._\n")
+        lines.append("🍽️ *Dining Perks:*")
+        for s in sorted(d_fnb, key=lambda x: x["name"]):
+            lines.append(f"• *{s['name']}* ({s.get('unit')}): {s.get('resident_discount')}")
+
+        lines.append("\n💇 *Hair, Clinics & Services:*")
+        for s in sorted(d_services, key=lambda x: x["name"]):
+            lines.append(f"• *{s['name']}* ({s.get('unit')}): {s.get('resident_discount')}")
+
+        await query.edit_message_text(text="\n".join(lines), reply_markup=back_kb, parse_mode="Markdown")
 
 
 async def handle_answer_feedback_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -1119,6 +1243,7 @@ def create_bot_app() -> Application:
     # Callback handler for resident interactive 1-tap quick action menu
     app.add_handler(CallbackQueryHandler(handle_quick_menu_callback, pattern=r"^menu_"))
     app.add_handler(CallbackQueryHandler(handle_directions_callback, pattern=r"^dir_tower:"))
+    app.add_handler(CallbackQueryHandler(handle_mall_hub_callback, pattern=r"^mall_"))
     app.add_handler(CallbackQueryHandler(handle_fallback_callback, pattern=r"^fallback_"))
     app.add_handler(CallbackQueryHandler(handle_answer_feedback_callback, pattern=r"^(fb_rate|noop)"))
 

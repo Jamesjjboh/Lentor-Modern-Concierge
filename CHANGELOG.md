@@ -18,6 +18,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Added `📍 Guest Directions (MRT & Car)` button to `/menu` for instant 1-tap template access.
   - Added dedicated `/directions` command producing a formatted, ready-to-forward WhatsApp/Telegram navigation message with tower options.
   - Integrated into admin analytics tracking under `Guest Directions`.
+- **Interactive Mall & Deals Hub Suite (`menu_mall`)**:
+  - Upgraded the Mall quick menu card with pro-tips (CS Fresh 8:30 PM sushi & bakery 20%–30% markdown hack).
+  - Added 4 dedicated 1-tap interactive exploration sub-screens:
+    - `[ 🏢 Full Directory (54 Stores) ]`: Complete mall tenant listing organized cleanly by floor (Basement 1, Level 1, Level 2) with unit numbers and categories.
+    - `[ 🎟️ GuocoLand Vouchers (34) ]`: Complete listing of all 34 participating outlets (21 F&B + 13 retail/services) plus the reminder that CS Fresh does not accept mall vouchers.
+    - `[ 🏷️ Resident Perks (31) ]`: Full breakdown of 31 resident discounts across dining and personal services.
+    - `[ 📲 Open ResiQ ]`: Direct mobile URL launcher to skip queues and order ahead online.
 - **Public Privacy Policy (`PRIVACY.md`)**:
   - Published comprehensive Singapore PDPA-compliant privacy policy outlining data collection, zero third-party tracking, and transient session retention.
   - Linked to Telegram `@LMConciergeBot` via `@BotFather` `/setprivacy`.

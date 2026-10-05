@@ -91,8 +91,18 @@ class TestFastFAQ(unittest.TestCase):
         res = match_fast_faq("when does the defect liability period end")
         self.assertIsNotNone(res)
         text, tools = res
-        self.assertIn("31 October 2026", text)
+        self.assertIn("12 months from your individual Key Collection", text)
         self.assertIn("Novade", text)
+        self.assertIn("search_bylaws_and_handbook", tools)
+
+    def test_security_numbers_match(self):
+        res = match_fast_faq("Security numbers")
+        self.assertIsNotNone(res)
+        text, tools = res
+        self.assertIn("+65 6054 3379", text)
+        self.assertIn("+65 6054 3370", text)
+        self.assertIn("+65 6054 3375", text)
+        self.assertIn("+65 6259 0700", text)
         self.assertIn("search_bylaws_and_handbook", tools)
 
     def test_unmatched_query_falls_back(self):

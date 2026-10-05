@@ -179,17 +179,41 @@ FAQ_RULES = [
         ),
         (
             "🛠️ *Lentor Modern Defect Liability Period (DLP)*\n\n"
-            "• *Official DLP End Date:* *31 October 2026* _(Confirmed by Block Management)_\n"
+            "• *DLP Duration:* Strictly *12 months from your individual Key Collection / Notice of Vacant Possession (NVP) date*.\n"
+            "• *How to Check Your Exact End Date:* Because units were handed over in phases, each unit's DLP ends on a different date. Please check your exact DLP expiry date directly inside the *Novade Quality app*, or confirm with your assigned *Block Manager / Customer Service Officer (CSO)*.\n"
             "• *Developer Obligation:* Under the BCA Standard Sale & Purchase Agreement, the developer (GuocoLand) and main contractor (Lian Beng Construction) are legally required to rectify defects in materials and workmanship at their cost within 30 days of notification.\n\n"
             "📱 *How to Report Defects:*\n"
             "1. Lodge defect items with clear photos via the *Novade Quality* mobile app.\n"
             "2. Your assigned Customer Service Officer (CSO) will schedule a joint inspection walkthrough.\n"
             "3. Sign off on the app once rectifications are satisfactorily verified.\n\n"
-            "⚠️ *Important Notice:* Ensure all unit defects are submitted on Novade before *31 October 2026*. For common property defects (e.g. corridors, swimming pool, lifts), report immediately to the Management Office (CBRE: `+65 6054 3370`) so repairs are charged to the developer before DLP expires."
+            "⚠️ *Important Notice:* Ensure all unit defects are submitted on Novade before your individual 12-month DLP expires. For common property defects (e.g. corridors, swimming pool, lifts), report immediately to the Management Office (CBRE: `+65 6054 3370` / `managementoffice@LT-MODERN.COM`) so repairs are charged to the developer before handover warranty expires."
         ),
         ["search_bylaws_and_handbook", "search_estate_profile"],
     ),
-    # 13. QB Premium Resident Discount & Queue
+    # 13. Security Control Room, Guardhouse & Management Contacts
+    (
+        re.compile(
+            r"\b(security numbers?|guard\s*house numbers?|guardhouse|security control|security hotline|call security)\b|\b(what is|how to call|phone number of|contact for|number of|number for)\b.*\b(security|guardhouse|guard house)\b",
+            re.IGNORECASE,
+        ),
+        (
+            "🛡️ *Lentor Modern Security & Estate Hotlines*\n\n"
+            "• *24/7 Security Control Room / Guardhouse:* `+65 6054 3379`\n"
+            "  _(Available 24 hours daily for urgent emergencies, barrier gate issues, noise complaints, and visitor verification)_\n\n"
+            "• *Managing Agent (CBRE Management Office):* `+65 6054 3370`\n"
+            "  • Location: 9 Lentor Central, Level 3\n"
+            "  • Hours: Mon–Fri 9:00 AM – 6:00 PM | Sat 9:00 AM – 1:00 PM (Closed Sun & PH)\n"
+            "  • Email: managementoffice@LT-MODERN.COM\n\n"
+            "• *On-Site Concierge Desk:* `+65 6054 3375`\n"
+            "  • Location: Level 4 Clubhouse\n"
+            "  • Hours: 9:00 AM – 8:00 PM daily\n"
+            "  • Email: concierge@LT-MODERN.COM\n\n"
+            "• *Intercom & Access Hardware Support (Fermax Asia):* `+65 6259 0700`\n"
+            "  _(Developer supplier for video intercom and resident access card technical support)_"
+        ),
+        ["search_bylaws_and_handbook", "search_estate_profile"],
+    ),
+    # 14. QB Premium Resident Discount & Queue
     (
         re.compile(r"\b(qb\s*premium|qb\s*house|qb)\b.*\b(discount|promo|perk|resident|offer|deal|cut|hair|queue)\b|\b(discount|promo|perk|resident|offer|deal)\b.*\b(qb\s*premium|qb\s*house|qb)\b", re.IGNORECASE),
         (

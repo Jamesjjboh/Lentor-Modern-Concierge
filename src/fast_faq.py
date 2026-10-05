@@ -61,7 +61,7 @@ FAQ_RULES = [
     ),
     # 4. Renovation Working Hours & Noisy Works
     (
-        re.compile(r"\b(reno|renovation|drilling|hacking|noisy works?)\b.*\b(hours?|timing|saturday|sunday|holiday|permit|deposit)\b|\b(can i drill|can renovate)\b", re.IGNORECASE),
+        re.compile(r"\b(reno|renovation|hacking|noisy works?)\b.*\b(hours?|timing|saturday|sunday|holiday|permit|deposit)\b|\bcan renovate\b", re.IGNORECASE),
         (
             "🔨 *Renovation & Noisy Works Guidelines*\n\n"
             "• *Mondays to Fridays:* *9:00 AM – 5:00 PM*\n"

@@ -161,6 +161,37 @@ def get_back_to_mall_keyboard() -> InlineKeyboardMarkup:
     return InlineKeyboardMarkup(keyboard)
 
 
+def get_contacts_hub_keyboard() -> InlineKeyboardMarkup:
+    """Returns 1-tap category exploration buttons for the Estate Contacts hub."""
+    keyboard = [
+        [
+            InlineKeyboardButton("🔧 Appliances & Equipment (8)", callback_data="contacts_appliances"),
+        ],
+        [
+            InlineKeyboardButton("🚪 Fittings & Finishes (8)", callback_data="contacts_fittings"),
+            InlineKeyboardButton("⚡ Utilities & Gas (2)", callback_data="contacts_utilities"),
+        ],
+        [
+            InlineKeyboardButton("✉️ Draft Email to MA", callback_data="contacts_draft_ma"),
+        ],
+        [
+            InlineKeyboardButton("◀️ Back to Quick Menu", callback_data="menu_main"),
+        ],
+    ]
+    return InlineKeyboardMarkup(keyboard)
+
+
+def get_back_to_contacts_keyboard() -> InlineKeyboardMarkup:
+    """Returns Back to Contacts Hub and Back to Quick Menu buttons."""
+    keyboard = [
+        [
+            InlineKeyboardButton("◀️ Back to Estate Contacts", callback_data="menu_contacts"),
+            InlineKeyboardButton("🏠 Quick Menu", callback_data="menu_main"),
+        ],
+    ]
+    return InlineKeyboardMarkup(keyboard)
+
+
 def get_unanswered_fallback_keyboard() -> InlineKeyboardMarkup:
     """Returns interactive 1-tap options when a question cannot be factually answered."""
     keyboard = [
@@ -303,7 +334,8 @@ async def handle_quick_menu_callback(update: Update, context: ContextTypes.DEFAU
             "  📞 `+65 6054 3379`\n\n"
             "• *Developer CST (Defects & Novade Support):*\n"
             "  📞 `6433 9342` | ✉️ `LMcustomerservice@lentormodern.com.sg`\n"
-            "  Main Contractor: Lian Beng Construction (1988) Pte Ltd"
+            "  Main Contractor: Lian Beng Construction (1988) Pte Ltd\n\n"
+            "Tap any option below for appliance warranties, contractor hotlines, utilities, or to draft an email:"
         )
     elif action == "menu_facilities":
         text = (
@@ -397,6 +429,8 @@ async def handle_quick_menu_callback(update: Update, context: ContextTypes.DEFAU
         chosen_markup = get_directions_keyboard()
     elif action == "menu_mall":
         chosen_markup = get_mall_hub_keyboard()
+    elif action == "menu_contacts":
+        chosen_markup = get_contacts_hub_keyboard()
     else:
         chosen_markup = back_markup
 
@@ -565,6 +599,130 @@ async def handle_mall_hub_callback(update: Update, context: ContextTypes.DEFAULT
             lines.append(f"• *{s['name']}* ({s.get('unit')}): {s.get('resident_discount')}")
 
         await query.edit_message_text(text="\n".join(lines), reply_markup=back_kb, parse_mode="Markdown")
+
+
+async def handle_contacts_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Handles 1-tap sub-screens for Estate Contacts (Appliances, Fittings, Utilities, Draft Email)."""
+    query = update.callback_query
+    if not query:
+        return
+    await query.answer()
+
+    action = query.data
+    back_kb = get_back_to_contacts_keyboard()
+    user = query.from_user
+
+    if action == "contacts_appliances":
+        text = (
+            "🔧 *Home Appliances, Locks & Equipment Hotlines*\n\n"
+            "• ❄️ *Air Conditioning (ACMV):*\n"
+            "  *Mitsubishi Electric Asia*\n"
+            "  📞 `6473 2308`\n"
+            "  _VRV / Multi-Split wall-mounted servicing & warranty_\n\n"
+            "• 🍳 *Kitchen Appliances (Hob, Oven, Hood, Washer, Fridge):*\n"
+            "  *SMEG Singapore*\n"
+            "  📞 `6950 0910`\n"
+            "  _Warranty servicing, maintenance & user guide queries_\n\n"
+            "• 🔐 *Main Door Digital Lock:*\n"
+            "  *Assa Abloy (Yale)*\n"
+            "  📞 `6591 8868`\n"
+            "  _Yale YDM7116A digital lock support & RFID card pairing_\n\n"
+            "• 🚿 *Electric Storage Water Heater:*\n"
+            "  *Rheem Manufacturing*\n"
+            "  📞 `6872 2043`\n"
+            "  _Ceiling storage water heater servicing_\n\n"
+            "• 🔥 *Town Gas Water Heater:*\n"
+            "  *Ferroli - Casa (S) Pte Ltd*\n"
+            "  📞 `9747 8743` (WhatsApp)\n"
+            "  _Town gas water heater units_\n\n"
+            "• 📟 *Intercom, Smart Home & Fire Alarm (HFAD):*\n"
+            "  *Fermax Asia*\n"
+            "  📞 `6259 0700`\n"
+            "  _Video intercom, access cards, Zigbee gateway, smoke alarm_\n\n"
+            "• 📬 *Smart Letter Box Lock:*\n"
+            "  *Metform Industries*\n"
+            "  📞 `6757 2822`\n"
+            "  _S301 digital letterbox lock_\n\n"
+            "• 🛗 *Passenger & Service Lifts (24/7):*\n"
+            "  *TK Elevator (Singapore)*\n"
+            "  📞 `6890 1640`\n"
+            "  _24/7 lift emergency rescue & maintenance_\n\n"
+            "💡 *Resident Tip:* When contacting suppliers for warranty claims, have your unit number, handover date, and serial number (on appliance sticker) ready."
+        )
+        await query.edit_message_text(text=text, reply_markup=back_kb, parse_mode="Markdown")
+
+    elif action == "contacts_fittings":
+        text = (
+            "🚪 *Fittings, Finishes & Building Contractors*\n\n"
+            "• 🪟 *Windows & Balcony Sliding Doors:*\n"
+            "  *Hungsen Engineering* | 📞 `6339 2131`\n"
+            "  _Balcony sliding glass doors, window catches & gaskets_\n\n"
+            "• 🚪 *Bathroom & Kitchen Bi-fold Doors:*\n"
+            "  *PD Door Pte Ltd* | 📞 `6776 6666`\n"
+            "  _Bi-fold door rollers, alignment & track maintenance_\n\n"
+            "• 🚪 *Pocket Sliding Doors:*\n"
+            "  *Slide & Hide System* | 📞 `6369 9988`\n"
+            "  _Concealed interior sliding door mechanisms_\n\n"
+            "• 🚿 *Sanitary Ware & Tap Mixers:*\n"
+            "  *Carera Bathroom* | 📞 `6533 0455`\n"
+            "  _Basin taps, shower mixers, rain shower, WC flushing systems_\n\n"
+            "• 🚿 *Shower Screens:*\n"
+            "  *Jin Yuan Engineering* | 📞 `6481 5622`\n"
+            "  _Tempered glass bathroom screens & door seal strips_\n\n"
+            "• 🪵 *Engineered Timber Flooring:*\n"
+            "  *T. J. Seang Holdings* | 📞 `6745 0434`\n"
+            "  _Bedroom timber flooring care and rectification_\n\n"
+            "• 🧱 *Floor & Wall Tiles:*\n"
+            "  *Masonry Pte Ltd* | 📞 `6352 8981`\n"
+            "  _Living room, balcony & bathroom wall/floor tiles_\n\n"
+            "• 🗄️ *Cabinetry & Built-in Wardrobes:*\n"
+            "  *King Hup Construction* | 📞 `6220 5653`\n"
+            "  _Built-in bedroom wardrobes, vanity counters, kitchen carpentry_\n\n"
+            "• 🏗️ *Main Contractor (Handover Defects):*\n"
+            "  *Lian Beng Construction (1988) Pte Ltd*\n"
+            "  _Log defect rectifications via the Novade app or report to the BSC / Managing Agent office._"
+        )
+        await query.edit_message_text(text=text, reply_markup=back_kb, parse_mode="Markdown")
+
+    elif action == "contacts_utilities":
+        text = (
+            "⚡ *Utilities & Essential Services*\n\n"
+            "• 💡 *Electricity & Water (SP Group):*\n"
+            "  *SP Services Ltd*\n"
+            "  📞 Customer Service: `1800-222-2333`\n"
+            "  📞 24/7 Electricity Supply Breakdown: `1800-778-8888`\n"
+            "  📞 24/7 Water Supply Emergency (PUB): `1800-225-5782`\n"
+            "  _Account opening, meter activation, billing inquiries_\n\n"
+            "• 🔥 *Town Gas Supply (City Energy):*\n"
+            "  *City Energy Pte Ltd*\n"
+            "  📞 Customer Service & Appointments: `1800-555-1661`\n"
+            "  📞 24/7 Gas Emergency: `1800-752-1800`\n"
+            "  _Town gas supply turn-on appointment & gas cooker connection_\n\n"
+            "💡 *Move-In Sequence:* Open your SP Services utilities account via the SP app first, then schedule your City Energy appointment for gas turn-on before your kitchen hob is used."
+        )
+        await query.edit_message_text(text=text, reply_markup=back_kb, parse_mode="Markdown")
+
+    elif action == "contacts_draft_ma":
+        user_name = user.first_name if user and user.first_name else "Resident"
+        draft = (
+            "✉️ *Ready-to-Send Email Draft to Managing Agent (CBRE):*\n\n"
+            "```\n"
+            "To: managementoffice@LT-MODERN.COM\n"
+            "Cc: concierge@LT-MODERN.COM\n"
+            "Subject: [Lentor Modern] Resident Inquiry / Request\n\n"
+            "Dear Managing Agent (CBRE) / Estate Management Office,\n\n"
+            "I am writing as a resident of Lentor Modern regarding:\n"
+            "[Please describe your request, maintenance item, or question here]\n\n"
+            "In accordance with estate management guidelines, could you kindly advise on the next steps or arrange for follow-up?\n\n"
+            "Thank you for your assistance.\n\n"
+            "Best regards,\n"
+            f"{user_name}\n"
+            "Unit: [Your Unit # / Tower]\n"
+            "Contact: [Your Mobile #]\n"
+            "```\n\n"
+            "💡 *Tips:* Tap inside the code box above to copy the template instantly. You can also call the Estate Office directly at `+65 6054 3370` (Mon–Fri 9am–6pm, Sat 9am–1pm) or visit Level 3 at 9 Lentor Central."
+        )
+        await query.edit_message_text(text=draft, reply_markup=back_kb, parse_mode="Markdown")
 
 
 async def handle_answer_feedback_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -1244,6 +1402,7 @@ def create_bot_app() -> Application:
     app.add_handler(CallbackQueryHandler(handle_quick_menu_callback, pattern=r"^menu_"))
     app.add_handler(CallbackQueryHandler(handle_directions_callback, pattern=r"^dir_tower:"))
     app.add_handler(CallbackQueryHandler(handle_mall_hub_callback, pattern=r"^mall_"))
+    app.add_handler(CallbackQueryHandler(handle_contacts_callback, pattern=r"^contacts_"))
     app.add_handler(CallbackQueryHandler(handle_fallback_callback, pattern=r"^fallback_"))
     app.add_handler(CallbackQueryHandler(handle_answer_feedback_callback, pattern=r"^(fb_rate|noop)"))
 

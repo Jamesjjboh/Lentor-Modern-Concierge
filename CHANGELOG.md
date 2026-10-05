@@ -18,6 +18,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Added `📍 Guest Directions (MRT & Car)` button to `/menu` for instant 1-tap template access.
   - Added dedicated `/directions` command producing a formatted, ready-to-forward WhatsApp/Telegram navigation message with tower options.
   - Integrated into admin analytics tracking under `Guest Directions`.
+- **Interactive Estate Contacts Hub (`menu_contacts`)**:
+  - Upgraded the primary Estate Contacts menu into an interactive directory hub covering 22 verified service providers and contractors.
+  - Retained essential on-site management (CBRE Managing Agent, 24/7 Residential Concierge, 24/7 Security Control, GuocoLand CST / Lian Beng) on the primary screen.
+  - Added 4 dedicated 1-tap interactive sub-screens:
+    - `[ 🔧 Appliances & Equipment (8) ]`: Authorized warranty and repair contacts for Mitsubishi Electric (Aircon: `6473 2308`), SMEG Singapore (Kitchen appliances: `6950 0910`), Assa Abloy Yale (Digital lock: `6591 8868`), Rheem (Electric water heater: `6872 2043`), Ferroli (Town gas heater: `9747 8743`), Fermax (Intercom & smart home: `6259 0700`), Metform (Letterbox lock: `6757 2822`), and TK Elevator (24/7 Lifts: `6890 1640`).
+    - `[ 🚪 Fittings & Finishes (8) ]`: Architectural & defect contractors for Hungsen Engineering (Windows & sliding doors), PD Door (Bi-fold doors), Slide & Hide (Pocket doors), Carera Bathroom (Sanitary ware & mixers), Jin Yuan (Shower screens), T.J. Seang (Timber flooring), Masonry Pte Ltd (Tiles), and King Hup Construction (Cabinetry & wardrobes).
+    - `[ ⚡ Utilities & Gas (2) ]`: SP Group (`1800-222-2333` / 24/7 electricity breakdown `1800-778-8888`) and City Energy (`1800-555-1661` / 24/7 gas emergency `1800-752-1800`), with move-in account opening advice.
+    - `[ ✉️ Draft Email to MA ]`: In-place ready-to-send email template with 1-tap copy block and back navigation.
 - **Interactive Mall & Deals Hub Suite (`menu_mall`)**:
   - Upgraded the Mall quick menu card with pro-tips (CS Fresh 8:30 PM sushi & bakery 20%–30% markdown hack).
   - Added 4 dedicated 1-tap interactive exploration sub-screens:

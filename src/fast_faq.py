@@ -193,7 +193,7 @@ FAQ_RULES = [
     # 13. Lift Faults, Health Check & Emergency Breakdown
     (
         re.compile(
-            r"\b(lift|lifts|elevator|elevators|tke|tk elevator)\b.*\b(issue|issues|fault|faults|breakdown|stuck|trap|trapped|jerk|jerky|sensor|slow|spoil|spoilt|broken|health check|not working)\b|\b(report|broken)\b.*\b(lift|elevator)\b",
+            r"\b(lift|lifts|elevator|elevators|tke|tk elevator)\b.*\b(issue|issues|fault|faults|breakdown|break\s*downs?|break\s*down|stuck|trap|trapped|jerk|jerky|sensor|slow|spoil|spoilt|broken|health check|not working)\b|\b(report|broken)\b.*\b(lift|elevator)\b",
             re.IGNORECASE,
         ),
         (
@@ -208,6 +208,29 @@ FAQ_RULES = [
             "3. *Brief description* of issue (e.g. jerky motion, levelling gap, delayed doors, unlit buttons)\n"
             "4. *Photo or video* (if available)\n\n"
             "Management compiles all reports directly with TKE for technical investigation."
+        ),
+        ["search_bylaws_and_handbook"],
+    ),
+    # 14. Electric Vehicle (EV) Charging Stations & Rates
+    (
+        re.compile(
+            r"\b(ev\s*charg\w*|electric vehicle|charge\s*car|ev\s*station|novowatt|watt\s*app)\b|\b(charge|charging)\b.*\b(ev|car|vehicle|mall|resident)\b",
+            re.IGNORECASE,
+        ),
+        (
+            "⚡ *Electric Vehicle (EV) Charging at Lentor Modern*\n\n"
+            "🚗 *1. Resident Carpark (Level 3 under Block 3):*\n"
+            "• *Exclusivity:* Strictly for Lentor Modern residents (behind barrier ramp).\n"
+            "• *Lots:* 5 dedicated EV lots.\n"
+            "• *Operator:* *Novowatt* (App: *Watt - EV Charging* | 24/7 Hotline: `+65 6537 7333`).\n"
+            "• *Charging Rate:* *~$0.50 / kWh* (pay-per-use; zero carpark hourly fees for resident vehicles).\n\n"
+            "🛒 *2. Mall Carpark (Basement 1, Lots 39–42):*\n"
+            "• *Access:* Open to *both residents and the public*.\n"
+            "• *Lots:* 4 AC charging lots.\n"
+            "• *Operator:* *SP Mobility* (billed via the *SP App*).\n"
+            "• *Charging Rate:* *~$0.75 – $0.81 / kWh* (SP Group EV tariff).\n"
+            "• *Carpark Fees:* Normal mall parking rates apply ($1.20 1st hr, $0.50/30m thereafter; 10-min free grace period).\n\n"
+            "💡 *Tip:* Level 3 Resident Carpark (~$0.50/kWh, no parking fees) is significantly cheaper than B1 Mall Carpark!"
         ),
         ["search_bylaws_and_handbook"],
     ),

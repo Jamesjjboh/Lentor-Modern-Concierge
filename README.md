@@ -2,7 +2,7 @@
 
 [![Google Cloud Run](https://img.shields.io/badge/Google_Cloud_Run-Serverless-4285F4?logo=google-cloud&logoColor=white)](https://cloud.google.com/run)
 [![Google Cloud Firestore](https://img.shields.io/badge/Google_Cloud_Firestore-Native_NoSQL-FFCA28?logo=firebase&logoColor=black)](https://cloud.google.com/firestore)
-[![Gemini 3.8 Flash](https://img.shields.io/badge/Gemini_3.8_Flash-Autonomous_Agent-8E75C2?logo=google&logoColor=white)](https://ai.google.dev/)
+[![Gemini 3.5 Flash Lite](https://img.shields.io/badge/Gemini_3.5_Flash_Lite-Autonomous_Agent-8E75C2?logo=google&logoColor=white)](https://ai.google.dev/)
 [![Telegram Bot API](https://img.shields.io/badge/Telegram_Bot_API-v22.8-26A5E4?logo=telegram&logoColor=white)](https://t.me/LMConciergeBot)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
@@ -32,11 +32,11 @@ flowchart TD
     end
 
     subgraph FastPath["Zero-Shot Fast FAQ (<5ms, Zero LLM Cost)"]
-        Webhook -->|"Top 10 High-Frequency Queries"| FastFAQ["Pre-Compiled Regex Index<br/>(src/fast_faq.py)"]
-        FastFAQ -->|"Instant Match (Gym, Pool, Reno, MRT, Paint)"| QuickReturn["Instant Verified Response (<5ms)"]
+        Webhook -->|"Top 18+ High-Frequency Queries"| FastFAQ["Pre-Compiled Regex Index<br/>(src/fast_faq.py)"]
+        FastFAQ -->|"Instant Match (Gym, Pool, Reno, MRT, Paint, EV, Lifts, Games Room)"| QuickReturn["Instant Verified Response (<5ms)"]
     end
 
-    subgraph AgentCore["Autonomous Agent Core (Gemini 3.8 Flash)"]
+    subgraph AgentCore["Autonomous Agent Core (Gemini 3.5 Flash Lite)"]
         FastFAQ -->|"Nuanced, Novel or Complex Queries"| Agent["Autonomous Tool Orchestrator<br/>(src/agent.py)"]
         Agent -->|"Multimodal Vision Analysis"| Vision["analyze_resident_image"]
         Agent -->|"Bylaws & Defect Hotlines"| Tool1["search_bylaws_and_handbook"]
@@ -94,7 +94,7 @@ flowchart TD
 * Iterates through all registered users in Firestore with safety rate-limiting (25 msgs/sec).
 
 ### 3. Product Analytics & Content Gaps (`/admin_stats [7|30|all]`)
-An instant, text-first dashboard (no chart rendering), with inline buttons `[ 7d ] [ 30d ] [ All ] [ 👥 User Activity ] [ 📋 Full gap list ] [ 🔄 Refresh ]`.
+An instant, text-first dashboard (no chart rendering), with inline buttons `[ 7d ] [ 30d ] [ All ] [ 👥 User Activity ] [ 🕒 Recent ] [ 📋 Full gap list ] [ 🔄 Refresh ]`.
 
 | Metric | Definition |
 | :--- | :--- |
@@ -103,6 +103,7 @@ An instant, text-first dashboard (no chart rendering), with inline buttons `[ 7d
 | **Adoption ≈** | Registered users ÷ 605 units. An approximation only (users, not households). |
 | **Questions asked** | Typed and photo questions in the window, showing total questions, active askers count & percentage, average questions per active user, and lurker count. |
 | **User Activity Breakdown** | 1-Tap sub-screen ranking residents by activity (questions asked in window, lifetime queries, quick-menu taps, and humanized relative active timestamps). |
+| **Recent Questions Stream** | 1-Tap `[ 🕒 Recent ]` sub-screen or `/recent [n]` command displaying the latest resident queries with user attribution, time elapsed, and matched retrieval tools. |
 | **Answer rate** | Share of questions the bot could answer, detected from the reply wording (e.g. "I don't have…", "No shops found…", "couldn't find…"), not just two fixed phrases. |
 | **Top topics** | Questions grouped by the tool used (handbook, mall, transit/estate profile, tips, etc.). |
 | **Quick-menu taps** | How often each `/menu` button is used. |
@@ -110,6 +111,7 @@ An instant, text-first dashboard (no chart rendering), with inline buttons `[ 7d
 | **Feedback** | Totals, new/unresolved count, breakdown by type (bug / data correction / feature request) and age of the oldest unresolved item. |
 
 * **Daily sparkline:** a 7-day question trend, e.g. `▁▃▅▂▇▄▂`.
+* **Recent questions stream (`/recent [n]`):** easily audit the latest questions asked by residents to spot immediate community concerns or missing handbook items.
 * **Conversational analytics (admin only):** just ask in chat, e.g. *"What did residents ask most this week?"*, *"Who are the most active users?"*, or *"How many questions did each user ask?"*. Gemini answers using only the verified aggregates (never raw resident messages) and cites exact numbers.
 
 ### 4. Multimodal Vision & Photo Ingestion
@@ -177,7 +179,7 @@ An instant, text-first dashboard (no chart rendering), with inline buttons `[ 7d
 | **Hosting** | Google Cloud Run (`asia-southeast1`) | **\$0.00** (Free Tier includes 2 million requests + 360,000 GiB-seconds / month; warm instance with 512MiB memory) |
 | **Database** | Google Cloud Firestore (Native Mode) | **\$0.00** (Uses <1% of 50k free reads/day) |
 | **Storage / Registry** | Google Artifact Registry | **\$0.00** (Automated cleanup keeps $\le 2$ builds, < 380 MB of 500 MB Free Tier) |
-| **AI Inference** | Google Gemini 3.8 Flash (with 3.5 / 3.1 fallback cascade) | **\$0.00** (Generous API tier) |
+| **AI Inference** | Google Gemini 3.5 Flash Lite (with 3.1 / 3.8 fallback cascade) | **\$0.00** (Generous API tier) |
 
 ### Automated Artifact Registry Cleanup Policy
 To ensure container images never trigger storage billing (avoiding historical build accumulation):

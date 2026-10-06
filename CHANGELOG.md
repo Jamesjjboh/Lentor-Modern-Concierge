@@ -7,6 +7,46 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [2.0.0] - 2026-10-06
+
+### Added
+- **Interactive Recent Questions Engine & Admin Command (`/recent [n]`)**:
+  - Added dedicated `/recent [n]` command for estate administrators to inspect the latest $N$ (default 10) resident queries with user attribution, relative timestamps, and matched retrieval tools.
+  - Added interactive `[ 🕒 Recent ]` button to the `/admin_stats` dashboard with instant 1-tap switching and dynamic time-range filter retention.
+- **Electric Vehicle (EV) Charging Knowledge & Fast FAQ Rule**:
+  - Ingested verified specifications for both charging hubs at Lentor Modern:
+    - **L3 Resident Carpark:** 5 dedicated lots operated by **Novowatt** via *Watt - EV Charging* app at **~$0.50/kWh** (zero parking fees for residents).
+    - **B1 Mall Carpark (Lots 39–42):** 4 public AC lots operated by **SP Mobility** via *SP App* at **~$0.75–$0.81/kWh** (standard mall parking charges apply).
+  - Added zero-shot regex pattern to return instant comparison answers in under 5ms.
+- **Clubhouse Games Room & Sports Amenities**:
+  - Documented Level 4 Clubhouse Games Room facilities (beside the Dance Studio), open until 10:00 PM daily.
+  - Added details for the multi-function convertible table (**Table Tennis / Ping Pong** and **Pool / Billiard** table) and electronic dart board, bookable via the *iPlus Living* mobile app.
+- **TK Elevator (TKE) Protocol & Lift Emergency Hotline**:
+  - Documented 24/7 emergency lift rescue hotline (`+65 6890 1640`).
+  - Added 4-point fault reporting guidelines (tower/lift ID, date/time, issue description, photo/video) for residents reporting issues to the Management Office (`managementoffice@LT-MODERN.COM`).
+  - Recorded completed estate-wide lift health checks and ongoing TKE rectifications.
+- **Comprehensive Defect Liability Period (DLP) Dual Timelines**:
+  - Clarified dual DLP boundaries:
+    - **Individual Unit DLP:** Strictly 12 months from individual Key Collection / Notice of Vacant Possession (NVP) date via *Novade Quality*.
+    - **Development & Common Property DLP:** **25 February 2027** (confirmed in writing by CBRE Management Office) covering facade, lifts, pools, and landscape decks.
+- **Bylaws on Smoking & High-Rise Littering**:
+  - Ingested strict NEA Environmental Public Health Act (EPHA) statutory presumption rules ($2,000 / $4,000 / $10,000 court fines + Corrective Work Orders) for high-rise cigarette butt and litter tossing.
+- **Minor DIY Drilling vs Formal Renovation**:
+  - Clarified that minor DIY drilling inside units (pictures, mirrors, TV wall mounts) does *not* require an MCST Form 2.0 permit or deposit, while strictly enforcing noisy work hours (Mon–Fri 9am–5pm, Sat 9am–1pm, no Sun/PH).
+- **Physical Concierge Desk Counter Hours**:
+  - Updated physical counter hours to **9:00 AM – 8:00 PM daily** (+65 6054 3375), with after-hours security handover to 24/7 Security Control (+65 6054 3379).
+- **Expanded Fast FAQ Index**:
+  - Expanded zero-shot index to 18+ high-frequency rules covering EV charging, Games Room / Table Tennis, Lifts, Smoking/Littering, Minor Drilling, Security Hotlines, and DLP dates.
+
+### Fixed & Improved
+- **Telegram Markdown Entity Sanitization & Plain Text Fallback**:
+  - Sanitized markdown entity formatting (`_md()`) in admin dashboards and recent question cards to prevent Telegram API `Bad Request: can't parse entities` errors caused by raw underscores in usernames (e.g., `@daryl_trj`).
+  - Implemented automatic plain-text fallback on error to guarantee delivery under all conditions.
+- **Model Engine Upgrade & Documentation Alignment**:
+  - Standardized autonomous orchestrator model configuration on `gemini-3.5-flash-lite` for ultra-low latency (<2s) and high reliability.
+
+---
+
 ## [1.9.0] - 2026-10-05
 
 ### Added

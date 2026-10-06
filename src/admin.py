@@ -504,6 +504,8 @@ async def handle_stats_callback(update: Update, context: ContextTypes.DEFAULT_TY
         text = analytics.format_gaps(stats)
     elif view == "users":
         text = analytics.format_user_activity(stats)
+    elif view == "recent":
+        text = analytics.format_recent_queries(stats)
     else:
         text = analytics.format_dashboard(stats)
 
@@ -516,3 +518,25 @@ async def handle_stats_callback(update: Update, context: ContextTypes.DEFAULT_TY
     except BadRequest as e:
         if "not modified" not in str(e).lower():
             logger.error(f"Failed to update stats dashboard: {e}")
+
+
+async def handle_recent_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Admin command `/recent [count]` to instantly display the most recent resident questions."""
+    user = update.effective_user
+    if not user or not is_admin(user.id):
+        if update.message:
+            await update.message.reply_text("⛔ This command is restricted to estate administrators.")
+        return
+
+    limit = 15
+    if context.args and context.args[0].isdigit():
+        limit = min(50, max(1, int(context.args[0])))
+
+    stats = db_client.get_analytics_summary(days=None)
+    text = analytics.format_recent_queries(stats, limit=limit)
+    if update.message:
+        await update.message.reply_text(
+            text,
+            reply_markup=analytics.stats_keyboard(days=None, current_view="recent"),
+            parse_mode="Markdown",
+        )

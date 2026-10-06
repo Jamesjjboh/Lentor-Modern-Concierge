@@ -232,6 +232,40 @@ def compute_analytics(
     if ages:
         oldest_days = max(ages)
 
+    # --- Recent Queries List ---
+    # Store user lookup dict for rich resident attribution
+    user_map = {}
+    for u in users:
+        uid = str(u.get("user_id", "")).strip()
+        if uid:
+            user_map[uid] = u
+
+    # Build chronological list of recent non-menu queries
+    recent_query_list: List[Dict[str, Any]] = []
+    # Sort all query logs in window by timestamp descending
+    sorted_q_logs = sorted(
+        query_logs,
+        key=lambda l: _parse_ts(l.get("timestamp")) or datetime.min.replace(tzinfo=timezone.utc),
+        reverse=True,
+    )
+    for l in sorted_q_logs:
+        uid = str(l.get("user_id", "")).strip()
+        u_info = user_map.get(uid, {})
+        disp_name = u_info.get("first_name") or u_info.get("username") or (f"Resident {uid[:6]}" if uid else "Anonymous")
+        uname = f"@{u_info['username']}" if u_info.get("username") else ""
+        ts_val = l.get("timestamp")
+        recent_query_list.append({
+            "user_id": uid,
+            "display_name": disp_name,
+            "username": uname,
+            "query": str(l.get("user_query", "")).strip(),
+            "timestamp": ts_val,
+            "timestamp_dt": _parse_ts(ts_val),
+            "answered_successfully": l.get("answered_successfully", True),
+            "tools_called": l.get("tools_called", []),
+            "agent_response": l.get("agent_response", ""),
+        })
+
     return {
         "days": days,
         "registered_users": registered,
@@ -253,6 +287,7 @@ def compute_analytics(
         "feedback_by_status": dict(fb_by_status),
         "feedback_oldest_unresolved_days": oldest_days,
         "user_activity": user_activity_list,
+        "recent_queries": recent_query_list,
         "active_askers": active_askers,
         "lurkers": lurkers,
         "avg_queries_per_asker": avg_queries_per_asker,
@@ -446,6 +481,38 @@ def format_gaps(s: Dict[str, Any]) -> str:
     return "\n".join(lines)
 
 
+def format_recent_queries(s: Dict[str, Any], limit: int = 12, now: Optional[datetime] = None) -> str:
+    """Renders the most recent resident natural language questions for the chosen window."""
+    now = now or datetime.now(timezone.utc)
+    days = s.get("days")
+    lines = [f"🕒 *Recent Resident Questions* — {window_label(days)}", ""]
+
+    recent_queries = s.get("recent_queries", [])
+    if not recent_queries:
+        lines.append("No resident questions recorded in this window.")
+    else:
+        for i, q_item in enumerate(recent_queries[:limit], 1):
+            name = _md(q_item["display_name"])
+            handle = f" ({q_item['username']})" if q_item["username"] else ""
+            uid = q_item["user_id"]
+            q_text = _md(q_item["query"])
+            rel_time = format_relative_time(q_item.get("timestamp_dt"), now)
+            status_icon = "✅" if q_item.get("answered_successfully", True) else "⚠️"
+
+            lines.append(f"*{i}.* \"{q_text}\"")
+            lines.append(f"   • {status_icon} From *{name}*{handle} (`{uid}`) · {rel_time}")
+
+        if len(recent_queries) > limit:
+            remaining = len(recent_queries) - limit
+            lines.append(f"\n_... and {remaining} more question{'s' if remaining != 1 else ''}_")
+
+    lines += [
+        "",
+        "💡 *Tip:* Use `/reply <user_id> <message>` to follow up directly with a resident.",
+    ]
+    return "\n".join(lines)
+
+
 def stats_keyboard(days: Optional[int], current_view: str = "dash") -> InlineKeyboardMarkup:
     """Returns interactive keyboard for navigating analytics timeframes and sub-screens."""
     def label(text: str, d: Optional[int]) -> str:
@@ -459,21 +526,18 @@ def stats_keyboard(days: Optional[int], current_view: str = "dash") -> InlineKey
         InlineKeyboardButton(label("All", None), callback_data=f"stats_{current_view}_all"),
     ]
 
-    if current_view == "users":
-        action_row = [
-            InlineKeyboardButton("📊 Dashboard", callback_data=f"stats_dash_{d_str}"),
-            InlineKeyboardButton("📋 Full gap list", callback_data=f"stats_gaps_{d_str}"),
-        ]
-    elif current_view == "gaps":
-        action_row = [
-            InlineKeyboardButton("📊 Dashboard", callback_data=f"stats_dash_{d_str}"),
-            InlineKeyboardButton("👥 User Activity", callback_data=f"stats_users_{d_str}"),
-        ]
-    else:  # dash
-        action_row = [
-            InlineKeyboardButton("👥 User Activity", callback_data=f"stats_users_{d_str}"),
-            InlineKeyboardButton("📋 Full gap list", callback_data=f"stats_gaps_{d_str}"),
-        ]
+    # Action navigation rows
+    nav_buttons = [
+        ("📊 Dashboard", "dash"),
+        ("🕒 Recent", "recent"),
+        ("👥 Users", "users"),
+        ("📋 Gaps", "gaps"),
+    ]
+    action_row = [
+        InlineKeyboardButton(text, callback_data=f"stats_{view}_{d_str}")
+        for text, view in nav_buttons
+        if view != current_view
+    ]
 
     return InlineKeyboardMarkup(
         [

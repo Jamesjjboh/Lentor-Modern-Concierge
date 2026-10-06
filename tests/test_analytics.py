@@ -168,6 +168,35 @@ class TestAnalytics(unittest.TestCase):
         self.assertEqual(analytics.format_relative_time(NOW - timedelta(days=4), now=NOW), "4d ago")
         self.assertEqual(analytics.format_relative_time(None, now=NOW), "unknown")
 
+    def test_recent_queries_extraction_and_formatting(self):
+        s = analytics.compute_analytics(USERS, LOGS, FEEDBACK, days=7, now=NOW)
+        self.assertIn("recent_queries", s)
+        self.assertEqual(len(s["recent_queries"]), 4)  # 4 non-menu queries within 7d
+        # Check chronological ordering: newest first (Where is the gym? at 0.2d ago)
+        first_q = s["recent_queries"][0]
+        self.assertEqual(first_q["query"], "Where is the gym?")
+        self.assertEqual(first_q["display_name"], "James")
+        self.assertEqual(first_q["username"], "@jamesjjboh")
+        self.assertTrue(first_q["answered_successfully"])
+
+        text = analytics.format_recent_queries(s, limit=10, now=NOW)
+        self.assertIn("Recent Resident Questions", text)
+        self.assertIn("Where is the gym?", text)
+        self.assertIn("From *James* (@jamesjjboh)", text)
+        self.assertIn("Is there a pet salon?", text)
+
+    def test_stats_keyboard_and_callback_parsing(self):
+        kb_dash = analytics.stats_keyboard(days=7, current_view="dash")
+        self.assertTrue(any("Recent" in btn.text for row in kb_dash.inline_keyboard for btn in row))
+
+        view, days = analytics.parse_stats_callback("stats_recent_7")
+        self.assertEqual(view, "recent")
+        self.assertEqual(days, 7)
+
+        view_all, days_all = analytics.parse_stats_callback("stats_recent_all")
+        self.assertEqual(view_all, "recent")
+        self.assertIsNone(days_all)
+
 
 if __name__ == "__main__":
     unittest.main()

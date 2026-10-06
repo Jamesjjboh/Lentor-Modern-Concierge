@@ -28,6 +28,7 @@ from src.admin import (
     handle_feedback_callback,
     handle_flagged_command,
     handle_moderation_callback,
+    handle_recent_command,
     handle_reply_command,
     handle_stats_callback,
     is_admin,
@@ -1416,6 +1417,7 @@ def create_bot_app() -> Application:
         if ADMIN_TELEGRAM_ID:
             admin_commands = resident_commands + [
                 BotCommand("admin_stats", "View usage analytics dashboard"),
+                BotCommand("recent", "View recent resident questions: /recent [n]"),
                 BotCommand("flagged", "View flagged inaccurate answers"),
                 BotCommand("reply", "Reply directly to a resident: /reply <uid> <msg>"),
                 BotCommand("broadcast", "Send announcement: /broadcast <msg>"),
@@ -1449,6 +1451,7 @@ def create_bot_app() -> Application:
     app.add_handler(CommandHandler("reply", handle_reply_command))
     app.add_handler(CommandHandler("broadcast", handle_broadcast_command))
     app.add_handler(CommandHandler("admin_stats", handle_admin_stats_command))
+    app.add_handler(CommandHandler("recent", handle_recent_command))
     app.add_handler(CommandHandler("flagged", handle_flagged_command))
 
     # Callback handler for resident interactive 1-tap quick action menu

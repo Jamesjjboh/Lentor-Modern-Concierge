@@ -516,8 +516,16 @@ async def handle_stats_callback(update: Update, context: ContextTypes.DEFAULT_TY
             parse_mode="Markdown",
         )
     except BadRequest as e:
-        if "not modified" not in str(e).lower():
-            logger.error(f"Failed to update stats dashboard: {e}")
+        if "not modified" in str(e).lower():
+            return
+        logger.warning(f"Failed to update stats dashboard with Markdown ({e}); retrying with plain text")
+        try:
+            await query.edit_message_text(
+                text,
+                reply_markup=analytics.stats_keyboard(days, current_view=view),
+            )
+        except Exception as retry_err:
+            logger.error(f"Failed to update stats dashboard even with plain text: {retry_err}")
 
 
 async def handle_recent_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -535,8 +543,15 @@ async def handle_recent_command(update: Update, context: ContextTypes.DEFAULT_TY
     stats = db_client.get_analytics_summary(days=None)
     text = analytics.format_recent_queries(stats, limit=limit)
     if update.message:
-        await update.message.reply_text(
-            text,
-            reply_markup=analytics.stats_keyboard(days=None, current_view="recent"),
-            parse_mode="Markdown",
-        )
+        try:
+            await update.message.reply_text(
+                text,
+                reply_markup=analytics.stats_keyboard(days=None, current_view="recent"),
+                parse_mode="Markdown",
+            )
+        except Exception as e:
+            logger.warning(f"Failed to send /recent with Markdown ({e}); falling back to plain text")
+            await update.message.reply_text(
+                text,
+                reply_markup=analytics.stats_keyboard(days=None, current_view="recent"),
+            )

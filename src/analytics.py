@@ -444,13 +444,15 @@ def format_user_activity(s: Dict[str, Any], now: Optional[datetime] = None) -> s
         TOP_LIMIT = 15
         for i, u in enumerate(users[:TOP_LIMIT], 1):
             name = _md(u["display_name"])
-            handle = f" ({u['username']})" if u["username"] != "no @username" else ""
+            raw_uname = _md(u["username"]) if u["username"] != "no @username" else ""
+            handle = f" ({raw_uname})" if raw_uname else ""
+            uid = u["user_id"]
             q_win = u["queries_window"]
             q_life = u["total_queries_lifetime"]
             m_win = u["menu_taps_window"]
             rel_time = format_relative_time(u.get("last_active_dt"), now)
 
-            lines.append(f"*{i}. {name}*{handle} (`{u['user_id']}`)")
+            lines.append(f"*{i}. {name}*{handle} (`{uid}`)")
             activity_parts = [f"Questions: *{q_win}* (lifetime: {q_life})"]
             if m_win > 0:
                 activity_parts.append(f"Menu taps: *{m_win}*")
@@ -493,7 +495,8 @@ def format_recent_queries(s: Dict[str, Any], limit: int = 12, now: Optional[date
     else:
         for i, q_item in enumerate(recent_queries[:limit], 1):
             name = _md(q_item["display_name"])
-            handle = f" ({q_item['username']})" if q_item["username"] else ""
+            raw_uname = _md(q_item["username"]) if q_item.get("username") else ""
+            handle = f" ({raw_uname})" if raw_uname else ""
             uid = q_item["user_id"]
             q_text = _md(q_item["query"])
             rel_time = format_relative_time(q_item.get("timestamp_dt"), now)

@@ -50,12 +50,30 @@ FAQ_RULES = [
     ),
     # 3. Tennis Court Booking & Hours
     (
-        re.compile(r"\b(tennis|tennis court)\b.*\b(hours?|book|booking|open|timing|cost|fee)\b|\b(how to book|reserve).*\b(tennis)\b", re.IGNORECASE),
+        re.compile(r"\b(tennis court)\b|\btennis\b.*\b(hours?|book|booking|open|timing|cost|fee)\b|\b(how to book|reserve).*\btennis\b", re.IGNORECASE),
         (
             "🎾 *Tennis Court (Level 4)*\n\n"
             "• *Operating Hours:* *8:00 AM – 10:00 PM daily*\n"
             "• *Booking:* Reserve via the *iPlus Living* mobile app (up to 14 days in advance, 1 peak slot/week per unit).\n"
             "• Strictly non-marking tennis court shoes required."
+        ),
+        ["search_bylaws_and_handbook"],
+    ),
+    # 4. Games Room, Table Tennis, Pool Table & Darts
+    (
+        re.compile(
+            r"\b(table tennis|ping\s*pong|games? room|darts?|pool table|billiard)\b",
+            re.IGNORECASE,
+        ),
+        (
+            "🎯 *Games Room & Amenities (Level 4 Clubhouse)*\n\n"
+            "• *Location:* Level 4 Clubhouse (located right beside the Dance Studio).\n"
+            "• *Operating Hours:* *Until 10:00 PM daily*.\n\n"
+            "🏓 *What is available inside:*\n"
+            "• *Multi-Function Convertible Table:* Functions as both a *Table Tennis (Ping Pong)* table and a *Pool / Billiard* table!\n"
+            "• *Electronic Dart Board:* Available for residents.\n"
+            "• *Dance Studio:* Located adjacent to the Games Room with wall mirrors for dance and yoga.\n\n"
+            "📱 *Booking:* Reserve your slot via the *iPlus Living* mobile app under Facility Booking."
         ),
         ["search_bylaws_and_handbook"],
     ),

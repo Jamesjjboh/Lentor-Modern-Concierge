@@ -179,18 +179,39 @@ FAQ_RULES = [
         ),
         (
             "🛠️ *Lentor Modern Defect Liability Period (DLP)*\n\n"
-            "• *DLP Duration:* Strictly *12 months from your individual Key Collection / Notice of Vacant Possession (NVP) date*.\n"
-            "• *How to Check Your Exact End Date:* Because units were handed over in phases, each unit's DLP ends on a different date. Please check your exact DLP expiry date directly inside the *Novade Quality app*, or confirm with your assigned *Block Manager / Customer Service Officer (CSO)*.\n"
-            "• *Developer Obligation:* Under the BCA Standard Sale & Purchase Agreement, the developer (GuocoLand) and main contractor (Lian Beng Construction) are legally required to rectify defects in materials and workmanship at their cost within 30 days of notification.\n\n"
+            "• *Individual Unit DLP:* Strictly *12 months from your individual Key Collection / Notice of Vacant Possession (NVP) date* under the BCA S&P Agreement.\n"
+            "  _(Check your exact unit expiry date inside the *Novade Quality* app or confirm with your Block Manager)_\n\n"
+            "• *Development & Common Property DLP:* *25 February 2027* _(Confirmed by CBRE Management Office)_\n"
+            "  _(Covers external wall façade, corridors, swimming pools, clubhouse, landscape deck, and lifts)_\n\n"
             "📱 *How to Report Defects:*\n"
-            "1. Lodge defect items with clear photos via the *Novade Quality* mobile app.\n"
-            "2. Your assigned Customer Service Officer (CSO) will schedule a joint inspection walkthrough.\n"
-            "3. Sign off on the app once rectifications are satisfactorily verified.\n\n"
-            "⚠️ *Important Notice:* Ensure all unit defects are submitted on Novade before your individual 12-month DLP expires. For common property defects (e.g. corridors, swimming pool, lifts), report immediately to the Management Office (CBRE: `+65 6054 3370` / `managementoffice@LT-MODERN.COM`) so repairs are charged to the developer before handover warranty expires."
+            "1. *Unit Defects:* Lodge items with clear photos via the *Novade Quality* mobile app.\n"
+            "2. *Common Property Defects:* Report promptly to the Management Office (CBRE: `+65 6054 3370` / `managementoffice@LT-MODERN.COM`) before 25 Feb 2027 so repairs are billed to the developer.\n\n"
+            "• *Developer Obligation:* Under BCA standard contract, the developer (GuocoLand) and main contractor (Lian Beng) are required to rectify defects at their cost within 30 days of notice."
         ),
         ["search_bylaws_and_handbook", "search_estate_profile"],
     ),
-    # 13. Security Control Room, Guardhouse & Management Contacts
+    # 13. Lift Faults, Health Check & Emergency Breakdown
+    (
+        re.compile(
+            r"\b(lift|lifts|elevator|elevators|tke|tk elevator)\b.*\b(issue|issues|fault|faults|breakdown|stuck|trap|trapped|jerk|jerky|sensor|slow|spoil|spoilt|broken|health check|not working)\b|\b(report|broken)\b.*\b(lift|elevator)\b",
+            re.IGNORECASE,
+        ),
+        (
+            "🛗 *Lift Issues & Fault Reporting (TK Elevator / TKE)*\n\n"
+            "• *24/7 Emergency Lift Rescue:* `+65 6890 1640`\n"
+            "  _(TK Elevator emergency hotline if someone is trapped or urgent breakdown)_\n\n"
+            "• *Ongoing Rectifications:* Management completed a comprehensive lift health check across all towers, and TKE is conducting ongoing rectifications.\n\n"
+            "📋 *How to Report Lift Faults to Management:*\n"
+            "Send an email to `managementoffice@LT-MODERN.COM` or call `+65 6054 3370` with these *4 details*:\n"
+            "1. *Tower & lift identification* (e.g. Tower 3 Passenger Lift 1, Service Lift)\n"
+            "2. *Date & time* of the incident\n"
+            "3. *Brief description* of issue (e.g. jerky motion, levelling gap, delayed doors, unlit buttons)\n"
+            "4. *Photo or video* (if available)\n\n"
+            "Management compiles all reports directly with TKE for technical investigation."
+        ),
+        ["search_bylaws_and_handbook"],
+    ),
+    # 14. Security Control Room, Guardhouse & Management Contacts
     (
         re.compile(
             r"\b(security numbers?|guard\s*house numbers?|guardhouse|security control|security hotline|call security)\b|\b(what is|how to call|phone number of|contact for|number of|number for)\b.*\b(security|guardhouse|guard house)\b",

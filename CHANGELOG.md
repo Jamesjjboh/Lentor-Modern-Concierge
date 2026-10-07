@@ -9,6 +9,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [2.0.1] - 2026-10-07
 
+- **Admin Analytics Quick Menu Summation & Total Interactions**:
+  - **Quick Menu Summation:** Added summation total `(Total: *X*)` for quick menu taps alongside individual button tap counts in `/admin_stats`.
+  - **Total Interactions (Combined):** Added grand total calculation `Total interactions: *Y* (*A* questions + *B* menu taps)` to measure holistic resident usage across both conversational AI queries and quick menus.
+  - **Conversational Analytics Integration:** Fed total interactions and quick menu summation into `summary_for_llm` so admin conversational Q&A queries (e.g. *"What was total bot engagement this week?"*) cite exact combined numbers.
+- **Engagement & Growth Over Time Engine (`/growth [7|30|all]` & `[ 📈 Growth ]`)**:
+  - **Hourly Traffic Distribution:** Added 24-hour analysis bucketed into Morning (6am–12pm), Afternoon (12pm–6pm), Evening (6pm–12am), and Late Night (12am–6am), displaying percentage shares and identifying the estate's peak traffic hour.
+  - **Daily Activity Breakdown:** Day-by-day table tracking questions asked, quick menu taps, combined total interactions, and net new resident signups.
+  - **Week-on-Week (WoW) Comparison:** Automatically compares current 7-day activity against previous weeks with percentage growth deltas (`+X% 🟢` / `-X% 🔴`).
+  - **Interactive Navigation:** Integrated `[ 📈 Growth ]` button into `/admin_stats` dynamic keyboard and added dedicated `/growth` shortcut command.
 - **Business Lounge & Co-Working Space / Meeting Room Updates**:
   - **Zero-Shot Fast FAQ Rule:** Added instant (<5ms) rule matching co-working space, business lounge, meeting room bookings, quiet study corners, and work booths.
   - **🏊 Facilities & Gym (`menu_facilities`):** Added the Level 4 Grand Clubhouse **Business Lounge & Co-Working Space** (private hot-desking acoustic work booths, window counters, charging ports; open 6:00 AM – 10:00 PM) and quiet work corners at Level 14 Sky Club.

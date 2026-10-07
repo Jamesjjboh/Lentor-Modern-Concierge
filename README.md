@@ -93,26 +93,29 @@ flowchart TD
 * Admin command: `/broadcast 📢 Lift maintenance for Tower 1 tomorrow from 10am to 12pm.`
 * Iterates through all registered users in Firestore with safety rate-limiting (25 msgs/sec).
 
-### 3. Product Analytics & Content Gaps (`/admin_stats [7|30|all]`)
-An instant, text-first dashboard (no chart rendering), with inline buttons `[ 7d ] [ 30d ] [ All ] [ 👥 User Activity ] [ 🕒 Recent ] [ 📋 Full gap list ] [ 🔄 Refresh ]`.
+### 3. Product Analytics, Growth & Content Gaps (`/admin_stats [7|30|all]` & `/growth`)
+An instant, text-first dashboard (no chart rendering), with inline buttons `[ 7d ] [ 30d ] [ All ] [ 📈 Growth ] [ 🕒 Recent ] [ 👥 Users ] [ 📋 Gaps ] [ 🔄 Refresh ]`.
 
 | Metric | Definition |
 | :--- | :--- |
 | **Registered users** | Unique Telegram accounts that have started or messaged the bot. This is **not** a household count: one home may have several users, and no unit numbers are collected (privacy by design). |
 | **New / Active 7d / Active 30d** | Users first seen in the window, and users active in the last 7 / 30 days. |
 | **Adoption ≈** | Registered users ÷ 605 units. An approximation only (users, not households). |
+| **Total Interactions** | Combined resident usage summing **Questions Asked + Quick-Menu Taps** in the selected window. |
 | **Questions asked** | Typed and photo questions in the window, showing total questions, active askers count & percentage, average questions per active user, and lurker count. |
-| **User Activity Breakdown** | 1-Tap sub-screen ranking residents by activity (questions asked in window, lifetime queries, quick-menu taps, and humanized relative active timestamps). |
+| **Quick-menu taps** | Summation total of all `/menu` button presses alongside individual button counts (Transit, Facilities, Contacts, etc.). |
+| **Growth & Traffic Engine (`/growth`)** | 1-Tap `[ 📈 Growth ]` sub-screen displaying **Hourly Traffic Distribution** (Morning/Afternoon/Evening/Late Night peak hours in SGT), **Daily Activity Breakdown**, and **Week-on-Week (WoW)** percentage engagement deltas. |
+| **User Activity Breakdown** | 1-Tap `[ 👥 Users ]` sub-screen ranking residents by activity (questions asked in window, lifetime queries, quick-menu taps, and humanized relative active timestamps). |
 | **Recent Questions Stream** | 1-Tap `[ 🕒 Recent ]` sub-screen or `/recent [n]` command displaying the latest resident queries with user attribution, time elapsed, and matched retrieval tools. |
 | **Answer rate** | Share of questions the bot could answer, detected from the reply wording (e.g. "I don't have…", "No shops found…", "couldn't find…"), not just two fixed phrases. |
 | **Top topics** | Questions grouped by the tool used (handbook, mall, transit/estate profile, tips, etc.). |
-| **Quick-menu taps** | How often each `/menu` button is used. |
 | **Content gaps** | Unanswered questions, de-duplicated and ranked by how often they were asked (`"Is there a pet salon?" ×7`). |
 | **Feedback** | Totals, new/unresolved count, breakdown by type (bug / data correction / feature request) and age of the oldest unresolved item. |
 
 * **Daily sparkline:** a 7-day question trend, e.g. `▁▃▅▂▇▄▂`.
+* **Growth engine (`/growth [7|30|all]`):** track hourly peak times and week-on-week adoption trends to optimize estate notices and identify when residents most frequently seek assistance.
 * **Recent questions stream (`/recent [n]`):** easily audit the latest questions asked by residents to spot immediate community concerns or missing handbook items.
-* **Conversational analytics (admin only):** just ask in chat, e.g. *"What did residents ask most this week?"*, *"Who are the most active users?"*, or *"How many questions did each user ask?"*. Gemini answers using only the verified aggregates (never raw resident messages) and cites exact numbers.
+* **Conversational analytics (admin only):** just ask in chat, e.g. *"What was total bot engagement this week?"*, *"Who are the most active users?"*, or *"How many questions did each user ask?"*. Gemini answers using only the verified aggregates (never raw resident messages) and cites exact numbers.
 
 ### 4. Multimodal Vision & Photo Ingestion
 * Residents can snap photos of mall flyers, opening hours notices, or appliance error codes directly in Telegram without typing.

@@ -506,6 +506,8 @@ async def handle_stats_callback(update: Update, context: ContextTypes.DEFAULT_TY
         text = analytics.format_user_activity(stats)
     elif view == "recent":
         text = analytics.format_recent_queries(stats)
+    elif view == "growth":
+        text = analytics.format_growth(stats)
     else:
         text = analytics.format_dashboard(stats)
 
@@ -554,4 +556,37 @@ async def handle_recent_command(update: Update, context: ContextTypes.DEFAULT_TY
             await update.message.reply_text(
                 text,
                 reply_markup=analytics.stats_keyboard(days=None, current_view="recent"),
+            )
+
+
+async def handle_growth_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Admin command `/growth [7|30|all]` showing engagement and growth trends (hourly, daily, weekly)."""
+    user = update.effective_user
+    if not user or not is_admin(user.id):
+        if update.message:
+            await update.message.reply_text("⛔ This command is restricted to estate administrators.")
+        return
+
+    days: Optional[int] = 7
+    if context.args:
+        arg = context.args[0].lower().rstrip("d")
+        if arg == "all":
+            days = None
+        elif arg.isdigit() and int(arg) > 0:
+            days = int(arg)
+
+    stats = db_client.get_analytics_summary(days=days)
+    text = analytics.format_growth(stats)
+    if update.message:
+        try:
+            await update.message.reply_text(
+                text,
+                reply_markup=analytics.stats_keyboard(days=days, current_view="growth"),
+                parse_mode="Markdown",
+            )
+        except Exception as e:
+            logger.warning(f"Failed to send /growth with Markdown ({e}); falling back to plain text")
+            await update.message.reply_text(
+                text,
+                reply_markup=analytics.stats_keyboard(days=days, current_view="growth"),
             )

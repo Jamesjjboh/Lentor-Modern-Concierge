@@ -162,7 +162,88 @@ def compute_analytics(
     queries_by_day = [(d, daily.get(d, 0)) for d in day_keys]
 
     total_queries = len(query_logs)
+    total_menu_taps = len(menu_logs)
+    total_interactions = total_queries + total_menu_taps
     answer_rate = (1 - len(unanswered_logs) / total_queries) if total_queries else None
+
+    # --- Growth Trends Analysis (Hourly, Daily, Weekly) ---
+    # 1. Hourly Distribution in SGT (0..23) for all interactions in window
+    hourly_distribution = [0] * 24
+    for l in window_logs:
+        dt = _parse_ts(l.get("timestamp"))
+        if dt:
+            h = dt.astimezone(SGT).hour
+            hourly_distribution[h] += 1
+
+    # 2. Daily breakdown table in window (oldest -> newest, max 14 days)
+    # Determine days to display: if days is specified, up to that many days (capped at 14 for compact card);
+    # if days is None (all time), show the last 14 days
+    display_days_count = min(days, 14) if days is not None else 14
+    growth_day_keys = [today - timedelta(days=i) for i in range(display_days_count - 1, -1, -1)]
+
+    daily_q = Counter()
+    daily_m = Counter()
+    for l in logs:
+        dt = _parse_ts(l.get("timestamp"))
+        if not dt:
+            continue
+        d = dt.astimezone(SGT).date()
+        if str(l.get("user_query", "")).startswith(MENU_PREFIX):
+            daily_m[d] += 1
+        else:
+            daily_q[d] += 1
+
+    daily_new_users = Counter()
+    for u in users:
+        dt = _parse_ts(u.get("first_seen"))
+        if dt:
+            daily_new_users[dt.astimezone(SGT).date()] += 1
+
+    daily_growth_table = []
+    for d in growth_day_keys:
+        q_cnt = daily_q.get(d, 0)
+        m_cnt = daily_m.get(d, 0)
+        u_cnt = daily_new_users.get(d, 0)
+        daily_growth_table.append({
+            "date": d,
+            "queries": q_cnt,
+            "menu_taps": m_cnt,
+            "total": q_cnt + m_cnt,
+            "new_users": u_cnt,
+        })
+
+    # 3. Weekly (Week-on-Week) Breakdown
+    # Compare:
+    # - Current week (last 7 days: [now-7d, now])
+    # - Previous week ([now-14d, now-7d))
+    # - 2 weeks ago ([now-21d, now-14d))
+    def count_week_activity(start_dt: datetime, end_dt: datetime):
+        w_queries = 0
+        w_menu = 0
+        for l in logs:
+            dt = _parse_ts(l.get("timestamp"))
+            if dt and start_dt <= dt < end_dt:
+                if str(l.get("user_query", "")).startswith(MENU_PREFIX):
+                    w_menu += 1
+                else:
+                    w_queries += 1
+        w_users = sum(1 for u in users if (_parse_ts(u.get("first_seen")) and start_dt <= _parse_ts(u.get("first_seen")) < end_dt))
+        return {
+            "queries": w_queries,
+            "menu_taps": w_menu,
+            "total": w_queries + w_menu,
+            "new_users": w_users,
+        }
+
+    w_curr = count_week_activity(now - timedelta(days=7), now)
+    w_prev = count_week_activity(now - timedelta(days=14), now - timedelta(days=7))
+    w_prev2 = count_week_activity(now - timedelta(days=21), now - timedelta(days=14))
+
+    weekly_growth = {
+        "current_week": w_curr,
+        "prev_week": w_prev,
+        "two_weeks_ago": w_prev2,
+    }
 
     # --- Per-User Activity Breakdown ---
     user_queries_counter = Counter(str(l.get("user_id", "")).strip() for l in query_logs if l.get("user_id"))
@@ -275,6 +356,11 @@ def compute_analytics(
         "adoption_pct": registered / TOTAL_UNITS,
         "total_units": TOTAL_UNITS,
         "total_queries": total_queries,
+        "total_menu_taps": total_menu_taps,
+        "total_interactions": total_interactions,
+        "hourly_distribution": hourly_distribution,
+        "daily_growth_table": daily_growth_table,
+        "weekly_growth": weekly_growth,
         "answer_rate": answer_rate,
         "queries_by_day": queries_by_day,
         "topic_counts": topic_counts.most_common(),
@@ -347,9 +433,14 @@ def format_dashboard(s: Dict[str, Any]) -> str:
     lurkers = s.get("lurkers", 0)
     avg_per_asker = s.get("avg_queries_per_asker", 0.0)
     asker_summary = f" by *{active_askers}* of *{registered}* users (avg {avg_per_asker:.1f}/asker) · *{lurkers}* lurker{'s' if lurkers != 1 else ''}" if registered > 0 else ""
+    total_q = s.get("total_queries", 0)
+    total_m = s.get("total_menu_taps", 0)
+    total_inter = s.get("total_interactions", total_q + total_m)
+
     lines += [
-        "💬 *Questions*",
-        f"Asked: *{s['total_queries']}*{asker_summary}",
+        "💬 *Questions & Interactions*",
+        f"Total interactions: *{total_inter}* (*{total_q}* questions + *{total_m}* menu taps)",
+        f"Questions asked: *{total_q}*{asker_summary}",
         f"Answer rate: {rate_text}",
         f"Last 7 days: {sparkline([c for _, c in daily])} ({daily[0][0].strftime('%d %b')}→{daily[-1][0].strftime('%d %b')}, peak {max(c for _, c in daily)}/day)",
         "",
@@ -363,7 +454,7 @@ def format_dashboard(s: Dict[str, Any]) -> str:
         lines.append("")
 
     if s["menu_counts"]:
-        lines.append("🔘 *Quick-menu taps*")
+        lines.append(f"🔘 *Quick-menu taps* (Total: *{total_m}*)")
         lines.append(" · ".join(f"{n} {c}" for n, c in s["menu_counts"]))
         lines.append("")
 
@@ -516,6 +607,78 @@ def format_recent_queries(s: Dict[str, Any], limit: int = 12, now: Optional[date
     return "\n".join(lines)
 
 
+def format_growth(s: Dict[str, Any]) -> str:
+    """Renders growth and traffic patterns: hourly distribution, daily breakdown, and week-on-week trends."""
+    days = s.get("days")
+    lines = [f"📈 *Engagement & Growth Trends* — {window_label(days)}", ""]
+
+    # 1. Hourly Traffic Distribution (SGT UTC+8)
+    h_dist = s.get("hourly_distribution", [0] * 24)
+    total_h = sum(h_dist)
+    lines.append("🕒 *Traffic by Time of Day (SGT UTC+8)*")
+    if total_h == 0:
+        lines.append("No activity recorded in this window.")
+    else:
+        # Buckets:
+        # Morning: 06:00 - 11:59 (hours 6..11)
+        # Afternoon: 12:00 - 17:59 (hours 12..17)
+        # Evening: 18:00 - 23:59 (hours 18..23)
+        # Late Night: 00:00 - 05:59 (hours 0..5)
+        morn = sum(h_dist[6:12])
+        aft = sum(h_dist[12:18])
+        eve = sum(h_dist[18:24])
+        night = sum(h_dist[0:6])
+
+        peak_h = max(range(24), key=lambda i: h_dist[i])
+        peak_cnt = h_dist[peak_h]
+        peak_str = f"{peak_h:02d}:00–{(peak_h+1)%24:02d}:00"
+
+        lines.append(f"• Morning (06:00–12:00): *{morn}* ({morn/total_h:.0%})")
+        lines.append(f"• Afternoon (12:00–18:00): *{aft}* ({aft/total_h:.0%})")
+        lines.append(f"• Evening (18:00–24:00): *{eve}* ({eve/total_h:.0%})")
+        lines.append(f"• Late Night (00:00–06:00): *{night}* ({night/total_h:.0%})")
+        lines.append(f"🔥 Peak Traffic Hour: *{peak_str}* (*{peak_cnt}* interactions)")
+    lines.append("")
+
+    # 2. Daily Breakdown Table
+    daily_table = s.get("daily_growth_table", [])
+    lines.append("📅 *Daily Activity Breakdown*")
+    if not daily_table or all(row["total"] == 0 and row["new_users"] == 0 for row in daily_table):
+        lines.append("No daily activity in this timeframe.")
+    else:
+        for row in daily_table:
+            d_str = row["date"].strftime("%d %b (%a)")
+            q = row["queries"]
+            m = row["menu_taps"]
+            tot = row["total"]
+            new_u = row["new_users"]
+            new_u_str = f" · +{new_u} resident{'s' if new_u != 1 else ''}" if new_u > 0 else ""
+            lines.append(f"• {d_str}: *{tot}* total (*{q}* questions, *{m}* menus){new_u_str}")
+    lines.append("")
+
+    # 3. Weekly (Week-on-Week) Comparison
+    wg = s.get("weekly_growth", {})
+    w_curr = wg.get("current_week", {"total": 0, "new_users": 0})
+    w_prev = wg.get("prev_week", {"total": 0, "new_users": 0})
+    w_prev2 = wg.get("two_weeks_ago", {"total": 0, "new_users": 0})
+
+    def calc_delta(curr: int, prev: int) -> str:
+        if prev == 0:
+            return "(+100% 🟢)" if curr > 0 else "(0%)"
+        pct = (curr - prev) / prev * 100
+        sign = "+" if pct > 0 else ""
+        icon = "🟢" if pct > 0 else ("🔴" if pct < 0 else "⚪")
+        return f"({sign}{pct:.0f}% {icon})"
+
+    lines += [
+        "🗓️ *Week-on-Week Engagement*",
+        f"• *This Week (Last 7d):* *{w_curr['total']}* interactions {calc_delta(w_curr['total'], w_prev['total'])} · *+{w_curr['new_users']}* residents",
+        f"• *Previous Week (7–14d ago):* *{w_prev['total']}* interactions {calc_delta(w_prev['total'], w_prev2['total'])} · *+{w_prev['new_users']}* residents",
+        f"• *2 Weeks Ago (14–21d ago):* *{w_prev2['total']}* interactions · *+{w_prev2['new_users']}* residents",
+    ]
+    return "\n".join(lines)
+
+
 def stats_keyboard(days: Optional[int], current_view: str = "dash") -> InlineKeyboardMarkup:
     """Returns interactive keyboard for navigating analytics timeframes and sub-screens."""
     def label(text: str, d: Optional[int]) -> str:
@@ -532,6 +695,7 @@ def stats_keyboard(days: Optional[int], current_view: str = "dash") -> InlineKey
     # Action navigation rows
     nav_buttons = [
         ("📊 Dashboard", "dash"),
+        ("📈 Growth", "growth"),
         ("🕒 Recent", "recent"),
         ("👥 Users", "users"),
         ("📋 Gaps", "gaps"),
@@ -542,13 +706,18 @@ def stats_keyboard(days: Optional[int], current_view: str = "dash") -> InlineKey
         if view != current_view
     ]
 
-    return InlineKeyboardMarkup(
-        [
-            time_row,
-            action_row,
-            [InlineKeyboardButton("🔄 Refresh", callback_data=f"stats_{current_view}_{d_str}")],
-        ]
-    )
+    # Split navigation buttons cleanly across 2 rows of 2 buttons each
+    row1 = action_row[:2]
+    row2 = action_row[2:]
+
+    keyboard = [time_row]
+    if row1:
+        keyboard.append(row1)
+    if row2:
+        keyboard.append(row2)
+    keyboard.append([InlineKeyboardButton("🔄 Refresh", callback_data=f"stats_{current_view}_{d_str}")])
+
+    return InlineKeyboardMarkup(keyboard)
 
 
 def parse_stats_callback(data: str) -> Tuple[str, Optional[int]]:
@@ -595,10 +764,11 @@ def summary_for_llm(s: Dict[str, Any]) -> str:
         f"Active asking users in window: {s.get('active_askers', 0)} of {s['registered_users']} ({s.get('lurkers', 0)} lurkers / menu-only)\n"
         f"Average questions per active asker: {s.get('avg_queries_per_asker', 0.0):.1f}\n"
         f"Per-user activity breakdown (Top 10): {user_top_str}\n"
+        f"Total resident interactions: {s.get('total_interactions', s['total_queries'])} ({s['total_queries']} questions + {s.get('total_menu_taps', 0)} quick menu taps)\n"
         f"Questions asked: {s['total_queries']}; answer rate: {'n/a' if s['answer_rate'] is None else format(s['answer_rate'], '.0%')}\n"
         f"Questions per day (last 7): {[(d.isoformat(), c) for d, c in s['queries_by_day']]}\n"
         f"Topics: {s['topic_counts']}\n"
-        f"Quick-menu taps: {s['menu_counts']}\n"
+        f"Quick-menu taps (Total {s.get('total_menu_taps', 0)}): {s['menu_counts']}\n"
         f"Unanswered (question, times asked): {s['unanswered_ranked'][:10]}\n"
         f"Feedback: total {s['feedback_total']}, new {s['feedback_new']}, by type {s['feedback_by_category']}"
     )

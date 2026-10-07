@@ -27,6 +27,7 @@ from src.admin import (
     handle_broadcast_command,
     handle_feedback_callback,
     handle_flagged_command,
+    handle_growth_command,
     handle_moderation_callback,
     handle_recent_command,
     handle_reply_command,
@@ -1463,6 +1464,7 @@ def create_bot_app() -> Application:
     app.add_handler(CommandHandler("reply", handle_reply_command))
     app.add_handler(CommandHandler("broadcast", handle_broadcast_command))
     app.add_handler(CommandHandler("admin_stats", handle_admin_stats_command))
+    app.add_handler(CommandHandler("growth", handle_growth_command))
     app.add_handler(CommandHandler("recent", handle_recent_command))
     app.add_handler(CommandHandler("flagged", handle_flagged_command))
 

@@ -157,7 +157,7 @@ class TestAnalytics(unittest.TestCase):
     def test_format_dashboard_includes_asker_summary(self):
         s = analytics.compute_analytics(USERS, LOGS, FEEDBACK, days=7, now=NOW)
         dash = analytics.format_dashboard(s)
-        self.assertIn("Asked: *4* by *2* of *4* users", dash)
+        self.assertIn("Questions asked: *4* by *2* of *4* users", dash)
         self.assertIn("2* lurkers", dash)
 
     def test_relative_time_formatter(self):
@@ -185,17 +185,37 @@ class TestAnalytics(unittest.TestCase):
         self.assertIn("From *James* (@jamesjjboh)", text)
         self.assertIn("Is there a pet salon?", text)
 
-    def test_stats_keyboard_and_callback_parsing(self):
-        kb_dash = analytics.stats_keyboard(days=7, current_view="dash")
-        self.assertTrue(any("Recent" in btn.text for row in kb_dash.inline_keyboard for btn in row))
+    def test_total_interactions_and_menu_summation(self):
+        s = analytics.compute_analytics(USERS, LOGS, FEEDBACK, days=7, now=NOW)
+        self.assertEqual(s["total_queries"], 4)
+        self.assertEqual(s["total_menu_taps"], 2)
+        self.assertEqual(s["total_interactions"], 6)
 
-        view, days = analytics.parse_stats_callback("stats_recent_7")
-        self.assertEqual(view, "recent")
+        dash = analytics.format_dashboard(s)
+        self.assertIn("Total interactions: *6* (*4* questions + *2* menu taps)", dash)
+        self.assertIn("Quick-menu taps* (Total: *2*)", dash)
+
+    def test_growth_trends_computation_and_formatting(self):
+        s = analytics.compute_analytics(USERS, LOGS, FEEDBACK, days=7, now=NOW)
+        self.assertIn("hourly_distribution", s)
+        self.assertIn("daily_growth_table", s)
+        self.assertIn("weekly_growth", s)
+        self.assertEqual(sum(s["hourly_distribution"]), 6)  # 4 questions + 2 menu taps in window
+
+        growth_text = analytics.format_growth(s)
+        self.assertIn("Engagement & Growth Trends", growth_text)
+        self.assertIn("Traffic by Time of Day (SGT UTC+8)", growth_text)
+        self.assertIn("Daily Activity Breakdown", growth_text)
+        self.assertIn("Week-on-Week Engagement", growth_text)
+
+        # Test callback parsing for growth
+        view, days = analytics.parse_stats_callback("stats_growth_7")
+        self.assertEqual(view, "growth")
         self.assertEqual(days, 7)
 
-        view_all, days_all = analytics.parse_stats_callback("stats_recent_all")
-        self.assertEqual(view_all, "recent")
-        self.assertIsNone(days_all)
+        # Test keyboard contains Growth button
+        kb_dash = analytics.stats_keyboard(days=7, current_view="dash")
+        self.assertTrue(any("Growth" in btn.text for row in kb_dash.inline_keyboard for btn in row))
 
 
 if __name__ == "__main__":

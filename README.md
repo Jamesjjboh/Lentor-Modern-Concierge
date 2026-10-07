@@ -32,8 +32,8 @@ flowchart TD
     end
 
     subgraph FastPath["Zero-Shot Fast FAQ (<5ms, Zero LLM Cost)"]
-        Webhook -->|"Top 18+ High-Frequency Queries"| FastFAQ["Pre-Compiled Regex Index<br/>(src/fast_faq.py)"]
-        FastFAQ -->|"Instant Match (Gym, Pool, Reno, MRT, Paint, EV, Lifts, Games Room)"| QuickReturn["Instant Verified Response (<5ms)"]
+        Webhook -->|"Top 19+ High-Frequency Queries"| FastFAQ["Pre-Compiled Regex Index<br/>(src/fast_faq.py)"]
+        FastFAQ -->|"Instant Match (Gym, Pool, Reno, MRT, Paint, EV, Lifts, Chute, Games Room)"| QuickReturn["Instant Verified Response (<5ms)"]
     end
 
     subgraph AgentCore["Autonomous Agent Core (Gemini 3.5 Flash Lite)"]

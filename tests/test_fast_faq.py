@@ -105,6 +105,22 @@ class TestFastFAQ(unittest.TestCase):
         self.assertIn("+65 6259 0700", text)
         self.assertIn("search_bylaws_and_handbook", tools)
 
+    def test_rubbish_chute_stuck_match(self):
+        queries = [
+            "rubbish chute is stuck",
+            "chute stuck",
+            "refuse chute choked",
+            "where to throw bulky boxes",
+        ]
+        for q in queries:
+            res = match_fast_faq(q)
+            self.assertIsNotNone(res, f"Failed to match Fast FAQ for: {q}")
+            text, tools = res
+            self.assertIn("Level 2 Bin Area", text)
+            self.assertIn("+65 6054 3370", text)
+            self.assertIn("+65 6054 3379", text)
+            self.assertIn("search_bylaws_and_handbook", tools)
+
     def test_unmatched_query_falls_back(self):
         res = match_fast_faq("Can I keep an exotic lizard in my unit?")
         self.assertIsNone(res)

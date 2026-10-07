@@ -229,7 +229,31 @@ FAQ_RULES = [
         ),
         ["search_bylaws_and_handbook"],
     ),
-    # 14. Electric Vehicle (EV) Charging Stations & Rates
+    # 14. Rubbish / Refuse Chute Stuck or Choked
+    (
+        re.compile(
+            r"\b(rubbish|refuse|trash|garbage)\b.*\b(chute|chutes)\b|\b(chute|chutes)\b.*\b(stuck|choke|choked|jam|jammed|spoil|spoilt|broken|block|blocked|full|smell|cannot open)\b|\b(chute\s*stuck|stuck\s*chute|choked?\s*chute)\b|\bwhere to (throw|dump|dispose).*(big|bulky|large|box|boxes|rubbish|trash)\b",
+            re.IGNORECASE,
+        ),
+        (
+            "🗑️ *Rubbish & Refuse Chute Stuck / Choked Guidelines*\n\n"
+            "If your floor's rubbish or recycling chute is jammed, stuck, or won't open:\n\n"
+            "🚨 *1. Immediate Reporting to Clear the Choke:*\n"
+            "• *Office Hours (Mon–Fri 9am–6pm, Sat 9am–1pm):*\n"
+            "  Contact *CBRE Management Office* at `+65 6054 3370` or email `managementoffice@LT-MODERN.COM` with your *Tower & Floor/Level* so the estate cleaning team can clear it immediately.\n"
+            "• *After Hours, Sundays & Urgent Emergencies:*\n"
+            "  Contact *24/7 Security Control* at `+65 6054 3379` to dispatch duty officers.\n\n"
+            "📦 *2. Temporary Disposal (Level 2 Bin Area):*\n"
+            "• *DO NOT leave rubbish bags outside the chute or along the common corridor* (this creates severe foul odors, cockroaches, and pest infestations for corridor neighbours).\n"
+            "• Please take the lift down to the *Level 2 Bin Area* to dispose of accumulated rubbish or recyclables.\n\n"
+            "💡 *3. Choke Prevention Guidelines:*\n"
+            "• The chute hopper opening is compact (requires pulling past 45°).\n"
+            "• *Never force or squeeze oversized trash bags, rigid delivery boxes, or stiff paper/tote bags* into the chute—they get wedged inside the vertical barrel.\n"
+            "• Flatten all cardboard delivery boxes and bring bulky trash directly down to Level 2."
+        ),
+        ["search_bylaws_and_handbook"],
+    ),
+    # 15. Electric Vehicle (EV) Charging Stations & Rates
     (
         re.compile(
             r"\b(ev\s*charg\w*|electric vehicle|charge\s*car|ev\s*station|novowatt|watt\s*app)\b|\b(charge|charging)\b.*\b(ev|car|vehicle|mall|resident)\b",

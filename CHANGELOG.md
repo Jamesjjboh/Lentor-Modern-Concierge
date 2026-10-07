@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [2.0.1] - 2026-10-07
+
+### Added
+- **Rubbish & Refuse Chute Stuck / Choked Fast FAQ Rule**:
+  - Implemented instant (<5ms) zero-shot Fast FAQ rule matching inquiries about stuck, jammed, or choked refuse chutes, and bulky box disposal.
+  - Formatted clear operational guidelines:
+    - **Reporting protocol:** Contact CBRE Management Office (`+65 6054 3370`) during office hours (Mon–Fri 9am–6pm, Sat 9am–1pm) or 24/7 Security Control (`+65 6054 3379`) after hours.
+    - **Temporary Disposal:** Directs residents to the **Level 2 Bin Area** when common floor chutes are obstructed to eliminate foul odor and pest infestation in corridors.
+    - **Choke Prevention:** Guidance on compact hopper dimensions (>45° pull angle), advising against forcing oversized bags, delivery boxes, or stiff tote bags.
+  - Ingested official refuse chute by-laws into `data/processed/bylaws_handbook.json`.
+  - Added unit test cases in `tests/test_fast_faq.py`.
+
+---
+
 ## [2.0.0] - 2026-10-06
 
 ### Added

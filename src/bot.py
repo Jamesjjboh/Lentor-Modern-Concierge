@@ -336,10 +336,11 @@ async def handle_quick_menu_callback(update: Update, context: ContextTypes.DEFAU
             "  📍 9 Lentor Central, Level 3\n"
             "  📞 `+65 6054 3370` (Mon–Fri 9am–6pm, Sat 9am–1pm)\n"
             "  ✉️ `managementoffice@LT-MODERN.COM`\n\n"
-            "• *Residential Concierge Desk (24/7):*\n"
-            "  📞 `+65 6054 3375` | ✉️ `concierge@LT-MODERN.COM`\n\n"
-            "• *Security Control Room (24/7 Emergency):*\n"
-            "  📞 `+65 6054 3379`\n\n"
+            "• *Physical Concierge Desk (Level 4 Clubhouse):*\n"
+            "  📞 `+65 6054 3375` (9:00 AM – 8:00 PM daily)\n"
+            "  ✉️ `concierge@LT-MODERN.COM`\n\n"
+            "• *Security Control Room (24/7 Emergency & Night Entry):*\n"
+            "  📞 `+65 6054 3379` (24 Hours daily)\n\n"
             "• *Developer CST (Defects & Novade Support):*\n"
             "  📞 `6433 9342` | ✉️ `LMcustomerservice@lentormodern.com.sg`\n"
             "  Main Contractor: Lian Beng Construction (1988) Pte Ltd\n\n"
@@ -352,9 +353,13 @@ async def handle_quick_menu_callback(update: Update, context: ContextTypes.DEFAU
             "  _Extended from 8am for morning workouts! Automated door access cuts off at 10pm sharp._\n"
             "• 🏊 *50m Lap Pool & Pools (Level 4):* 7:00 AM – 10:00 PM daily\n"
             "• 🎾 *Tennis Court (Level 4):* 8:00 AM – 10:00 PM (Book via iPlus Living)\n"
-            "• 🍖 *Sky Dining & BBQ Pavilions (Level 14):* Closes 10:00 PM (Book via iPlus Living)\n"
+            "• 🎯 *Games Room (Level 4 Clubhouse):* Open until 10:00 PM (Book via iPlus Living)\n"
+            "  _Equipped with electronic darts and a multi-function convertible table (Table Tennis / Ping Pong & Pool / Billiards)!_\n"
+            "• 🪞 *Dance Studio (Level 4 Clubhouse):* Open until 10:00 PM (Mirrored studio for dance/yoga)\n"
+            "• 🍖 *Sky Dining & BBQ Pavilions (Level 14 across Towers 3, 5, 7):* Closes 10:00 PM (Book via iPlus Living)\n"
             "• 🎱 *Clubhouse Function Room (Level 4):* Closes 10:00 PM (Book via iPlus Living)\n"
-            "• 🚗 *Car Washing Bays (Level 3 Carpark):* Lots 245, 259, 292 (Water tap key from Concierge)"
+            "• 🚗 *Car Washing Bays (Level 3 Carpark):* Lots 245, 259, 292 (Water tap key from Concierge)\n"
+            "• ⚡ *EV Charging Bays (Level 3 Resident Carpark):* 5 dedicated Novowatt lots (~$0.50/kWh)"
         )
     elif action == "menu_transit":
         text = (
@@ -387,12 +392,17 @@ async def handle_quick_menu_callback(update: Update, context: ContextTypes.DEFAU
         )
     elif action == "menu_reno":
         text = (
-            "🔨 *Moving In & Renovation Rules:*\n\n"
-            "• ⏰ *Working Hours:* Mon–Fri 9am–5pm, Sat 9am–1pm\n"
-            "  _STRICTLY NO noisy works on Sundays & Public Holidays._\n"
-            "• 💰 *Security Deposit:* S$1,000 (non-hacking) / S$2,000 (hacking)\n"
-            "• 🚚 *Residential Loading Bay:* Accessible via Lentor Central ramp (Height limit: 3.8m)\n"
+            "🔨 *Moving In, Renovation & Waste Rules:*\n\n"
+            "• ⏰ *Working Hours (Noisy Works & Drilling):*\n"
+            "  • Mon–Fri: 9:00 AM – 5:00 PM\n"
+            "  • Sat: 9:00 AM – 1:00 PM (Quiet works)\n"
+            "  • _Sundays & Public Holidays: STRICTLY PROHIBITED_\n\n"
+            "• 🖼️ *Minor DIY Drilling (TV Mounts, Pictures):*\n"
+            "  _No formal Form 2.0 permit or deposit required for simple drilling inside unit, but must observe noisy work hours!_\n\n"
+            "• 💰 *Renovation Deposit:* S$1,000 (non-hacking) / S$2,000 (hacking)\n"
+            "• 🚚 *Residential Loading Bay:* Accessible via Lentor Central ramp (Height clearance: 3.8m)\n"
             "• 🛗 *Lift Padding:* Must book with Estate Office 3 days prior ($300 penalty if unpadded)\n"
+            "• 🗑️ *Bulky Waste & Cardboard Disposal:* Take lift down to *Level 2 Bin Area* (do not force large boxes into common floor rubbish chutes)\n"
             "• 🎨 *Official Balcony Paint:* Dulux Thick Smoke (`96YR 09/033`)\n"
             "• 🎨 *Official Interior Paint:* Intermatt BS E55 (White)"
         )
@@ -402,7 +412,7 @@ async def handle_quick_menu_callback(update: Update, context: ContextTypes.DEFAU
             "1. *Download App:* Search 'iPlus Living' on Apple App Store / Google Play Store.\n"
             "2. *Account Activation:* Register with your email and Property Activation Code (found in your CBRE Welcome Letter).\n"
             "3. *Smart Intercom Buzzer:* Link your mobile under 'Visitor Access'. When guests or delivery riders dial your unit at lobby intercoms, your phone video rings — tap 'Unlock' to open the lobby glass door remotely!\n"
-            "4. *Facility Bookings:* Book BBQ, Tennis, Function Room 14–30 days in advance (1 peak session/week per unit, $100–$200 deposit).\n"
+            "4. *Facility Bookings:* Book Tennis Court, Games Room (Table Tennis / Pool / Darts), Function Room, and BBQ Pavilions 14–30 days in advance (1 peak session/week per unit, $100–$200 deposit).\n"
             "5. *Support:* Email `managementoffice@LT-MODERN.COM` or call `+65 6054 3370`."
         )
     elif action == "menu_directions":

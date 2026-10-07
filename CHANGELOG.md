@@ -16,8 +16,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     - **Reporting protocol:** Contact CBRE Management Office (`+65 6054 3370`) during office hours (Mon–Fri 9am–6pm, Sat 9am–1pm) or 24/7 Security Control (`+65 6054 3379`) after hours.
     - **Temporary Disposal:** Directs residents to the **Level 2 Bin Area** when common floor chutes are obstructed to eliminate foul odor and pest infestation in corridors.
     - **Choke Prevention:** Guidance on compact hopper dimensions (>45° pull angle), advising against forcing oversized bags, delivery boxes, or stiff tote bags.
-  - Ingested official refuse chute by-laws into `data/processed/bylaws_handbook.json`.
-  - Added unit test cases in `tests/test_fast_faq.py`.
+- **Estate Quick Menu Synchronizations (`/menu`)**:
+  - **🏊 Facilities & Gym (`menu_facilities`):** Added the Level 4 Clubhouse **Games Room** (convertible table tennis/pool/darts), **Dance Studio**, and **L3 Resident EV Charging** lots (Novowatt, ~$0.50/kWh).
+  - **🏢 Estate Contacts (`menu_contacts`):** Clarified the Level 4 Physical Concierge Counter hours as **9:00 AM – 8:00 PM daily**, with 24/7 Security Control handling night entry and urgent security after-hours.
+  - **🔨 Moving & Reno (`menu_reno`):** Added guidelines on minor DIY drilling (no Form 2.0 permit needed for TV mounting/frames) and directed residents to the **Level 2 Bin Area** for large delivery boxes and bulky waste.
+  - **📱 iPlus Living Guide (`menu_iplus`):** Updated bookable facilities list to include the **Games Room** (Table Tennis / Pool / Darts) alongside Tennis Court and BBQ pavilions.
 
 ---
 

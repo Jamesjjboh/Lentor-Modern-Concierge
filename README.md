@@ -129,12 +129,12 @@ An instant, text-first dashboard (no chart rendering), with inline buttons `[ 7d
 
 ### 6. Interactive 1-Tap Quick Menu (`/menu`)
 * Residents can pull up immediate answers without consuming AI tokens:
-  * **Estate Contacts Hub:** Managing Agent (CBRE), Concierge Desk, 24/7 Security Hotline, and Developer CST, with interactive sub-screens for **Appliances & Equipment** (Mitsubishi aircon, SMEG kitchen, Yale lock, Rheem/Ferroli heaters, Fermax intercom, Metform letterbox, TK Elevator), **Fittings & Contractors** (Windows, bi-fold & pocket doors, sanitary mixers, shower screens, timber flooring, tiles, carpentry, Lian Beng), **Utilities** (SP Services & City Energy), and a 1-tap **MA Email Draft**.
-  * **Facilities & Gym:** Gym hours (6am–10pm), pool hours (7am–10pm), tennis court, BBQ, and car wash bays.
+  * **Estate Contacts Hub:** Managing Agent (CBRE), Physical Concierge Counter (9am–8pm daily), 24/7 Security Control Room, and Developer CST, with interactive sub-screens for **Appliances & Equipment** (Mitsubishi aircon, SMEG kitchen, Yale lock, Rheem/Ferroli heaters, Fermax intercom, Metform letterbox, TK Elevator), **Fittings & Contractors** (Windows, bi-fold & pocket doors, sanitary mixers, shower screens, timber flooring, tiles, carpentry, Lian Beng), **Utilities** (SP Services & City Energy), and a 1-tap **MA Email Draft**.
+  * **Facilities & Gym:** Gym hours (6am–10pm), pool hours (7am–10pm), tennis court, Games Room (convertible table tennis/pool/darts), Dance Studio, BBQ pavilions, car wash bays, and L3 resident EV charging lots.
   * **Transit & Buses:** Lentor MRT (TE5) first/last train timings and Exit 1 buses (825, 855, 852).
   * **Mall & Deals Hub:** CS Fresh markdown pro-tip, full 54-store tenant directory by floor, 34 GuocoLand voucher merchants, 31 resident discounts, and direct ResiQ order/queue link.
-  * **Moving & Reno:** Renovation hours, deposit schedule, loading bay clearance (3.8m), and official paint codes.
-  * **iPlus Living Guide:** Mobile intercom buzzer video setup, property activation codes, and facility booking rules.
+  * **Moving & Reno:** Renovation & drilling hours, minor DIY drilling guidelines, deposit schedule, loading bay clearance (3.8m), Level 2 bin area disposal for large boxes, and official paint codes.
+  * **iPlus Living Guide:** Mobile intercom buzzer video setup, property activation codes, and facility booking rules (Tennis, Games Room, BBQ, Function Room).
   * **Guest Directions (MRT & Car):** 1-tap tower selection buttons (`[ Tower 3 ]`, `[ Tower 5 ]`, `[ Tower 7 ]`) and `/directions` command for copy-paste visitor guidance.
 
 ### 7. Responsive UX: In-Chat Status Bubbles & 1-Tap Fallback Action Cards

@@ -412,7 +412,7 @@ async def handle_quick_menu_callback(update: Update, context: ContextTypes.DEFAU
             "1. *Download App:* Search 'iPlus Living' on Apple App Store / Google Play Store.\n"
             "2. *Account Activation:* Register with your email and Property Activation Code (found in your CBRE Welcome Letter).\n"
             "3. *Smart Intercom Buzzer:* Link your mobile under 'Visitor Access'. When guests or delivery riders dial your unit at lobby intercoms, your phone video rings — tap 'Unlock' to open the lobby glass door remotely!\n"
-            "4. *Facility Bookings:* Book Tennis Court, Games Room (Table Tennis / Pool / Darts), Function Room, and BBQ Pavilions 14–30 days in advance (1 peak session/week per unit, $100–$200 deposit).\n"
+            "4. *Facility Bookings:* Book Tennis Court, Games Room (Table Tennis / Pool / Darts), Dance Studio, Function Room, and BBQ Pavilions 14–30 days in advance (1 peak session/week per unit, $100–$200 deposit).\n"
             "5. *Support:* Email `managementoffice@LT-MODERN.COM` or call `+65 6054 3370`."
         )
     elif action == "menu_directions":

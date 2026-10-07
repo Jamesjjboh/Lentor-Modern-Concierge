@@ -62,7 +62,7 @@ FAQ_RULES = [
     # 4. Games Room, Table Tennis, Pool Table & Darts
     (
         re.compile(
-            r"\b(table tennis|ping\s*pong|games? room|darts?|pool table|billiard)\b",
+            r"\b(table tennis|ping\s*pong|games?\s*room|darts?|pool table|billiard|dance\s*studio|dance\s*room)\b",
             re.IGNORECASE,
         ),
         (

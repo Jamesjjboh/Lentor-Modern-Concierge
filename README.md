@@ -134,7 +134,7 @@ An instant, text-first dashboard (no chart rendering), with inline buttons `[ 7d
   * **Transit & Buses:** Lentor MRT (TE5) first/last train timings and Exit 1 buses (825, 855, 852).
   * **Mall & Deals Hub:** CS Fresh markdown pro-tip, full 54-store tenant directory by floor, 34 GuocoLand voucher merchants, 31 resident discounts, and direct ResiQ order/queue link.
   * **Moving & Reno:** Renovation & drilling hours, minor DIY drilling guidelines, deposit schedule, loading bay clearance (3.8m), Level 2 bin area disposal for large boxes, and official paint codes.
-  * **iPlus Living Guide:** Mobile intercom buzzer video setup, property activation codes, and facility booking rules (Tennis, Games Room, BBQ, Function Room).
+  * **iPlus Living Guide:** Mobile intercom buzzer video setup, property activation codes, and facility booking rules (Tennis, Games Room, Dance Studio, BBQ, Function Room).
   * **Guest Directions (MRT & Car):** 1-tap tower selection buttons (`[ Tower 3 ]`, `[ Tower 5 ]`, `[ Tower 7 ]`) and `/directions` command for copy-paste visitor guidance.
 
 ### 7. Responsive UX: In-Chat Status Bubbles & 1-Tap Fallback Action Cards

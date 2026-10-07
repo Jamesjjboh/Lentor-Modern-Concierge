@@ -20,7 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - **🏊 Facilities & Gym (`menu_facilities`):** Added the Level 4 Clubhouse **Games Room** (convertible table tennis/pool/darts), **Dance Studio**, and **L3 Resident EV Charging** lots (Novowatt, ~$0.50/kWh).
   - **🏢 Estate Contacts (`menu_contacts`):** Clarified the Level 4 Physical Concierge Counter hours as **9:00 AM – 8:00 PM daily**, with 24/7 Security Control handling night entry and urgent security after-hours.
   - **🔨 Moving & Reno (`menu_reno`):** Added guidelines on minor DIY drilling (no Form 2.0 permit needed for TV mounting/frames) and directed residents to the **Level 2 Bin Area** for large delivery boxes and bulky waste.
-  - **📱 iPlus Living Guide (`menu_iplus`):** Updated bookable facilities list to include the **Games Room** (Table Tennis / Pool / Darts) alongside Tennis Court and BBQ pavilions.
+  - **📱 iPlus Living Guide (`menu_iplus`):** Updated bookable facilities list to include the **Games Room** (Table Tennis / Pool / Darts) and **Dance Studio** alongside Tennis Court and BBQ pavilions.
 
 ---
 

@@ -77,7 +77,27 @@ FAQ_RULES = [
         ),
         ["search_bylaws_and_handbook"],
     ),
-    # 4. Renovation Working Hours & Noisy Works
+    # 5. Business Lounge, Co-Working Space & Meeting Room
+    (
+        re.compile(
+            r"\b(co[\s-]*working|coworking|business lounge|meeting room|work booth|study room|work lounge|hot[\s-]*desking)\b|\bwhere (can i|to) (work|study)\b",
+            re.IGNORECASE,
+        ),
+        (
+            "💼 *Business Lounge, Co-Working Space & Meeting Room (Level 4 Clubhouse)*\n\n"
+            "• *Location:* Level 4 Grand Clubhouse\n"
+            "• *Operating Hours:* *Until 10:00 PM daily*\n\n"
+            "💻 *Work & Productivity Amenities:*\n"
+            "• *Hot-Desking & Work Booths:* Private semi-enclosed acoustic work booths and window counters designed for focused solo work, study, and video calls (open walk-in access for residents).\n"
+            "• *Enclosed Meeting Room:* Dedicated 6-person private conference room equipped for business discussions, group work, and presentations.\n"
+            "• *Level 14 Sky Club:* Additional work corners and club lounge seating across Towers 3, 5, and 7.\n\n"
+            "📱 *Facility Booking (iPlus Living):*\n"
+            "• *Hot-desking booths & open tables:* Free walk-in access (no booking required).\n"
+            "• *6-Person Meeting Room:* Reserve your slot via the *iPlus Living* mobile app under Facility Booking."
+        ),
+        ["search_bylaws_and_handbook"],
+    ),
+    # 6. Renovation Working Hours & Noisy Works
     (
         re.compile(r"\b(reno|renovation|hacking|noisy works?)\b.*\b(hours?|timing|saturday|sunday|holiday|permit|deposit)\b|\bcan renovate\b", re.IGNORECASE),
         (

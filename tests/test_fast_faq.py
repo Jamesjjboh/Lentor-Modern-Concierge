@@ -121,6 +121,23 @@ class TestFastFAQ(unittest.TestCase):
             self.assertIn("+65 6054 3379", text)
             self.assertIn("search_bylaws_and_handbook", tools)
 
+    def test_coworking_and_meeting_room_match(self):
+        queries = [
+            "coworking space",
+            "co-working at lentor modern",
+            "is there a meeting room",
+            "business lounge",
+            "where can i study",
+        ]
+        for q in queries:
+            res = match_fast_faq(q)
+            self.assertIsNotNone(res, f"Failed to match Fast FAQ for: {q}")
+            text, tools = res
+            self.assertIn("Business Lounge", text)
+            self.assertIn("6-Person Meeting Room", text)
+            self.assertIn("iPlus Living", text)
+            self.assertIn("search_bylaws_and_handbook", tools)
+
     def test_unmatched_query_falls_back(self):
         res = match_fast_faq("Can I keep an exotic lizard in my unit?")
         self.assertIsNone(res)

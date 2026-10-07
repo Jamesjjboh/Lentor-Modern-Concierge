@@ -9,7 +9,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [2.0.1] - 2026-10-07
 
-### Added
+- **Business Lounge & Co-Working Space / Meeting Room Updates**:
+  - **Zero-Shot Fast FAQ Rule:** Added instant (<5ms) rule matching co-working space, business lounge, meeting room bookings, quiet study corners, and work booths.
+  - **🏊 Facilities & Gym (`menu_facilities`):** Added the Level 4 Grand Clubhouse **Business Lounge & Co-Working Space** (private hot-desking acoustic work booths, window counters, charging ports; open 6:00 AM – 10:00 PM) and quiet work corners at Level 14 Sky Club.
+  - **📱 iPlus Living Guide (`menu_iplus`):** Added the enclosed **6-person Meeting Room** (Level 4 Business Lounge) to the bookable facilities list alongside Tennis Court, Games Room, Dance Studio, BBQ Pavilions, and Clubhouse Function Rooms.
+  - **Bylaws & Knowledge Base (`bylaws_handbook.json`):** Ingested operating hours, booking rules via iPlus Living, and policy details for co-working amenities.
 - **Rubbish & Refuse Chute Stuck / Choked Fast FAQ Rule**:
   - Implemented instant (<5ms) zero-shot Fast FAQ rule matching inquiries about stuck, jammed, or choked refuse chutes, and bulky box disposal.
   - Formatted clear operational guidelines:
@@ -17,10 +21,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     - **Temporary Disposal:** Directs residents to the **Level 2 Bin Area** when common floor chutes are obstructed to eliminate foul odor and pest infestation in corridors.
     - **Choke Prevention:** Guidance on compact hopper dimensions (>45° pull angle), advising against forcing oversized bags, delivery boxes, or stiff tote bags.
 - **Estate Quick Menu Synchronizations (`/menu`)**:
-  - **🏊 Facilities & Gym (`menu_facilities`):** Added the Level 4 Clubhouse **Games Room** (convertible table tennis/pool/darts), **Dance Studio**, and **L3 Resident EV Charging** lots (Novowatt, ~$0.50/kWh).
+  - **🏊 Facilities & Gym (`menu_facilities`):** Added the Level 4 Clubhouse **Games Room** (convertible table tennis/pool/darts), **Dance Studio**, **Business Lounge & Co-Working Space**, and **L3 Resident EV Charging** lots (Novowatt, ~$0.50/kWh).
   - **🏢 Estate Contacts (`menu_contacts`):** Clarified the Level 4 Physical Concierge Counter hours as **9:00 AM – 8:00 PM daily**, with 24/7 Security Control handling night entry and urgent security after-hours.
   - **🔨 Moving & Reno (`menu_reno`):** Added guidelines on minor DIY drilling (no Form 2.0 permit needed for TV mounting/frames) and directed residents to the **Level 2 Bin Area** for large delivery boxes and bulky waste.
-  - **📱 iPlus Living Guide (`menu_iplus`):** Updated bookable facilities list to include the **Games Room** (Table Tennis / Pool / Darts) and **Dance Studio** alongside Tennis Court and BBQ pavilions.
+  - **📱 iPlus Living Guide (`menu_iplus`):** Updated bookable facilities list to include the **Games Room** (Table Tennis / Pool / Darts), **Dance Studio**, and **Meeting Room (Level 4 Business Lounge)** alongside Tennis Court and BBQ pavilions.
 
 ---
 

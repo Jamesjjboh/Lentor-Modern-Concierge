@@ -353,6 +353,8 @@ async def handle_quick_menu_callback(update: Update, context: ContextTypes.DEFAU
             "  _Extended from 8am for morning workouts! Automated door access cuts off at 10pm sharp._\n"
             "• 🏊 *50m Lap Pool & Pools (Level 4):* 7:00 AM – 10:00 PM daily\n"
             "• 🎾 *Tennis Court (Level 4):* 8:00 AM – 10:00 PM (Book via iPlus Living)\n"
+            "• 💼 *Business Lounge & Co-Working (Level 4 Clubhouse):* Open until 10:00 PM daily\n"
+            "  _Equipped with private hot-desking work booths and an enclosed 6-person Meeting Room (bookable via iPlus Living)!_\n"
             "• 🎯 *Games Room (Level 4 Clubhouse):* Open until 10:00 PM (Book via iPlus Living)\n"
             "  _Equipped with electronic darts and a multi-function convertible table (Table Tennis / Ping Pong & Pool / Billiards)!_\n"
             "• 🪞 *Dance Studio (Level 4 Clubhouse):* Open until 10:00 PM (Mirrored studio for dance/yoga)\n"
@@ -412,7 +414,7 @@ async def handle_quick_menu_callback(update: Update, context: ContextTypes.DEFAU
             "1. *Download App:* Search 'iPlus Living' on Apple App Store / Google Play Store.\n"
             "2. *Account Activation:* Register with your email and Property Activation Code (found in your CBRE Welcome Letter).\n"
             "3. *Smart Intercom Buzzer:* Link your mobile under 'Visitor Access'. When guests or delivery riders dial your unit at lobby intercoms, your phone video rings — tap 'Unlock' to open the lobby glass door remotely!\n"
-            "4. *Facility Bookings:* Book Tennis Court, Games Room (Table Tennis / Pool / Darts), Dance Studio, Function Room, and BBQ Pavilions 14–30 days in advance (1 peak session/week per unit, $100–$200 deposit).\n"
+            "4. *Facility Bookings:* Book Tennis Court, Games Room (Table Tennis / Pool / Darts), Dance Studio, Meeting Room (Level 4 Business Lounge), Function Room, and BBQ Pavilions 14–30 days in advance (1 peak session/week per unit, $100–$200 deposit).\n"
             "5. *Support:* Email `managementoffice@LT-MODERN.COM` or call `+65 6054 3370`."
         )
     elif action == "menu_directions":

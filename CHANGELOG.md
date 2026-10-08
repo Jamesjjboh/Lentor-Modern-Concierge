@@ -9,6 +9,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [2.0.1] - 2026-10-07
 
+- **Main Door Digital Lock (Yale YDM7116A) & Yale Home App Integration**:
+  - **Zero-Shot Fast FAQ Rule:** Added instant (<5ms) rule matching `user manual for lock`, `set code for door`, `change door pin`, `is there an app for this lock`, and `link to the app store`.
+  - **Step-by-Step PIN Registration:** Documented exact physical programming protocol using the interior `[I]` (Registration) button located behind the battery cover.
+  - **Official Mobile App Links:** Directed residents to the official **Yale Home** app (Assa Abloy) on [Apple App Store](https://apps.apple.com/sg/app/yale-home/id1436055535) and [Google Play Store](https://play.google.com/store/apps/details?id=com.assaabloy.yale), clarifying that the older "Yale Access" app was sunsetted in Singapore and highlighting the BLE module requirement.
+  - **Official Manual PDF & Emergency Jumpstart:** Embedded official [Yale YDM7116A User Manual PDF](https://www.yalehome.com/content/dam/yale-home/apac/products/digital-door-lock/ydm7116a/Yale%20YDM7116A%20User%20Manual.pdf) and external 9V rectangular battery jumpstart procedure.
+- **Novade Quality Defect App Direct Store Links**:
+  - Enhanced the DLP & Defect Reporting Fast FAQ rule to include direct [Apple App Store](https://apps.apple.com/app/id1579805253) and [Google Play Store](https://play.google.com/store/apps/details?id=com.novade.field) download links for the Novade app alongside GuocoLand CST contact channels (`6433 9342`).
 - **Admin Analytics Quick Menu Summation & Total Interactions**:
   - **Quick Menu Summation:** Added summation total `(Total: *X*)` for quick menu taps alongside individual button tap counts in `/admin_stats`.
   - **Total Interactions (Combined):** Added grand total calculation `Total interactions: *Y* (*A* questions + *B* menu taps)` to measure holistic resident usage across both conversational AI queries and quick menus.

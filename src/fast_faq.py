@@ -209,10 +209,10 @@ FAQ_RULES = [
         ),
         ["search_bylaws_and_handbook", "search_estate_profile"],
     ),
-    # 12. Defect Liability Period (DLP) & Handover Defects
+    # 12. Defect Liability Period (DLP) & Handover Defects (Novade)
     (
         re.compile(
-            r"\b(dlp|defect liability|defects? liability period)\b|\b(when|what time|until when|last day|deadline)\b.*\b(defect|defects|dlp)\b|\b(defect|defects|dlp)\b.*\b(end|ends|expiry|expire|expires|over|deadline)\b",
+            r"\b(dlp|defect liability|defects? liability period|novade|novade quality)\b|\b(when|what time|until when|last day|deadline)\b.*\b(defect|defects|dlp)\b|\b(defect|defects|dlp)\b.*\b(end|ends|expiry|expire|expires|over|deadline)\b|\bhow to (report|lodge).*defect\b",
             re.IGNORECASE,
         ),
         (
@@ -221,10 +221,16 @@ FAQ_RULES = [
             "  _(Check your exact unit expiry date inside the *Novade Quality* app or confirm with your Block Manager)_\n\n"
             "• *Development & Common Property DLP:* *25 February 2027* _(Confirmed by CBRE Management Office)_\n"
             "  _(Covers external wall façade, corridors, swimming pools, clubhouse, landscape deck, and lifts)_\n\n"
-            "📱 *How to Report Defects:*\n"
-            "1. *Unit Defects:* Lodge items with clear photos via the *Novade Quality* mobile app.\n"
-            "2. *Common Property Defects:* Report promptly to the Management Office (CBRE: `+65 6054 3370` / `managementoffice@LT-MODERN.COM`) before 25 Feb 2027 so repairs are billed to the developer.\n\n"
-            "• *Developer Obligation:* Under BCA standard contract, the developer (GuocoLand) and main contractor (Lian Beng) are required to rectify defects at their cost within 30 days of notice."
+            "📱 *How to Report Defects via Novade:*\n"
+            "1. *Download the App:*\n"
+            "   • [Apple App Store (iOS)](https://apps.apple.com/app/id1579805253)\n"
+            "   • [Google Play Store (Android)](https://play.google.com/store/apps/details?id=com.novade.field)\n"
+            "2. *Log In:* Use the login credentials provided during key collection / NVP.\n"
+            "3. *Lodge Defect:* Select your unit and room, attach clear close-up & wide photos, and submit.\n"
+            "4. *Track Status:* `Pending Contractor` ➔ `Under Rectification` ➔ `Ready for Joint Inspection`.\n\n"
+            "🏢 *Common Property Defects:*\n"
+            "• Report common area defects (lifts, pools, facade) directly to CBRE Management Office (`+65 6054 3370` / `managementoffice@LT-MODERN.COM`).\n\n"
+            "📞 *GuocoLand Customer Service Team (CST):* `6433 9342` | `LMcustomerservice@lentormodern.com.sg` (Mon–Fri 9am–6pm)."
         ),
         ["search_bylaws_and_handbook", "search_estate_profile"],
     ),
@@ -442,6 +448,33 @@ FAQ_RULES = [
             "_You can also ask about any specific store (e.g. 'discount for QB Premium')!_"
         ),
         ["search_mall_directory"],
+    ),
+    # 17. Digital Door Lock (Yale YDM7116A) Manual, PIN Code Setup & Yale Home App
+    (
+        re.compile(
+            r"\b(yale|door lock|digital lock|main door lock|yale lock|ydm7116a)\b.*\b(manual|code|pin|app|download|ios|apple|android|user manual|change|set|reset|battery|jumpstart|flat)\b|\b(set|change|reset)\b.*\b(code|pin|password)\b|\b(user manual|manual)\b.*\b(lock|door)\b|\bis there an app for this lock\b|\blink to the app store\b|\bhow to (set|change|reset).*(door|lock|pin|code)\b",
+            re.IGNORECASE,
+        ),
+        (
+            "🚪 *Main Door Digital Lock (Yale YDM7116A)*\n\n"
+            "🔑 *How to Set or Change Your User PIN Code:*\n"
+            "1. Remove the battery cover on the *inside (interior)* of your main door.\n"
+            "2. Press the physical *`[I]` (Registration)* button once.\n"
+            "3. On the exterior keypad, enter your new *4 to 10-digit User PIN code*.\n"
+            "4. Press the *`[I]` (Registration)* button again on the interior body to complete registration.\n"
+            "   _(If in Master Mode: Press `[I]` ➔ Enter Master PIN ➔ `#` ➔ Press `1` ➔ Enter New PIN ➔ `*` ➔ Press `[I]` to confirm)_\n\n"
+            "📱 *Mobile App (Yale Home):*\n"
+            "• The official app for Singapore is **Yale Home** (Assa Abloy). _Note: The older 'Yale Access' app was discontinued in Singapore in mid-2023._\n"
+            "• 🍏 [Apple App Store (iOS)](https://apps.apple.com/sg/app/yale-home/id1436055535)\n"
+            "• 🤖 [Google Play Store (Android)](https://play.google.com/store/apps/details?id=com.assaabloy.yale)\n"
+            "• _Note:_ Mobile phone pairing requires the Yale Bluetooth/BLE module installed in the slot behind the battery cover.\n\n"
+            "📖 *Official User Manual (PDF):*\n"
+            "• [Download Yale YDM7116A User Manual](https://www.yalehome.com/content/dam/yale-home/apac/products/digital-door-lock/ydm7116a/Yale%20YDM7116A%20User%20Manual.pdf)\n\n"
+            "🔋 *Emergency Battery Jumpstart:*\n"
+            "• If batteries are completely flat and you are locked out, touch a standard *9V rectangular battery* to the emergency terminals at the bottom of the exterior handle, then enter your PIN or scan fingerprint.\n\n"
+            "📞 *Assa Abloy (Yale Singapore Hotline):* `+65 6591 8868` | `support.sg@yalesmart.com`"
+        ),
+        ["search_bylaws_and_handbook"],
     ),
 ]
 

@@ -40,11 +40,16 @@
     "appliance": "Yale Digital Door Lock",
     "model": "YDM7116A",
     "category": "access_control",
-    "features": "Fingerprint recognition, RFID key card / tag, Master/User PIN code, physical override key, and mobile Bluetooth/Zigbee access.",
+    "features": "Fingerprint recognition, RFID key card / tag, Master/User PIN code, physical override mechanical key, and mobile Bluetooth/Zigbee access via Yale Home app.",
+    "app_name": "Yale Home",
+    "app_store_link": "https://apps.apple.com/sg/app/yale-home/id1436055535",
+    "play_store_link": "https://play.google.com/store/apps/details?id=com.assaabloy.yale",
+    "app_note": "In Singapore, the previous 'Yale Access' app was discontinued in mid-2023; residents must use the 'Yale Home' app (by Assa Abloy). Mobile phone pairing requires the Yale Bluetooth/BLE module installed in the slot behind the battery cover.",
+    "manual_url": "https://www.yalehome.com/content/dam/yale-home/apac/products/digital-door-lock/ydm7116a/Yale%20YDM7116A%20User%20Manual.pdf",
     "battery_replacement": "Uses 4x AA 1.5V Alkaline batteries (located behind interior battery cover). DO NOT use rechargeable batteries. Low battery alarm sounds when battery drops below 4.5V.",
-    "emergency_jumpstart": "If the batteries are completely drained and you are locked outside, touch a standard 9V rectangular battery to the emergency power terminals at the bottom of the exterior lock body, then enter your PIN or scan fingerprint.",
-    "pin_setup": "Remove battery cover, press 'I' (Registration) button, enter current Master PIN followed by #, press 1 for User PIN, enter new 4-10 digit PIN followed by #, press 'I' button to complete.",
-    "supplier_contact": "Assa Abloy (Yale): 6591 8868"
+    "emergency_jumpstart": "If the batteries are completely drained and you are locked outside, touch a standard 9V rectangular battery to the emergency power terminals at the bottom of the exterior lock handle, then enter your PIN or scan fingerprint.",
+    "pin_setup": "1. Remove the battery cover on the inside (interior) of the door. 2. Press the physical [I] (Registration) button. 3. On the exterior keypad, enter your new 4–10 digit User PIN code. 4. Press the [I] button again on the inside to confirm. (In Master Mode: Press [I] button -> enter Master PIN -> # -> press 1 -> enter new User PIN -> * -> press [I] button).",
+    "supplier_contact": "Assa Abloy (Yale Singapore): 6591 8868 / support.sg@yalesmart.com"
   },
   {
     "appliance": "Rheem Ceiling Electric Storage Water Heater",

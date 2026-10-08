@@ -138,6 +138,33 @@ class TestFastFAQ(unittest.TestCase):
             self.assertIn("iPlus Living", text)
             self.assertIn("search_bylaws_and_handbook", tools)
 
+    def test_yale_door_lock_and_app_match(self):
+        queries = [
+            "User manual for lock",
+            "Link to the App Store - Apple",
+            "Is there an app for this lock",
+            "Set code for door",
+            "how to change door pin",
+            "yale door lock manual",
+        ]
+        for q in queries:
+            res = match_fast_faq(q)
+            self.assertIsNotNone(res, f"Failed to match Fast FAQ for: {q}")
+            text, tools = res
+            self.assertIn("Yale YDM7116A", text)
+            self.assertIn("Yale Home", text)
+            self.assertIn("Registration", text)
+            self.assertIn("apps.apple.com", text)
+            self.assertIn("search_bylaws_and_handbook", tools)
+
+    def test_novade_app_links_match(self):
+        res = match_fast_faq("Novade")
+        self.assertIsNotNone(res)
+        text, tools = res
+        self.assertIn("Novade Quality", text)
+        self.assertIn("apps.apple.com", text)
+        self.assertIn("play.google.com", text)
+
     def test_unmatched_query_falls_back(self):
         res = match_fast_faq("Can I keep an exotic lizard in my unit?")
         self.assertIsNone(res)

@@ -9,7 +9,7 @@
 An autonomous, privacy-preserving 24/7 Digital Concierge and living knowledge base built for the **~605 households at Lentor Modern** (an integrated mixed-use development by GuocoLand in Singapore, atop Lentor Modern Mall and Lentor MRT).
 
 **Status:** Live 24/7 on Google Cloud Run (Dedicated to ~605 households at Lentor Modern).  
-*Direct bot access is restricted to estate residents; recruiter & interviewer demo walkthroughs available upon request.*
+*Direct bot access is restricted to estate residents.*
 
 ---
 

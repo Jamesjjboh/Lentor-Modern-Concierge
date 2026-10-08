@@ -3,12 +3,13 @@
 [![Google Cloud Run](https://img.shields.io/badge/Google_Cloud_Run-Serverless-4285F4?logo=google-cloud&logoColor=white)](https://cloud.google.com/run)
 [![Google Cloud Firestore](https://img.shields.io/badge/Google_Cloud_Firestore-Native_NoSQL-FFCA28?logo=firebase&logoColor=black)](https://cloud.google.com/firestore)
 [![Gemini 3.5 Flash Lite](https://img.shields.io/badge/Gemini_3.5_Flash_Lite-Autonomous_Agent-8E75C2?logo=google&logoColor=white)](https://ai.google.dev/)
-[![Telegram Bot API](https://img.shields.io/badge/Telegram_Bot_API-v22.8-26A5E4?logo=telegram&logoColor=white)](https://t.me/LMConciergeBot)
+[![Telegram Bot API](https://img.shields.io/badge/Telegram_Bot_API-v22.8-26A5E4?logo=telegram&logoColor=white)](https://core.telegram.org/bots/api)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 An autonomous, privacy-preserving 24/7 Digital Concierge and living knowledge base built for the **~605 households at Lentor Modern** (an integrated mixed-use development by GuocoLand in Singapore, atop Lentor Modern Mall and Lentor MRT).
 
-Live Telegram Bot: **[@LMConciergeBot](https://t.me/LMConciergeBot)**
+**Status:** Live 24/7 on Google Cloud Run (Dedicated to ~605 households at Lentor Modern).  
+*Direct bot access is restricted to estate residents; recruiter & interviewer demo walkthroughs available upon request.*
 
 ---
 
